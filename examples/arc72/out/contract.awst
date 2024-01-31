@@ -1,0 +1,99 @@
+struct Token {
+  owner: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+  uri: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[256]]
+  controller: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+}
+
+struct Control {
+  owner: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+  controller: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+}
+
+contract ARC72Contract
+{
+  globals {
+    ['next_index']: puyapy.BigUInt
+  }
+  
+  constructor()
+  {
+    this.globals['next_index']: puyapy.BigUInt = 0n
+  }
+  
+  subroutine _get_token(token_id: puyapy.arc4.BigUIntN[typing.Literal[256]]): examples.arc72.contract.Token
+  {
+    (data, exists): tuple[puyapy.Bytes, bool] = box_get(reinterpret_cast<puyapy.Bytes>(token_id))
+    if (!(exists)) {
+      zero_address_bytes: puyapy.Bytes = reinterpret_cast<puyapy.Bytes>(global<ZeroAddress>())
+      return arc4_encode((reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(zero_address_bytes), reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[256]]>(bzero(256u)), reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(zero_address_bytes)), examples.arc72.contract.Token)
+    }
+    return reinterpret_cast<examples.arc72.contract.Token>(data)
+  }
+  
+  subroutine _set_token(token_id: puyapy.arc4.BigUIntN[typing.Literal[256]], token: examples.arc72.contract.Token): None
+  {
+    box_put(reinterpret_cast<puyapy.Bytes>(token_id), reinterpret_cast<puyapy.Bytes>(token))
+  }
+  
+  abimethod arc72_ownerOf(token_id: puyapy.arc4.BigUIntN[typing.Literal[256]]): puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+  {
+    return this::_get_token(token_id)[0u]
+  }
+  
+  abimethod arc72_transferFrom(from_address: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]], to_address: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]], token_id: puyapy.arc4.BigUIntN[typing.Literal[256]]): None
+  {
+    token: examples.arc72.contract.Token = this::_get_token(token_id)
+    assert(reinterpret_cast<puyapy.Bytes>(token[0u]) == reinterpret_cast<puyapy.Bytes>(from_address), comment="From address must match owner")
+    sender_address: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]] = reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(reinterpret_cast<puyapy.Bytes>(txn<Sender>()))
+    key: examples.arc72.contract.Control = arc4_encode((from_address, sender_address), examples.arc72.contract.Control)
+    (_data, controller_exists): tuple[puyapy.Bytes, bool] = box_get(reinterpret_cast<puyapy.Bytes>(key))
+    if (reinterpret_cast<puyapy.Bytes>(sender_address) == reinterpret_cast<puyapy.Bytes>(from_address) or reinterpret_cast<puyapy.Bytes>(token[2u]) == reinterpret_cast<puyapy.Bytes>(sender_address) or controller_exists) {
+      token[0u]: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]] = to_address.copy()
+      this::_set_token(token_id, token.copy())
+    } else {
+      err()
+    }
+  }
+  
+  abimethod arc72_tokenURI(token_id: puyapy.arc4.BigUIntN[typing.Literal[256]]): puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[256]]
+  {
+    return this::_get_token(token_id)[1u]
+  }
+  
+  abimethod arc72_approve(operator: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]], token_id: puyapy.arc4.BigUIntN[typing.Literal[256]]): None
+  {
+    token: examples.arc72.contract.Token = this::_get_token(token_id)
+    token[2u]: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]] = operator.copy()
+    this::_set_token(token_id, token.copy())
+  }
+  
+  abimethod mint(to: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]): None
+  {
+    token_id: puyapy.arc4.BigUIntN[typing.Literal[256]] = arc4_encode(this.globals['next_index'], puyapy.arc4.BigUIntN[typing.Literal[256]])
+    zero_address_bytes: puyapy.Bytes = reinterpret_cast<puyapy.Bytes>(global<ZeroAddress>())
+    token: examples.arc72.contract.Token = arc4_encode((to.copy(), reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[256]]>(bzero(256u)), reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(zero_address_bytes)), examples.arc72.contract.Token)
+    this::_set_token(token_id, token.copy())
+    this.globals['next_index'] += 1n
+  }
+  
+  abimethod arc72_setApprovalForAll(operator: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]], approved: bool): None
+  {
+    sender_address: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]] = reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(reinterpret_cast<puyapy.Bytes>(txn<Sender>()))
+    key: puyapy.Bytes = reinterpret_cast<puyapy.Bytes>(arc4_encode((sender_address, operator), examples.arc72.contract.Control))
+    if (approved) {
+      box_put(key, '')
+    } else {
+      box_del(key)
+    }
+  }
+  
+  abimethod arc72_totalSupply(): puyapy.arc4.BigUIntN[typing.Literal[256]]
+  {
+    return arc4_encode(this.globals['next_index'], puyapy.arc4.BigUIntN[typing.Literal[256]])
+  }
+  
+  abimethod arc72_tokenByIndex(index: puyapy.arc4.BigUIntN[typing.Literal[256]]): puyapy.arc4.BigUIntN[typing.Literal[256]]
+  {
+    return index
+  }
+}

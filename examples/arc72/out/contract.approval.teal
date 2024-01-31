@@ -1,0 +1,384 @@
+#pragma version 8
+
+// examples.arc72.contract.ARC72Contract.approval_program() -> uint64:
+main_block@0:
+        txn ApplicationID
+        bnz main_entrypoint@2
+
+main_on_create@1:
+        callsub __init__
+
+main_entrypoint@2:
+        txn NumAppArgs
+        bz main_bare_routing@14
+
+main_abi_routing@3:
+        txna ApplicationArgs 0
+        method "arc72_ownerOf(uint256)address"
+        method "arc72_transferFrom(address,address,uint256)void"
+        method "arc72_tokenURI(uint256)byte[256]"
+        method "arc72_approve(address,uint256)void"
+        method "mint(address)void"
+        method "arc72_setApprovalForAll(address,bool)void"
+        method "arc72_totalSupply()uint256"
+        method "arc72_tokenByIndex(uint256)uint256"
+        uncover 8
+        match main_arc72_ownerOf_route@4 main_arc72_transferFrom_route@5 main_arc72_tokenURI_route@6 main_arc72_approve_route@7 main_mint_route@8 main_arc72_setApprovalForAll_route@9 main_arc72_totalSupply_route@10 main_arc72_tokenByIndex_route@11
+        b main_switch_case_default@12
+
+main_arc72_ownerOf_route@4:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        txna ApplicationArgs 1
+        callsub arc72_ownerOf
+        byte 0x151f7c75
+        swap
+        concat
+        log
+        int 1
+        return
+
+main_arc72_transferFrom_route@5:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        txna ApplicationArgs 1
+        txna ApplicationArgs 2
+        txna ApplicationArgs 3
+        callsub arc72_transferFrom
+        int 1
+        return
+
+main_arc72_tokenURI_route@6:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        txna ApplicationArgs 1
+        callsub arc72_tokenURI
+        byte 0x151f7c75
+        swap
+        concat
+        log
+        int 1
+        return
+
+main_arc72_approve_route@7:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        txna ApplicationArgs 1
+        txna ApplicationArgs 2
+        callsub arc72_approve
+        int 1
+        return
+
+main_mint_route@8:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        txna ApplicationArgs 1
+        callsub mint
+        int 1
+        return
+
+main_arc72_setApprovalForAll_route@9:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        txna ApplicationArgs 1
+        txna ApplicationArgs 2
+        int 0
+        getbit
+        callsub arc72_setApprovalForAll
+        int 1
+        return
+
+main_arc72_totalSupply_route@10:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        callsub arc72_totalSupply
+        byte 0x151f7c75
+        swap
+        concat
+        log
+        int 1
+        return
+
+main_arc72_tokenByIndex_route@11:
+        txn OnCompletion
+        !
+        assert // OnCompletion is NoOp
+        txn ApplicationID
+        assert // is not creating
+        txna ApplicationArgs 1
+        callsub arc72_tokenByIndex
+        byte 0x151f7c75
+        swap
+        concat
+        log
+        int 1
+        return
+
+main_switch_case_default@12:
+        err // reject transaction
+
+main_bare_routing@14:
+        txn OnCompletion
+        bnz main_reject_bare_on_completion@16
+
+main_create@15:
+        txn ApplicationID
+        !
+        assert // is creating
+        int 1
+        return
+
+main_reject_bare_on_completion@16:
+        err // reject transaction
+
+
+// examples.arc72.contract.ARC72Contract.arc72_ownerOf(token_id#0: bytes) -> bytes:
+arc72_ownerOf:
+        proto 1 1
+
+arc72_ownerOf_block@0:
+        frame_dig -1
+        callsub _get_token
+        extract 0 32
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract._get_token(token_id#0: bytes) -> bytes:
+_get_token:
+        proto 1 1
+
+_get_token_block@0:
+        frame_dig -1
+        box_get
+        bnz _get_token_after_if_else@2
+
+_get_token_if_body@1:
+        global ZeroAddress
+        int 256
+        bzero
+        dig 1
+        swap
+        concat
+        swap
+        concat
+        swap
+        retsub
+
+_get_token_after_if_else@2:
+        frame_dig 0
+        swap
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.arc72_transferFrom(from_address#0: bytes, to_address#0: bytes, token_id#0: bytes) -> void:
+arc72_transferFrom:
+        proto 3 0
+
+arc72_transferFrom_block@0:
+        frame_dig -1
+        callsub _get_token
+        dup
+        swap
+        extract 0 32
+        frame_dig -3
+        ==
+        assert // From address must match owner
+        txn Sender
+        dup
+        swap
+        frame_dig -3
+        dig 1
+        concat
+        box_get
+        cover 2
+        pop
+        frame_dig -3
+        ==
+        bnz arc72_transferFrom_if_body@3
+
+arc72_transferFrom_or_contd@1:
+        frame_dig 0
+        int 288
+        int 32
+        extract3
+        frame_dig 1
+        ==
+        bnz arc72_transferFrom_if_body@3
+
+arc72_transferFrom_or_contd@2:
+        frame_dig 2
+        bz arc72_transferFrom_else_body@4
+
+arc72_transferFrom_if_body@3:
+        frame_dig 0
+        frame_dig -2
+        replace2 0
+        frame_dig -1
+        swap
+        callsub _set_token
+        retsub
+
+arc72_transferFrom_else_body@4:
+        err
+
+
+// examples.arc72.contract.ARC72Contract._set_token(token_id#0: bytes, token#0: bytes) -> void:
+_set_token:
+        proto 2 0
+
+_set_token_block@0:
+        frame_dig -2
+        frame_dig -1
+        box_put
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.arc72_tokenURI(token_id#0: bytes) -> bytes:
+arc72_tokenURI:
+        proto 1 1
+
+arc72_tokenURI_block@0:
+        frame_dig -1
+        callsub _get_token
+        int 32
+        int 256
+        extract3
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.arc72_approve(operator#0: bytes, token_id#0: bytes) -> void:
+arc72_approve:
+        proto 2 0
+
+arc72_approve_block@0:
+        frame_dig -1
+        callsub _get_token
+        frame_dig -2
+        replace2 288
+        frame_dig -1
+        swap
+        callsub _set_token
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.mint(to#0: bytes) -> void:
+mint:
+        proto 1 0
+
+mint_block@0:
+        int 0
+        byte "next_index"
+        app_global_get_ex
+        assert // check value exists
+        dup
+        len
+        int 32
+        <=
+        assert // overflow
+        int 32
+        bzero
+        b|
+        global ZeroAddress
+        int 256
+        bzero
+        frame_dig -1
+        swap
+        concat
+        swap
+        concat
+        callsub _set_token
+        int 0
+        byte "next_index"
+        app_global_get_ex
+        assert // check value exists
+        byte 0x01
+        b+
+        byte "next_index"
+        swap
+        app_global_put
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.arc72_setApprovalForAll(operator#0: bytes, approved#0: uint64) -> void:
+arc72_setApprovalForAll:
+        proto 2 0
+
+arc72_setApprovalForAll_block@0:
+        txn Sender
+        frame_dig -2
+        concat
+        frame_dig -1
+        bz arc72_setApprovalForAll_else_body@2
+
+arc72_setApprovalForAll_if_body@1:
+        byte ""
+        box_put
+        b arc72_setApprovalForAll_after_if_else@3
+
+arc72_setApprovalForAll_else_body@2:
+        box_del
+
+arc72_setApprovalForAll_after_if_else@3:
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.arc72_totalSupply() -> bytes:
+arc72_totalSupply:
+        proto 0 1
+
+arc72_totalSupply_block@0:
+        int 0
+        byte "next_index"
+        app_global_get_ex
+        assert // check value exists
+        dup
+        len
+        int 32
+        <=
+        assert // overflow
+        int 32
+        bzero
+        b|
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.arc72_tokenByIndex(index#0: bytes) -> bytes:
+arc72_tokenByIndex:
+        proto 1 1
+
+arc72_tokenByIndex_block@0:
+        frame_dig -1
+        retsub
+
+
+// examples.arc72.contract.ARC72Contract.__init__() -> void:
+__init__:
+        proto 0 0
+
+__init___block@0:
+        byte "next_index"
+        byte 0x
+        app_global_put
+        retsub
+

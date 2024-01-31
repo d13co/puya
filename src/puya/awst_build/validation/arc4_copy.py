@@ -29,6 +29,7 @@ class ARC4CopyValidator(AWSTTraverser):
                         awst_nodes.ARC4ArrayEncode()
                         | awst_nodes.ARC4Encode()
                         | awst_nodes.Copy()
+                        | awst_nodes.ReinterpretCast()
                         | awst_nodes.ArrayConcat()
                         | awst_nodes.SubroutineCallExpression()
                     ):
