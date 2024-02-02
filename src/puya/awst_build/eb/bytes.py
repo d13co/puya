@@ -28,9 +28,6 @@ from puya.awst.nodes import (
     SliceExpression,
     Statement,
     SubroutineCallExpression,
-    UInt64BinaryOperation,
-    UInt64BinaryOperator,
-    UInt64Constant,
 )
 from puya.awst_build import intrinsic_factory
 from puya.awst_build.constants import CLS_BYTES_ALIAS
@@ -47,6 +44,7 @@ from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.utils import (
     convert_literal,
     convert_literal_to_expr,
+    eval_slice_component,
     expect_operand_wtype,
 )
 from puya.errors import CodeError, InternalError
@@ -177,8 +175,9 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
         # since we evaluate self both as base and to get its length,
         # we need to create a temporary assignment in case it has side effects
         base = SingleEvaluation(self.expr)
-        begin_index_expr = _eval_slice_component(base, begin_index, location)
-        end_index_expr = _eval_slice_component(base, end_index, location)
+        len_expr = intrinsic_factory.bytes_len(base)
+        begin_index_expr = eval_slice_component(len_expr, begin_index, location)
+        end_index_expr = eval_slice_component(len_expr, end_index, location)
         if begin_index_expr is not None and end_index_expr is not None:
             # special handling for if begin > end, will devolve into begin == end,
             # which already returns the correct result of an empty bytes
@@ -288,55 +287,3 @@ def _translate_binary_bytes_operator(
         return BytesBinaryOperator(operator.value)
     except ValueError as ex:
         raise CodeError(f"Unsupported bytes operator {operator.value}", loc) from ex
-
-
-def _eval_slice_component(
-    base: Expression, val: ExpressionBuilder | Literal | None, location: SourceLocation
-) -> Expression | None:
-    if val is None:
-        return None
-
-    len_expr = intrinsic_factory.bytes_len(base, location)
-
-    if isinstance(val, ExpressionBuilder):
-        # no negatives to deal with here, easy
-        index_expr = expect_operand_wtype(val, wtypes.uint64_wtype)
-        temp_index = SingleEvaluation(index_expr)
-        return intrinsic_factory.select(
-            false=len_expr,
-            true=temp_index,
-            condition=NumericComparisonExpression(
-                lhs=temp_index,
-                operator=NumericComparison.lt,
-                rhs=len_expr,
-                source_location=location,
-            ),
-            loc=location,
-        )
-
-    int_lit = val.value
-    if not isinstance(int_lit, int):
-        raise CodeError(f"Invalid literal for slicing: {int_lit!r}", val.source_location)
-    # take the min of abs(int_lit) and len(self.expr)
-    abs_lit_expr = UInt64Constant(value=abs(int_lit), source_location=val.source_location)
-    trunc_value_expr = intrinsic_factory.select(
-        false=len_expr,
-        true=abs_lit_expr,
-        condition=NumericComparisonExpression(
-            lhs=abs_lit_expr,
-            operator=NumericComparison.lt,
-            rhs=len_expr,
-            source_location=location,
-        ),
-        loc=location,
-    )
-    return (
-        trunc_value_expr
-        if int_lit >= 0
-        else UInt64BinaryOperation(
-            left=len_expr,
-            op=UInt64BinaryOperator.sub,
-            right=trunc_value_expr,
-            source_location=location,
-        )
-    )
