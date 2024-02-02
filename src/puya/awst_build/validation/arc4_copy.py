@@ -78,6 +78,7 @@ def _is_referable_expression(expr: awst_nodes.Expression) -> bool:
             | awst_nodes.AppAccountStateExpression()
             | awst_nodes.StateGet()
             | awst_nodes.StateGetEx()
+            | awst_nodes.BoxValueExpression()
         ):
             return True
         case (

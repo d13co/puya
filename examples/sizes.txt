@@ -25,6 +25,7 @@
   avm_types_in_abi/Test                            423       353     70       353      0 
   biguint_binary_ops/BiguintBinaryOps              154         8    146         8      0 
   boolean_binary_ops/BooleanBinaryOps              315       298     17       298      0 
+  box_storage/Box                                  971       825    146       825      0 
   bytes_ops/BiguintBinaryOps                       139       139      0       139      0 
   calculator                                       338       317     21       315      2 
   callsub                                           32        32      0        32      0 
@@ -93,5 +94,5 @@
   unassigned_expression/Unassigned                 132       115     17       115      0 
   undefined_phi_args/Baddie                        321       284     37       284      0 
   unssa/UnSSA                                      446       369     77       369      0 
-  voting/VotingRoundApp                           1591      1494     97      1494      0 
+  voting/VotingRoundApp                           1596      1491    105      1491      0 
   with_reentrancy/WithReentrancy                   262       242     20       242      0 
