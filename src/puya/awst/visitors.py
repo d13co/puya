@@ -317,3 +317,23 @@ class ExpressionVisitor(t.Generic[T], ABC):
     @abstractmethod
     def visit_template_var(self, expr: puya.awst.nodes.TemplateVar) -> T:
         ...
+
+    @abstractmethod
+    def visit_box_value_expression(self, expr: puya.awst.nodes.BoxValueExpression) -> T:
+        ...
+
+    @abstractmethod
+    def visit_box_length(self, expr: puya.awst.nodes.BoxLength) -> T:
+        ...
+
+    @abstractmethod
+    def visit_box_proxy_field(self, expr: puya.awst.nodes.BoxProxyField) -> T:
+        ...
+
+    @abstractmethod
+    def visit_box_proxy_expression(self, expr: puya.awst.nodes.BoxProxyExpression) -> T:
+        ...
+
+    @abstractmethod
+    def visit_box_key_expression(self, expr: puya.awst.nodes.BoxKeyExpression) -> T:
+        ...

@@ -1150,22 +1150,11 @@ def handle_arc4_assign(
     target: awst_nodes.Expression,
     value: ValueProvider,
     source_location: SourceLocation,
+    *,
+    is_recursive_assign: bool = False,
 ) -> Value:
+    result: Value
     match target:
-        case awst_nodes.VarExpression(name=var_name, source_location=var_loc):
-            (register,) = assign(
-                context,
-                source=value,
-                names=[(var_name, var_loc)],
-                source_location=source_location,
-            )
-            return register
-        case awst_nodes.AppAccountStateExpression() | awst_nodes.AppStateExpression():
-            (result,) = handle_assignment(
-                context, target, value=value, assignment_location=source_location
-            )
-            return result
-
         case awst_nodes.IndexExpression(
             base=awst_nodes.Expression(
                 wtype=wtypes.ARC4DynamicArray() | wtypes.ARC4StaticArray() as array_wtype
@@ -1184,6 +1173,7 @@ def handle_arc4_assign(
                     source_location=source_location,
                 ),
                 source_location=source_location,
+                is_recursive_assign=True,
             )
         case awst_nodes.FieldExpression(
             base=awst_nodes.Expression(wtype=wtypes.ARC4Struct() as struct_wtype) as base_expr,
@@ -1201,6 +1191,7 @@ def handle_arc4_assign(
                     source_location=source_location,
                 ),
                 source_location=source_location,
+                is_recursive_assign=True,
             )
         case awst_nodes.TupleItemExpression(
             base=awst_nodes.VarExpression(wtype=wtypes.WTuple(types=items_types)) as base_expr,
@@ -1212,10 +1203,26 @@ def handle_arc4_assign(
                 source=value,
                 source_location=source_location,
             )
-
+            return result
+        case (
+            awst_nodes.VarExpression()
+            | awst_nodes.FieldExpression()
+            | awst_nodes.IndexExpression()
+            | awst_nodes.TupleExpression()
+            | awst_nodes.AppStateExpression()
+            | awst_nodes.AppAccountStateExpression()
+            | awst_nodes.BoxValueExpression()
+        ) as target:
+            (result,) = handle_assignment(
+                context,
+                target,
+                value=value,
+                assignment_location=source_location,
+                is_recursive_assign=is_recursive_assign,
+            )
             return result
         case _:
-            raise CodeError("Not a valid assignment target", source_location)
+            raise CodeError(f"Invalid assignment target {target}", source_location)
 
 
 def _arc4_replace_array_item(

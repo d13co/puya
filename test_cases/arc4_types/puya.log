@@ -10893,8 +10893,8 @@ debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
-debug: Replacing redundant declaration let tmp%2#0: uint64 = (len some_bytes_as_string#0) with copy of existing registers [Register(ir_type=uint64, name='tmp%1', version=0, source_location=arc4_types/string.py:17:12-42)]
-debug: Replacing redundant declaration let base_length%0#0: uint64 = (len some_bytes_as_string#0) with copy of existing registers [Register(ir_type=uint64, name='tmp%1', version=0, source_location=arc4_types/string.py:17:12-42)]
+debug: Replacing redundant declaration let tmp%2#0: uint64 = (len some_bytes_as_string#0) with copy of existing registers [Register(ir_type=uint64, name='tmp%1', version=0, source_location=arc4_types/string.py:17:12-32)]
+debug: Replacing redundant declaration let base_length%0#0: uint64 = (len some_bytes_as_string#0) with copy of existing registers [Register(ir_type=uint64, name='tmp%1', version=0, source_location=arc4_types/string.py:17:12-32)]
 debug: Found equivalence set: tmp%1#0, tmp%2#0, base_length%0#0
 debug: Replacing {tmp%2#0, base_length%0#0} with tmp%1#0 made 2 modifications
 debug: Found equivalence set: value_as_uint16%1#0, tmp%11#0
