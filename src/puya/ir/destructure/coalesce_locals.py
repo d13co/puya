@@ -36,6 +36,12 @@ class CoalesceGroupStrategy(t.Protocol):
         ...
 
 
+@attrs.define
+class CoalescableGroup:
+    register_set: StableSet[models.Register]
+    combined_live_out: StableSet[models.Register]
+
+
 def coalesce_registers(group_strategy: CoalesceGroupStrategy, sub: models.Subroutine) -> int:
     """
     A local can be merged with another local if they are never live at the same time.
@@ -66,14 +72,12 @@ def coalesce_registers(group_strategy: CoalesceGroupStrategy, sub: models.Subrou
                         )
                         live_set |= op_live_out
 
-    coalescable_groups_by_key = dict[
-        object, list[tuple[StableSet[models.Register], StableSet[models.Register]]]
-    ]()
+    coalescable_groups_by_key = dict[object, list[CoalescableGroup]]()
     for defined_reg, live_set in variables_live_at_definition.items():
         coalescable_groups = coalescable_groups_by_key.setdefault(
             group_strategy.get_group_key(defined_reg), []
         )
-        for coalescable_register_set, combined_live_out in coalescable_groups:
+        for group in coalescable_groups:
             # conditions:
             # 1) this register/variable must not be "alive" _after_ the
             #    definition of any other variable in this set
@@ -83,18 +87,21 @@ def coalesce_registers(group_strategy: CoalesceGroupStrategy, sub: models.Subrou
             # for all A and B in coalescable_register_set such that A != B:
             #       A is not live-out whenever B is assigned
             #   AND B is not live-out whenever A is assigned
-            if defined_reg not in combined_live_out and live_set.isdisjoint(
-                coalescable_register_set
+            if defined_reg not in group.combined_live_out and live_set.isdisjoint(
+                group.register_set
             ):
-                coalescable_register_set.add(defined_reg)
-                combined_live_out |= live_set
+                group.register_set.add(defined_reg)
+                group.combined_live_out |= live_set
                 break
         else:
-            coalescable_groups.append((StableSet(defined_reg), StableSet(*live_set)))
+            coalescable_groups.append(
+                CoalescableGroup(StableSet(defined_reg), StableSet(*live_set))
+            )
 
     total_replacements = 0
-    for group in coalescable_groups_by_key.values():
-        for coalescable_register_set, _ in group:
+    for group_list in coalescable_groups_by_key.values():
+        for group in group_list:
+            coalescable_register_set = group.register_set
             if len(coalescable_register_set) < 2:
                 continue
             replacement = group_strategy.determine_group_replacement(coalescable_register_set)

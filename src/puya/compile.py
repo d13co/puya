@@ -152,7 +152,7 @@ def _contract_ir_to_teal(
             contract_ir,
             contract_ir_base_path if context.options.output_optimization_ir else None,
         )
-    contract_ir = destructure_ssa(context, contract_ir)
+    contract_ir = destructure_ssa(context, contract_ir, contract_ir_base_path)
     if context.options.output_destructured_ir:
         output_contract_ir_to_path(
             contract_ir, contract_ir_base_path.with_suffix(".destructured.ir")
