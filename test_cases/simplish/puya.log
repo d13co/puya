@@ -790,6 +790,7 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 3, ending loop
+debug: Output IR to simplish/out/contract_Simplish.d1-cssa.ir
 debug: Removing Phis from test_cases.simplish.contract.Simplish.approval_program
 debug: Removing Phis from test_cases.simplish.contract.itoa
 debug: Removing Phis from test_cases.simplish.base_class.CallCounter.set_sender_nickname
@@ -800,6 +801,7 @@ debug: Removing Phis from test_cases.simplish.contract.Simplish.increment_counte
 debug: Removing Phis from test_cases.simplish.base_class.CallCounter.increment_counter
 debug: Removing Phis from test_cases.simplish.base_class.CallCounter.__init__
 debug: Removing Phis from test_cases.simplish.contract.Simplish.clear_state_program
+debug: Output IR to simplish/out/contract_Simplish.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.simplish.contract.Simplish.approval_program
 debug: loc: {msg#15=None, result#10=None, msg#0=msg#0, result#0=result#0}
 debug: pred: {msg#15=msg#0, result#10=result#0}
@@ -960,6 +962,7 @@ debug: Sequentializing parallel copies in test_cases.simplish.contract.Simplish.
 debug: Sequentializing parallel copies in test_cases.simplish.base_class.CallCounter.increment_counter
 debug: Sequentializing parallel copies in test_cases.simplish.base_class.CallCounter.__init__
 debug: Sequentializing parallel copies in test_cases.simplish.contract.Simplish.clear_state_program
+debug: Output IR to simplish/out/contract_Simplish.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.simplish.contract.Simplish.approval_program using strategy RootOperandGrouping
 debug: Coalescing msg#0 with [msg#15, msg#1, msg#9, msg#2, msg#6, msg#12, msg#3, msg#5, msg#4]
 debug: Coalescing result#0 with [result#10, result#1, result#7, result#2, result#4, result#3]
@@ -986,8 +989,10 @@ debug: Coalescing local variables in test_cases.simplish.base_class.CallCounter.
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.simplish.contract.Simplish.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to simplish/out/contract_Simplish.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Removing jump block block@22: // after_if_else_L51 and replacing references with block@23: // after_if_else_L48
+debug: Removing duplicated block block@11: // after_if_else_L42 and updating references to block@3: // if_body_L29
 debug: Removing jump block block@7: // after_if_else_L80 and replacing references with block@8: // after_if_else_L77
 debug: Output IR to simplish/out/contract_Simplish.destructured.ir
 debug: Inserted main_block@0.ops[1]: 'store app_id%0#0 to l-stack (copy)'
@@ -1042,7 +1047,7 @@ debug: Inserted main_if_body@17.ops[3]: 'store asset_exists#0 to l-stack (copy)'
 debug: Replaced main_if_body@17.ops[6]: 'load asset_exists#0' with 'load asset_exists#0 from l-stack (no copy)'
 debug: Inserted main_else_body@19.ops[2]: 'store tmp%26#0 to l-stack (copy)'
 debug: Replaced main_else_body@19.ops[5]: 'load tmp%26#0' with 'load tmp%26#0 from l-stack (no copy)'
-debug: Found 12 edge set/s for test_cases.simplish.contract.Simplish.approval_program
+debug: Found 11 edge set/s for test_cases.simplish.contract.Simplish.approval_program
 debug: Allocated 1 variable/s to x-stack: result#0
 debug: shared x-stack for main_if_body@15 -> main_after_if_else@23: result#0
 debug: shared x-stack for main_after_if_else@20 -> main_after_if_else@23: result#0

@@ -525,8 +525,10 @@ debug: Not removing empty block block@5: // if_body_L32 because it's used by phi
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 3, ending loop
+debug: Output IR to less_simple/out/contract_MyContract.d1-cssa.ir
 debug: Removing Phis from test_cases.less_simple.contract.MyContract.approval_program
 debug: Removing Phis from test_cases.less_simple.contract.MyContract.clear_state_program
+debug: Output IR to less_simple/out/contract_MyContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.less_simple.contract.MyContract.approval_program
 debug: loc: {a#8=None, sum_of_evens#7=None, product_of_odds#9=None, a#0=a#0, sum_of_evens#0=sum_of_evens#0, product_of_odds#0=product_of_odds#0}
 debug: pred: {a#8=a#0, sum_of_evens#7=sum_of_evens#0, product_of_odds#9=product_of_odds#0}
@@ -641,6 +643,7 @@ debug: * avail i#1
 debug: * avail range_item%0#4
 debug: * to_do sum_of_squares#8
 debug: * to_do i#1
+debug: Output IR to less_simple/out/contract_MyContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.less_simple.contract.MyContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing a#0 with [a#8, a#1, a#4]
 debug: Coalescing sum_of_evens#0 with [sum_of_evens#7, sum_of_evens#1, sum_of_evens#2, sum_of_evens#10, sum_of_evens#3]
@@ -652,6 +655,7 @@ debug: Coalescing sum_of_squares#11 with [sum_of_squares#14]
 debug: Coalescing range_item%0#0 with [range_item%0#4]
 debug: Coalescing i#0 with [i#1]
 debug: Coalescing resulted in 23 replacement/s
+debug: Output IR to less_simple/out/contract_MyContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Removing jump block block@3: // if_body_L12 and replacing references with block@1: // while_top_L11
 debug: Removing jump block block@11: // after_if_else_L19 and replacing references with block@12: // after_if_else_L16

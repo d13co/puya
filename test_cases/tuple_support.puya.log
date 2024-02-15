@@ -1096,6 +1096,7 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 5, ending loop
+debug: Output IR to out/tuple_support_TupleSupport.d1-cssa.ir
 debug: Removing Phis from test_cases.tuple_support.TupleSupport.approval_program
 debug: Removing Phis from test_cases.tuple_support.add_three_values
 debug: Removing Phis from test_cases.tuple_support.bytes_combine
@@ -1105,6 +1106,7 @@ debug: Removing Phis from test_cases.tuple_support.test_tuple_swap
 debug: Removing Phis from test_cases.tuple_support.slicing
 debug: Removing Phis from test_cases.tuple_support.TupleSupport.__init__
 debug: Removing Phis from test_cases.tuple_support.TupleSupport.clear_state_program
+debug: Output IR to out/tuple_support_TupleSupport.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.tuple_support.TupleSupport.approval_program
 debug: Sequentializing parallel copies in test_cases.tuple_support.add_three_values
 debug: loc: {total#8=None, value#4=None, tuple_index%0#8=None, total#0=total#0, values.0#0=values.0#0, tuple_index%0#0=tuple_index%0#0}
@@ -1196,6 +1198,7 @@ debug: Sequentializing parallel copies in test_cases.tuple_support.test_tuple_sw
 debug: Sequentializing parallel copies in test_cases.tuple_support.slicing
 debug: Sequentializing parallel copies in test_cases.tuple_support.TupleSupport.__init__
 debug: Sequentializing parallel copies in test_cases.tuple_support.TupleSupport.clear_state_program
+debug: Output IR to out/tuple_support_TupleSupport.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.tuple_support.TupleSupport.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.tuple_support.add_three_values using strategy RootOperandGrouping
@@ -1221,6 +1224,7 @@ debug: Coalescing local variables in test_cases.tuple_support.TupleSupport.__ini
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.tuple_support.TupleSupport.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to out/tuple_support_TupleSupport.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to out/tuple_support_TupleSupport.destructured.ir
 debug: Inserted main_block@0.ops[1]: 'store app_id%0#0 to l-stack (copy)'

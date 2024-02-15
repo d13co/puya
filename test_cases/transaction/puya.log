@@ -700,6 +700,7 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 3, ending loop
+debug: Output IR to transaction/out/contract_TransactionContract.d1-cssa.ir
 debug: Removing Phis from test_cases.transaction.contract.TransactionContract.approval_program
 debug: Removing Phis from test_cases.transaction.contract.TransactionContract.create
 debug: Removing Phis from test_cases.transaction.contract.TransactionContract.pay
@@ -710,6 +711,7 @@ debug: Removing Phis from test_cases.transaction.contract.TransactionContract.as
 debug: Removing Phis from test_cases.transaction.contract.TransactionContract.asset_freeze
 debug: Removing Phis from test_cases.transaction.contract.TransactionContract.application_call
 debug: Removing Phis from test_cases.transaction.contract.TransactionContract.clear_state_program
+debug: Output IR to transaction/out/contract_TransactionContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.transaction.contract.TransactionContract.approval_program
 debug: Sequentializing parallel copies in test_cases.transaction.contract.TransactionContract.create
 debug: Sequentializing parallel copies in test_cases.transaction.contract.TransactionContract.pay
@@ -720,6 +722,7 @@ debug: Sequentializing parallel copies in test_cases.transaction.contract.Transa
 debug: Sequentializing parallel copies in test_cases.transaction.contract.TransactionContract.asset_freeze
 debug: Sequentializing parallel copies in test_cases.transaction.contract.TransactionContract.application_call
 debug: Sequentializing parallel copies in test_cases.transaction.contract.TransactionContract.clear_state_program
+debug: Output IR to transaction/out/contract_TransactionContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.transaction.contract.TransactionContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing awst_tmp%11#0 with [awst_tmp%11#1, awst_tmp%11#2, awst_tmp%11#3, awst_tmp%11#4, awst_tmp%11#5]
 debug: Coalescing resulted in 15 replacement/s
@@ -741,6 +744,7 @@ debug: Coalescing local variables in test_cases.transaction.contract.Transaction
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.transaction.contract.TransactionContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to transaction/out/contract_TransactionContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to transaction/out/contract_TransactionContract.destructured.ir
 debug: Inserted main_block@0.ops[1]: 'store tmp%0#0 to l-stack (copy)'

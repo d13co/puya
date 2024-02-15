@@ -1193,6 +1193,7 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 3, ending loop
+debug: Output IR to voting/out/voting_VotingRoundApp.d1-cssa.ir
 debug: Removing Phis from examples.voting.voting.VotingRoundApp.approval_program
 debug: Removing Phis from examples.voting.voting.VotingRoundApp.create
 debug: Removing Phis from examples.voting.voting.VotingRoundApp.store_option_counts
@@ -1209,6 +1210,7 @@ debug: Removing Phis from examples.voting.voting.VotingRoundApp.vote
 debug: Removing Phis from examples.voting.voting.increment_vote_in_box
 debug: Removing Phis from examples.voting.voting.VotingRoundApp.__init__
 debug: Removing Phis from examples.voting.voting.VotingRoundApp.clear_state_program
+debug: Output IR to voting/out/voting_VotingRoundApp.d2-phi_gone.ir
 debug: Sequentializing parallel copies in examples.voting.voting.VotingRoundApp.approval_program
 debug: Sequentializing parallel copies in examples.voting.voting.VotingRoundApp.create
 debug: Sequentializing parallel copies in examples.voting.voting.VotingRoundApp.store_option_counts
@@ -1393,6 +1395,7 @@ debug: * to_do question_index#1
 debug: Sequentializing parallel copies in examples.voting.voting.increment_vote_in_box
 debug: Sequentializing parallel copies in examples.voting.voting.VotingRoundApp.__init__
 debug: Sequentializing parallel copies in examples.voting.voting.VotingRoundApp.clear_state_program
+debug: Output IR to voting/out/voting_VotingRoundApp.d3-phi_gone_seq.ir
 debug: Coalescing local variables in examples.voting.voting.VotingRoundApp.approval_program using strategy RootOperandGrouping
 debug: Coalescing awst_tmp%24#0 with [awst_tmp%24#1]
 debug: Coalescing resulted in 3 replacement/s
@@ -1441,6 +1444,7 @@ debug: Coalescing local variables in examples.voting.voting.VotingRoundApp.__ini
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in examples.voting.voting.VotingRoundApp.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to voting/out/voting_VotingRoundApp.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to voting/out/voting_VotingRoundApp.destructured.ir
 debug: Inserted main_block@0.ops[1]: 'store app_id%0#0 to l-stack (copy)'

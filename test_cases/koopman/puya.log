@@ -421,14 +421,18 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 5, ending loop
+debug: Output IR to koopman/out/contract_MyContract.d1-cssa.ir
 debug: Removing Phis from test_cases.koopman.contract.MyContract.approval_program
 debug: Removing Phis from test_cases.koopman.contract.MyContract.clear_state_program
+debug: Output IR to koopman/out/contract_MyContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.koopman.contract.MyContract.approval_program
 debug: Sequentializing parallel copies in test_cases.koopman.contract.MyContract.clear_state_program
+debug: Output IR to koopman/out/contract_MyContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.koopman.contract.MyContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.koopman.contract.MyContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to koopman/out/contract_MyContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to koopman/out/contract_MyContract.destructured.ir
 info: Writing koopman/out/contract.approval.teal

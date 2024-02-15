@@ -948,8 +948,10 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 7, ending loop
+debug: Output IR to reversed_iteration/out/contract_MyContract.d1-cssa.ir
 debug: Removing Phis from test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Removing Phis from test_cases.reversed_iteration.contract.MyContract.clear_state_program
+debug: Output IR to reversed_iteration/out/contract_MyContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: loc: {item_index_internal%14#5=None, reverse_index_internal%15#5=None, item_index_internal%14#0=item_index_internal%14#0, reverse_index_internal%15#0=reverse_index_internal%15#0}
 debug: pred: {item_index_internal%14#5=item_index_internal%14#0, reverse_index_internal%15#5=reverse_index_internal%15#0}
@@ -1268,6 +1270,7 @@ debug: * to_do tuple_item#9
 debug: * to_do prev_item#1
 debug: * to_do tuple_index%101#1
 debug: Sequentializing parallel copies in test_cases.reversed_iteration.contract.MyContract.clear_state_program
+debug: Output IR to reversed_iteration/out/contract_MyContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.reversed_iteration.contract.MyContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing item_index_internal%14#0 with [item_index_internal%14#5, item_index_internal%14#1, item_index_internal%14#2]
 debug: Coalescing reverse_index_internal%15#0 with [reverse_index_internal%15#5, reverse_index_internal%15#1, reverse_index_internal%15#2]
@@ -1293,6 +1296,7 @@ debug: Coalescing tuple_index%101#0 with [tuple_index%101#10, tuple_index%101#1]
 debug: Coalescing resulted in 195 replacement/s
 debug: Coalescing local variables in test_cases.reversed_iteration.contract.MyContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to reversed_iteration/out/contract_MyContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to reversed_iteration/out/contract_MyContract.destructured.ir
 debug: Inserted main_for_header@7.ops[3]: 'store continue_looping%16#0 to l-stack (copy)'

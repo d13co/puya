@@ -661,6 +661,7 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 3, ending loop
+debug: Output IR to match/out/contract_MyContract.d1-cssa.ir
 debug: Removing Phis from test_cases.match.contract.MyContract.approval_program
 debug: Removing Phis from test_cases.match.contract.MyContract.match_uint64
 debug: Removing Phis from test_cases.match.contract.MyContract.match_biguint
@@ -669,6 +670,7 @@ debug: Removing Phis from test_cases.match.contract.MyContract.match_address
 debug: Removing Phis from test_cases.match.contract.MyContract.match_attributes
 debug: Removing Phis from test_cases.match.contract.MyContract.match_bools
 debug: Removing Phis from test_cases.match.contract.MyContract.clear_state_program
+debug: Output IR to match/out/contract_MyContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.match.contract.MyContract.approval_program
 debug: Sequentializing parallel copies in test_cases.match.contract.MyContract.match_uint64
 debug: Sequentializing parallel copies in test_cases.match.contract.MyContract.match_biguint
@@ -677,6 +679,7 @@ debug: Sequentializing parallel copies in test_cases.match.contract.MyContract.m
 debug: Sequentializing parallel copies in test_cases.match.contract.MyContract.match_attributes
 debug: Sequentializing parallel copies in test_cases.match.contract.MyContract.match_bools
 debug: Sequentializing parallel copies in test_cases.match.contract.MyContract.clear_state_program
+debug: Output IR to match/out/contract_MyContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.match.contract.MyContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.match.contract.MyContract.match_uint64 using strategy RootOperandGrouping
@@ -693,6 +696,7 @@ debug: Coalescing local variables in test_cases.match.contract.MyContract.match_
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.match.contract.MyContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to match/out/contract_MyContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to match/out/contract_MyContract.destructured.ir
 debug: Inserted match_uint64_block@0.ops[1]: 'store n#0 to l-stack (copy)'

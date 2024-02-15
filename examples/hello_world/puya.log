@@ -470,18 +470,22 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 4, ending loop
+debug: Output IR to hello_world/out/arc4_contract_HelloWorldContract.d1-cssa.ir
 debug: Removing Phis from examples.hello_world.arc4_contract.HelloWorldContract.approval_program
 debug: Removing Phis from examples.hello_world.arc4_contract.HelloWorldContract.hello
 debug: Removing Phis from examples.hello_world.arc4_contract.HelloWorldContract.clear_state_program
+debug: Output IR to hello_world/out/arc4_contract_HelloWorldContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in examples.hello_world.arc4_contract.HelloWorldContract.approval_program
 debug: Sequentializing parallel copies in examples.hello_world.arc4_contract.HelloWorldContract.hello
 debug: Sequentializing parallel copies in examples.hello_world.arc4_contract.HelloWorldContract.clear_state_program
+debug: Output IR to hello_world/out/arc4_contract_HelloWorldContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in examples.hello_world.arc4_contract.HelloWorldContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in examples.hello_world.arc4_contract.HelloWorldContract.hello using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in examples.hello_world.arc4_contract.HelloWorldContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to hello_world/out/arc4_contract_HelloWorldContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to hello_world/out/arc4_contract_HelloWorldContract.destructured.ir
 debug: Inserted main_block@0.ops[1]: 'store tmp%0#0 to l-stack (copy)'
@@ -551,14 +555,18 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 1, ending loop
+debug: Output IR to hello_world/out/contract_HelloWorldContract.d1-cssa.ir
 debug: Removing Phis from examples.hello_world.contract.HelloWorldContract.approval_program
 debug: Removing Phis from examples.hello_world.contract.HelloWorldContract.clear_state_program
+debug: Output IR to hello_world/out/contract_HelloWorldContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in examples.hello_world.contract.HelloWorldContract.approval_program
 debug: Sequentializing parallel copies in examples.hello_world.contract.HelloWorldContract.clear_state_program
+debug: Output IR to hello_world/out/contract_HelloWorldContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in examples.hello_world.contract.HelloWorldContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in examples.hello_world.contract.HelloWorldContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to hello_world/out/contract_HelloWorldContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to hello_world/out/contract_HelloWorldContract.destructured.ir
 debug: Inserted main_block@0.ops[5]: 'store tmp%0#0 to l-stack (copy)'

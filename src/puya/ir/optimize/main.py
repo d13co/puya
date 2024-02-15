@@ -18,7 +18,10 @@ from puya.ir.optimize.dead_code_elimination import (
     remove_unused_variables,
 )
 from puya.ir.optimize.intrinsic_simplification import intrinsic_simplifier
-from puya.ir.optimize.repeated_code_elimination import repeated_expression_elimination
+from puya.ir.optimize.repeated_code_elimination import (
+    repeated_expression_elimination,
+    block_deduplication,
+)
 from puya.ir.to_text_visitor import output_contract_ir_to_path
 
 MAX_PASSES = 100
@@ -61,6 +64,7 @@ def get_all_optimizations() -> Iterable[SubroutineOptimization]:
         SubroutineOptimization.from_function(remove_empty_blocks),
         SubroutineOptimization.from_function(remove_unreachable_blocks),
         SubroutineOptimization.from_function(repeated_expression_elimination),
+        SubroutineOptimization.from_function(block_deduplication),
     ]
 
 
@@ -93,12 +97,16 @@ def optimize_contract_ir(
     context: CompileContext,
     contract_ir: models.Contract,
     output_ir_base_path: Path | None = None,
+    pipeline: Iterable[SubroutineOptimization] | None = None,
+    suffix: str = "ssa",
+    *,
+    split_par_copies: bool = True,
 ) -> models.Contract:
     # TODO: program optimizer for trivial function inliner
-    pipeline = get_all_optimizations()
+    pipeline = pipeline or get_all_optimizations()
     if output_ir_base_path:
         existing = list(
-            output_ir_base_path.parent.glob(f"{output_ir_base_path.stem}.ssa.opt_pass_*.ir")
+            output_ir_base_path.parent.glob(f"{output_ir_base_path.stem}.{suffix}.opt_pass_*.ir")
         )
         if existing:
             for remove in existing:
@@ -109,7 +117,7 @@ def optimize_contract_ir(
         contract_ir = deepcopy(contract_ir)
         for subroutine in contract_ir.all_subroutines():
             logger.debug(f"Optimizing subroutine {subroutine.full_name}")
-            if pass_num == 1:
+            if pass_num == 1 and split_par_copies:
                 logger.debug("Splitting parallel copies prior to optimization")
                 _split_parallel_copies(subroutine)
             for optimizer in pipeline:
@@ -123,6 +131,6 @@ def optimize_contract_ir(
             logger.debug(f"No optimizations performed in pass {pass_num}, ending loop")
             break
         if output_ir_base_path:
-            ir_path = output_ir_base_path.with_suffix(f".ssa.opt_pass_{pass_num}.ir")
+            ir_path = output_ir_base_path.with_suffix(f".{suffix}.opt_pass_{pass_num}.ir")
             output_contract_ir_to_path(contract_ir, ir_path)
     return contract_ir

@@ -9,9 +9,10 @@ from puya.context import CompileContext
 from puya.ir import models
 from puya.ir.avm_ops import AVMOp
 from puya.ir.optimize.assignments import copy_propagation
+from puya.ir.optimize.collapse_blocks import BlockReferenceReplacer
 from puya.ir.optimize.dead_code_elimination import PURE_AVM_OPS
 from puya.ir.visitor import NoOpIRVisitor
-from puya.utils import StableSet
+from puya.utils import StableSet, unique
 
 logger = structlog.get_logger(__name__)
 
@@ -141,3 +142,21 @@ class RCEVisitor(NoOpIRVisitor[bool]):
             else:
                 self.asserted.add(assert_arg)
         return modified
+
+
+def block_deduplication(_context: CompileContext, subroutine: models.Subroutine) -> bool:
+    modified = False
+    seen = dict[tuple[object, ...], models.BasicBlock]()
+    for block in subroutine.body.copy():
+        all_ops = tuple(op.freeze() for op in block.all_ops)
+        if existing := seen.get(all_ops):
+            logger.debug(
+                f"Removing duplicated block {block} and updating references to {existing}"
+            )
+            modified = True
+            BlockReferenceReplacer.apply(find=block, replacement=existing, blocks=subroutine.body)
+            subroutine.body.remove(block)
+            existing.predecessors = unique([*existing.predecessors, *block.predecessors])
+        else:
+            seen[all_ops] = block
+    return modified

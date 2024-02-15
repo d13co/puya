@@ -68,9 +68,9 @@ class IRMutator(IRVisitor[t.Any]):
 
     def visit_assignment(self, ass: Assignment) -> Assignment | None:
         with self._enter_target_context():
-            ass.targets = [self.visit_register(r) for r in ass.targets]
-        ass.source = ass.source.accept(self)
-        return ass
+            targets = [self.visit_register(r) for r in ass.targets]
+        source = ass.source.accept(self)
+        return attrs.evolve(ass, targets=targets, source=source)
 
     def visit_register(self, reg: Register) -> Register:
         return reg
@@ -101,12 +101,10 @@ class IRMutator(IRVisitor[t.Any]):
         return arg
 
     def visit_intrinsic_op(self, intrinsic: Intrinsic) -> Intrinsic | None:
-        intrinsic.args = [a.accept(self) for a in intrinsic.args]
-        return intrinsic
+        return attrs.evolve(intrinsic, args=[a.accept(self) for a in intrinsic.args])
 
     def visit_invoke_subroutine(self, callsub: InvokeSubroutine) -> InvokeSubroutine:
-        callsub.args = [a.accept(self) for a in callsub.args]
-        return callsub
+        return attrs.evolve(callsub, args=[a.accept(self) for a in callsub.args])
 
     def visit_conditional_branch(self, branch: ConditionalBranch) -> ControlOp:
         branch.condition = branch.condition.accept(self)

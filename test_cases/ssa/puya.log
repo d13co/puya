@@ -610,10 +610,12 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 4, ending loop
+debug: Output IR to ssa/out/contract_MyContract.d1-cssa.ir
 debug: Removing Phis from test_cases.ssa.contract.MyContract.approval_program
 debug: Removing Phis from test_cases.ssa.contract.one_hundred
 debug: Removing Phis from test_cases.ssa.contract.phi_in_equiv_class
 debug: Removing Phis from test_cases.ssa.contract.MyContract.clear_state_program
+debug: Output IR to ssa/out/contract_MyContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.ssa.contract.MyContract.approval_program
 debug: loc: {a#9=None, b#11=None, a#1=a#1, b#1=b#1}
 debug: pred: {a#9=a#1, b#11=b#1}
@@ -717,6 +719,7 @@ debug: * to_do a#2
 debug: * to_do b#2
 debug: Sequentializing parallel copies in test_cases.ssa.contract.phi_in_equiv_class
 debug: Sequentializing parallel copies in test_cases.ssa.contract.MyContract.clear_state_program
+debug: Output IR to ssa/out/contract_MyContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.ssa.contract.MyContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing a#1 with [a#9, a#2, a#3, a#12, a#6, a#5]
 debug: Coalescing b#1 with [b#11, b#2, b#3, b#14, b#6, b#5, b#8]
@@ -732,6 +735,7 @@ debug: Coalescing local variables in test_cases.ssa.contract.phi_in_equiv_class 
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.ssa.contract.MyContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to ssa/out/contract_MyContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Removing jump block block@15: // after_if_else_L23 and replacing references with block@20: // after_if_else_L22
 debug: Removing jump block block@19: // after_if_else_L32 and replacing references with block@20: // after_if_else_L22

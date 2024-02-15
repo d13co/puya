@@ -1212,9 +1212,11 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 6, ending loop
+debug: Output IR to arc4_types/out/array_Arc4ArraysContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.array.Arc4ArraysContract.hash_as_array
 debug: Removing Phis from test_cases.arc4_types.array.Arc4ArraysContract.clear_state_program
+debug: Output IR to arc4_types/out/array_Arc4ArraysContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: loc: {item_index_internal%3#5=None, total#9=None, item_index_internal%3#0=item_index_internal%3#0, total#0=total#0}
 debug: pred: {item_index_internal%3#5=item_index_internal%3#0, total#9=total#0}
@@ -1368,6 +1370,7 @@ debug: * to_do result#18
 debug: * to_do index#4
 debug: Sequentializing parallel copies in test_cases.arc4_types.array.Arc4ArraysContract.hash_as_array
 debug: Sequentializing parallel copies in test_cases.arc4_types.array.Arc4ArraysContract.clear_state_program
+debug: Output IR to arc4_types/out/array_Arc4ArraysContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.array.Arc4ArraysContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing total#0 with [total#9, total#1, total#2, total#12, total#3, total#4, total#15, total#5, total#6]
 debug: Coalescing item_index_internal%3#0 with [item_index_internal%3#5, item_index_internal%3#1, item_index_internal%3#2]
@@ -1385,6 +1388,7 @@ debug: Coalescing local variables in test_cases.arc4_types.array.Arc4ArraysContr
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.array.Arc4ArraysContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/array_Arc4ArraysContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/array_Arc4ArraysContract.destructured.ir
 debug: Inserted main_for_header@1.ops[3]: 'store continue_looping%5#0 to l-stack (copy)'
@@ -2249,18 +2253,22 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 17, ending loop
+debug: Output IR to arc4_types/out/bool_Arc4BoolTypeContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.bool.Arc4BoolTypeContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.bool.Arc4BoolTypeContract.test_stuff
 debug: Removing Phis from test_cases.arc4_types.bool.Arc4BoolTypeContract.clear_state_program
+debug: Output IR to arc4_types/out/bool_Arc4BoolTypeContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.bool.Arc4BoolTypeContract.approval_program
 debug: Sequentializing parallel copies in test_cases.arc4_types.bool.Arc4BoolTypeContract.test_stuff
 debug: Sequentializing parallel copies in test_cases.arc4_types.bool.Arc4BoolTypeContract.clear_state_program
+debug: Output IR to arc4_types/out/bool_Arc4BoolTypeContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.bool.Arc4BoolTypeContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.bool.Arc4BoolTypeContract.test_stuff using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.bool.Arc4BoolTypeContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/bool_Arc4BoolTypeContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/bool_Arc4BoolTypeContract.destructured.ir
 debug: Inserted test_stuff_block@0.ops[3]: 'store tmp%0#0 to l-stack (copy)'
@@ -2611,14 +2619,17 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 6, ending loop
+debug: Output IR to arc4_types/out/dynamic_string_array_Arc4DynamicStringArrayContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz
 debug: Removing Phis from test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz_raw
 debug: Removing Phis from test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.clear_state_program
+debug: Output IR to arc4_types/out/dynamic_string_array_Arc4DynamicStringArrayContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.approval_program
 debug: Sequentializing parallel copies in test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz
 debug: Sequentializing parallel copies in test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz_raw
 debug: Sequentializing parallel copies in test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.clear_state_program
+debug: Output IR to arc4_types/out/dynamic_string_array_Arc4DynamicStringArrayContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz using strategy RootOperandGrouping
@@ -2629,6 +2640,7 @@ debug: Coalescing array_data%3#1 with [array_data%3#2, array_data%3#3, array_dat
 debug: Coalescing resulted in 8 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/dynamic_string_array_Arc4DynamicStringArrayContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/dynamic_string_array_Arc4DynamicStringArrayContract.destructured.ir
 debug: Inserted main_block@0.ops[1]: 'store tmp%0#0 to l-stack (copy)'
@@ -5808,6 +5820,7 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 11, ending loop
+debug: Output IR to arc4_types/out/mutation_Arc4MutationContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.mutation.Arc4MutationContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Removing Phis from test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_bool
@@ -5826,6 +5839,7 @@ debug: Removing Phis from puyapy_lib_arc4.static_array_replace_variable_size
 debug: Removing Phis from puyapy_lib_arc4.dynamic_array_concat_variable_size
 debug: Removing Phis from puyapy_lib_arc4.recalculate_array_offsets_static
 debug: Removing Phis from test_cases.arc4_types.mutation.Arc4MutationContract.clear_state_program
+debug: Output IR to arc4_types/out/mutation_Arc4MutationContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.mutation.Arc4MutationContract.approval_program
 debug: Sequentializing parallel copies in test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Sequentializing parallel copies in test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_bool
@@ -5931,6 +5945,7 @@ debug: * to_do array_data#6
 debug: * to_do tail_cursor#11
 debug: * to_do _i#1
 debug: Sequentializing parallel copies in test_cases.arc4_types.mutation.Arc4MutationContract.clear_state_program
+debug: Output IR to arc4_types/out/mutation_Arc4MutationContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.mutation.Arc4MutationContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size using strategy RootOperandGrouping
@@ -6000,6 +6015,7 @@ debug: Coalescing _i#0 with [_i#1]
 debug: Coalescing resulted in 36 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.mutation.Arc4MutationContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/mutation_Arc4MutationContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/mutation_Arc4MutationContract.destructured.ir
 debug: Inserted dynamic_array_fixed_size_block@0.ops[2]: 'store len_bytes%5#0 to l-stack (copy)'
@@ -7132,14 +7148,18 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 6, ending loop
+debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program
+debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program
 debug: Sequentializing parallel copies in test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program
+debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.destructured.ir
 debug: Inserted main_block@0.ops[2]: 'store val_as_bytes%0#0 to l-stack (copy)'
@@ -7258,15 +7278,19 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 2, ending loop
+debug: Output IR to arc4_types/out/reference_types_MyContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.reference_types.MyContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.reference_types.MyContract.clear_state_program
+debug: Output IR to arc4_types/out/reference_types_MyContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.reference_types.MyContract.approval_program
 debug: Sequentializing parallel copies in test_cases.arc4_types.reference_types.MyContract.clear_state_program
+debug: Output IR to arc4_types/out/reference_types_MyContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.reference_types.MyContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing and_result%7#0 with [and_result%7#5, and_result%7#1, and_result%7#2]
 debug: Coalescing resulted in 7 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.reference_types.MyContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/reference_types_MyContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/reference_types_MyContract.destructured.ir
 debug: Inserted main_block@0.ops[3]: 'store checked_address#0 to l-stack (copy)'
@@ -7466,16 +7490,20 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 5, ending loop
+debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.string.Arc4StringTypesContract.clear_state_program
+debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Sequentializing parallel copies in test_cases.arc4_types.string.Arc4StringTypesContract.clear_state_program
+debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.string.Arc4StringTypesContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing ternary_result%6#0 with [ternary_result%6#4, ternary_result%6#2]
 debug: Coalescing value#0 with [value#1, value#2, value#3]
 debug: Coalescing resulted in 11 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.string.Arc4StringTypesContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.destructured.ir
 debug: Inserted main_block@0.ops[2]: 'store value_as_bytes%1#0 to l-stack (copy)'
@@ -8081,11 +8109,13 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 7, ending loop
+debug: Output IR to arc4_types/out/structs_Arc4StructsTypeContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.structs.Arc4StructsTypeContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.structs.add
 debug: Removing Phis from test_cases.arc4_types.structs.check
 debug: Removing Phis from test_cases.arc4_types.structs.nested_decode
 debug: Removing Phis from test_cases.arc4_types.structs.Arc4StructsTypeContract.clear_state_program
+debug: Output IR to arc4_types/out/structs_Arc4StructsTypeContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.structs.Arc4StructsTypeContract.approval_program
 debug: loc: {val#5=None, tuple_index%6#6=None, val#0=val#0, tuple_index%6#0=tuple_index%6#0}
 debug: pred: {val#5=val#0, tuple_index%6#6=tuple_index%6#0}
@@ -8121,6 +8151,7 @@ debug: Sequentializing parallel copies in test_cases.arc4_types.structs.add
 debug: Sequentializing parallel copies in test_cases.arc4_types.structs.check
 debug: Sequentializing parallel copies in test_cases.arc4_types.structs.nested_decode
 debug: Sequentializing parallel copies in test_cases.arc4_types.structs.Arc4StructsTypeContract.clear_state_program
+debug: Output IR to arc4_types/out/structs_Arc4StructsTypeContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.structs.Arc4StructsTypeContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing val#0 with [val#5, val#2]
 debug: Coalescing tuple_index%6#0 with [tuple_index%6#6, tuple_index%6#1]
@@ -8133,6 +8164,7 @@ debug: Coalescing local variables in test_cases.arc4_types.structs.nested_decode
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.structs.Arc4StructsTypeContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/structs_Arc4StructsTypeContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/structs_Arc4StructsTypeContract.destructured.ir
 debug: Inserted main_block@0.ops[3]: 'store coord_3#0 to l-stack (copy)'
@@ -9568,12 +9600,15 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 26, ending loop
+debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.d1-cssa.ir
 debug: Removing Phis from test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.tuples.Arc4TuplesTypeContract.test_stuff
 debug: Removing Phis from test_cases.arc4_types.tuples.Arc4TuplesTypeContract.clear_state_program
+debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Sequentializing parallel copies in test_cases.arc4_types.tuples.Arc4TuplesTypeContract.test_stuff
 debug: Sequentializing parallel copies in test_cases.arc4_types.tuples.Arc4TuplesTypeContract.clear_state_program
+debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing encoded_tuple_buffer%1#3 with [encoded_tuple_buffer%1#4, encoded_tuple_buffer%1#5, encoded_tuple_buffer%1#6]
 debug: Coalescing resulted in 6 replacement/s
@@ -9581,6 +9616,7 @@ debug: Coalescing local variables in test_cases.arc4_types.tuples.Arc4TuplesType
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.arc4_types.tuples.Arc4TuplesTypeContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.destructured.ir
 debug: Inserted main_block@0.ops[2]: 'store value_as_bytes%2#0 to l-stack (copy)'

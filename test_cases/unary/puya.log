@@ -537,11 +537,13 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 3, ending loop
+debug: Output IR to unary/out/contract_UnaryContract.d1-cssa.ir
 debug: Removing Phis from test_cases.unary.contract.UnaryContract.approval_program
 debug: Removing Phis from test_cases.unary.contract.uint_unary
 debug: Removing Phis from test_cases.unary.contract.biguint_unary
 debug: Removing Phis from test_cases.unary.contract.bytes_unary
 debug: Removing Phis from test_cases.unary.contract.UnaryContract.clear_state_program
+debug: Output IR to unary/out/contract_UnaryContract.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.unary.contract.UnaryContract.approval_program
 debug: Sequentializing parallel copies in test_cases.unary.contract.uint_unary
 debug: loc: {i#9=None, tuple_index%1#10=None, i#0=i#0, tuple_index%1#0=tuple_index%1#0}
@@ -597,6 +599,7 @@ debug: * to_do i#4
 debug: Sequentializing parallel copies in test_cases.unary.contract.biguint_unary
 debug: Sequentializing parallel copies in test_cases.unary.contract.bytes_unary
 debug: Sequentializing parallel copies in test_cases.unary.contract.UnaryContract.clear_state_program
+debug: Output IR to unary/out/contract_UnaryContract.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.unary.contract.UnaryContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.unary.contract.uint_unary using strategy RootOperandGrouping
@@ -609,6 +612,7 @@ debug: Coalescing local variables in test_cases.unary.contract.bytes_unary using
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.unary.contract.UnaryContract.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to unary/out/contract_UnaryContract.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to unary/out/contract_UnaryContract.destructured.ir
 debug: Inserted uint_unary_for_body@5.ops[3]: 'store tmp%2#0 to l-stack (copy)'

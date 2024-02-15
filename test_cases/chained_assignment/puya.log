@@ -363,16 +363,19 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: No optimizations performed in pass 1, ending loop
+debug: Output IR to chained_assignment/out/contract_ChainedAssignment.d1-cssa.ir
 debug: Removing Phis from test_cases.chained_assignment.contract.ChainedAssignment.approval_program
 debug: Removing Phis from test_cases.chained_assignment.contract.ChainedAssignment.__init__
 debug: Removing Phis from test_cases.chained_assignment.contract.BaseContract.__init__
 debug: Removing Phis from test_cases.chained_assignment.contract.join_log_and_return
 debug: Removing Phis from test_cases.chained_assignment.contract.ChainedAssignment.clear_state_program
+debug: Output IR to chained_assignment/out/contract_ChainedAssignment.d2-phi_gone.ir
 debug: Sequentializing parallel copies in test_cases.chained_assignment.contract.ChainedAssignment.approval_program
 debug: Sequentializing parallel copies in test_cases.chained_assignment.contract.ChainedAssignment.__init__
 debug: Sequentializing parallel copies in test_cases.chained_assignment.contract.BaseContract.__init__
 debug: Sequentializing parallel copies in test_cases.chained_assignment.contract.join_log_and_return
 debug: Sequentializing parallel copies in test_cases.chained_assignment.contract.ChainedAssignment.clear_state_program
+debug: Output IR to chained_assignment/out/contract_ChainedAssignment.d3-phi_gone_seq.ir
 debug: Coalescing local variables in test_cases.chained_assignment.contract.ChainedAssignment.approval_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.chained_assignment.contract.ChainedAssignment.__init__ using strategy RootOperandGrouping
@@ -383,6 +386,7 @@ debug: Coalescing local variables in test_cases.chained_assignment.contract.join
 debug: Coalescing resulted in 0 replacement/s
 debug: Coalescing local variables in test_cases.chained_assignment.contract.ChainedAssignment.clear_state_program using strategy RootOperandGrouping
 debug: Coalescing resulted in 0 replacement/s
+debug: Output IR to chained_assignment/out/contract_ChainedAssignment.d4-coalesced.ir
 debug: Performing post-SSA optimizations
 debug: Output IR to chained_assignment/out/contract_ChainedAssignment.destructured.ir
 debug: Inserted main_block@0.ops[1]: 'store app_id%0#0 to l-stack (copy)'
