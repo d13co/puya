@@ -148,6 +148,8 @@ def block_deduplication(_context: CompileContext, subroutine: models.Subroutine)
     modified = False
     seen = dict[tuple[object, ...], models.BasicBlock]()
     for block in subroutine.body.copy():
+        if any(succ.phis for succ in block.successors):
+            continue
         all_ops = tuple(op.freeze() for op in block.all_ops)
         if existing := seen.get(all_ops):
             logger.debug(

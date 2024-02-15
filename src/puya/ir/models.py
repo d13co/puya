@@ -36,6 +36,8 @@ class _Freezable(abc.ABC):
     def freeze(self) -> object:
         data = self._frozen_data()
         hash(data)  # check we can hash
+        if data is self:
+            return data
         return self.__class__, data
 
     @abc.abstractmethod
