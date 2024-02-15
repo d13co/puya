@@ -615,11 +615,9 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Replacing redundant declaration let tmp%1#0: uint64 = (extract_uint16 option_counts#0 0u) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%0', version=0, source_location=voting/voting.py:218:15-35)]
-debug: Found equivalence set: tmp%0#0, tmp%1#0
-debug: Replacing {tmp%1#0} with tmp%0#0 made 1 modifications
 debug: Replacing redundant declaration let array_length%3#0: uint64 = (extract_uint16 option_counts#0 0u) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%0', version=0, source_location=voting/voting.py:218:15-35)]
-debug: Found equivalence set: tmp%0#0, array_length%3#0
-debug: Replacing {array_length%3#0} with tmp%0#0 made 1 modifications
+debug: Found equivalence set: tmp%0#0, tmp%1#0, array_length%3#0
+debug: Replacing {tmp%1#0, array_length%3#0} with tmp%0#0 made 2 modifications
 debug: Optimizing subroutine examples.voting.voting.VotingRoundApp.bootstrap
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
@@ -783,11 +781,9 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Replacing redundant declaration let tmp%8#0: uint64 = (extract_uint16 answer_ids#0 0u) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%6', version=0, source_location=voting/voting.py:180:15-32)]
-debug: Found equivalence set: tmp%6#0, tmp%8#0
-debug: Replacing {tmp%8#0} with tmp%6#0 made 1 modifications
 debug: Replacing redundant declaration let array_length%20#0: uint64 = (extract_uint16 answer_ids#0 0u) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%6', version=0, source_location=voting/voting.py:180:15-32)]
-debug: Found equivalence set: tmp%6#0, array_length%20#0
-debug: Replacing {array_length%20#0} with tmp%6#0 made 1 modifications
+debug: Found equivalence set: tmp%6#0, tmp%8#0, array_length%20#0
+debug: Replacing {tmp%8#0, array_length%20#0} with tmp%6#0 made 2 modifications
 debug: Optimizing subroutine examples.voting.voting.increment_vote_in_box
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification

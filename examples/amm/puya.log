@@ -583,9 +583,9 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Replacing redundant declaration let tmp%36#0: uint64 = ((gtxns AssetAmount) a_xfer#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%22', version=0, source_location=amm/contract.py:128:15-34)]
+debug: Replacing redundant declaration let tmp%37#0: uint64 = ((gtxns AssetAmount) b_xfer#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%31', version=0, source_location=amm/contract.py:135:15-34)]
 debug: Found equivalence set: tmp%22#0, tmp%36#0
 debug: Replacing {tmp%36#0} with tmp%22#0 made 1 modifications
-debug: Replacing redundant declaration let tmp%37#0: uint64 = ((gtxns AssetAmount) b_xfer#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%31', version=0, source_location=amm/contract.py:135:15-34)]
 debug: Found equivalence set: tmp%31#0, tmp%37#0
 debug: Replacing {tmp%37#0} with tmp%31#0 made 1 modifications
 debug: Optimizing subroutine examples.amm.contract.ConstantProductAMM._check_bootstrapped
@@ -675,11 +675,9 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Replacing redundant declaration let tmp%22#0: uint64 = ((gtxns AssetAmount) pool_xfer#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%12', version=0, source_location=amm/contract.py:182:15-37)]
-debug: Found equivalence set: tmp%12#0, tmp%22#0
-debug: Replacing {tmp%22#0} with tmp%12#0 made 1 modifications
 debug: Replacing redundant declaration let tmp%24#0: uint64 = ((gtxns AssetAmount) pool_xfer#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%12', version=0, source_location=amm/contract.py:182:15-37)]
-debug: Found equivalence set: tmp%12#0, tmp%24#0
-debug: Replacing {tmp%24#0} with tmp%12#0 made 1 modifications
+debug: Found equivalence set: tmp%12#0, tmp%22#0, tmp%24#0
+debug: Replacing {tmp%22#0, tmp%24#0} with tmp%12#0 made 2 modifications
 debug: Optimizing subroutine examples.amm.contract.tokens_to_burn
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification

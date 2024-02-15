@@ -425,14 +425,12 @@ debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Replacing redundant declaration let new_state_value%11#0: uint64 = ((gtxns Amount) pay#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%7', version=0, source_location=auction/contract.py:76:15-25)]
-debug: Found equivalence set: tmp%7#0, new_state_value%11#0
-debug: Replacing {new_state_value%11#0} with tmp%7#0 made 1 modifications
 debug: Replacing redundant declaration let new_state_value%12#0: bytes = ((gtxns Sender) pay#0) with copy of existing registers [Register(atype=<AVMType.bytes: 1>, name='tmp%4', version=0, source_location=auction/contract.py:74-75:15-25)]
+debug: Replacing redundant declaration let new_state_value%13#0: uint64 = ((gtxns Amount) pay#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%7', version=0, source_location=auction/contract.py:76:15-25)]
+debug: Found equivalence set: tmp%7#0, new_state_value%11#0, new_state_value%13#0
+debug: Replacing {new_state_value%11#0, new_state_value%13#0} with tmp%7#0 made 2 modifications
 debug: Found equivalence set: tmp%4#0, new_state_value%12#0
 debug: Replacing {new_state_value%12#0} with tmp%4#0 made 1 modifications
-debug: Replacing redundant declaration let new_state_value%13#0: uint64 = ((gtxns Amount) pay#0) with copy of existing registers [Register(atype=<AVMType.uint64: 2>, name='tmp%7', version=0, source_location=auction/contract.py:76:15-25)]
-debug: Found equivalence set: tmp%7#0, new_state_value%13#0
-debug: Replacing {new_state_value%13#0} with tmp%7#0 made 1 modifications
 debug: Optimizing subroutine examples.auction.contract.Auction.claim_bids
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification

@@ -48,7 +48,7 @@ def repeated_expression_elimination(
         for block in subroutine.body:
             visitor = RCEVisitor(block)
             for op in block.ops.copy():
-                modified = modified or bool(op.accept(visitor))
+                modified = bool(op.accept(visitor)) or modified
             block_asserted[block] = visitor.asserted
             block_const_intrinsics[block] = visitor.const_intrinsics
 
@@ -65,7 +65,7 @@ def repeated_expression_elimination(
                     ),
                 )
                 for op in block.ops.copy():
-                    modified = modified or bool(op.accept(visitor))
+                    modified = bool(op.accept(visitor)) or modified
         if modified:
             any_modified = True
             copy_propagation(context, subroutine)
