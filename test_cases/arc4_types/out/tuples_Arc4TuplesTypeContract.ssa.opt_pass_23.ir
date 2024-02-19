@@ -8,9 +8,6 @@ contract test_cases.arc4_types.tuples.Arc4TuplesTypeContract:
                 let tmp%68#0: uint64 = (btoi 0x10)
                 let tmp%69#0: uint64 = (== tmp%68#0 16u)
                 (assert tmp%69#0) // k is 16
-                let encoded_tuple_buffer%91#11: bytes = (concat 0x04bd80 0x10)
-                let tmp%99#0: uint64 = (== 0x04bd8010 encoded_tuple_buffer%91#11)
-                (assert tmp%99#0)
                 let (total#0: uint64, concat#0: bytes) = test_cases.arc4_types.tuples.Arc4TuplesTypeContract.test_stuff(AQIABwAO/wAFaGVsbG8ABXdvcmxk)
                 let tmp%102#0: bytes = ((extract 2 0) concat#0)
                 let tmp%103#0: uint64 = (== tmp%102#0 "hello world")

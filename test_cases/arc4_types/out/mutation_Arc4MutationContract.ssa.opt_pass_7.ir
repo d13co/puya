@@ -14,10 +14,9 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
         
         subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size() -> void:
             block@0: // L158
-                let dynamic_uint8_array#1: bytes = (concat 0x0003 0x010232)
-                let tmp%9#0: uint64 = (== dynamic_uint8_array#1 0x0003010232)
+                let tmp%9#0: uint64 = (== 0x0003010232 0x0003010232)
                 (assert tmp%9#0)
-                let expr_value_trimmed%10#0: bytes = ((extract 2 0) dynamic_uint8_array#1)
+                let expr_value_trimmed%10#0: bytes = ((extract 2 0) 0x0003010232)
                 let concatenated%12#0: bytes = (concat expr_value_trimmed%10#0 expr_value_trimmed%10#0)
                 let len_%13#0: uint64 = (len concatenated%12#0)
                 let len_bytes%14#0: bytes = (itob len_%13#0)
@@ -31,15 +30,12 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
                 let len_bytes%23#0: bytes = (itob len_%22#0)
                 let len_16_bit%24#0: bytes = ((extract 6 0) len_bytes%23#0)
                 let dynamic_uint8_array#3: bytes = (concat len_16_bit%24#0 concatenated%21#0)
-                let array_data%26#7: bytes = (concat 0x0008010232010232 0x04)
-                let array_data%26#8: bytes = (concat array_data%26#7 0x5a)
-                let tmp%27#0: uint64 = (== dynamic_uint8_array#3 array_data%26#8)
+                let tmp%27#0: uint64 = (== dynamic_uint8_array#3 0x0008010232010232045a)
                 (assert tmp%27#0)
                 let (popped#0: bytes, dynamic_uint8_array#4: bytes) = puyapy_lib_arc4.dynamic_array_pop_fixed_size(dynamic_uint8_array#3, 1u)
                 let tmp%30#0: uint64 = (== popped#0 0x5a)
                 (assert tmp%30#0)
-                let array_data%31#7: bytes = (concat 0x0007010232010232 0x04)
-                let tmp%32#0: uint64 = (== dynamic_uint8_array#4 array_data%31#7)
+                let tmp%32#0: uint64 = (== dynamic_uint8_array#4 0x000701023201023204)
                 (assert tmp%32#0)
                 return 
         
@@ -74,8 +70,6 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
         
         subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string() -> void:
             block@0: // L228
-                let tmp%8#0: uint64 = (== AAIABAALAAVIZWxsbwAFV29ybGQ= "\x00\x02\x00\x04\x00\x0b\x00\x05Hello\x00\x05World")
-                (assert tmp%8#0)
                 let dynamic_string_array#1: bytes = puyapy_lib_arc4.dynamic_array_concat_variable_size(AAIABAALAAVIZWxsbwAFV29ybGQ=, "\x00\x03Foo\x00\x03Bar", 2u)
                 let tmp%11#0: uint64 = (== dynamic_string_array#1 "\x00\x04\x00\x08\x00\x0f\x00\x16\x00\x1b\x00\x05Hello\x00\x05World\x00\x03Foo\x00\x03Bar")
                 (assert tmp%11#0)
@@ -97,14 +91,7 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
                 let value_as_bytes%40#0: bytes = (itob next_offset%18#7)
                 let value_as_uint16%41#0: bytes = ((extract 6 2) value_as_bytes%40#0)
                 let array_data%17#8: bytes = (concat array_data%17#7 value_as_uint16%41#0)
-                let array_data%17#9: bytes = (concat array_data%17#8 "\x00\x05Hello")
-                let array_data%17#10: bytes = (concat array_data%17#9 "\x00\x05World")
-                let array_data%17#11: bytes = (concat array_data%17#10 "\x00\x03Foo")
-                let array_data%17#12: bytes = (concat array_data%17#11 "\x00\x03Bar")
-                let array_data%17#13: bytes = (concat array_data%17#12 "\x00\x05Hello")
-                let array_data%17#14: bytes = (concat array_data%17#13 "\x00\x05World")
-                let array_data%17#15: bytes = (concat array_data%17#14 "\x00\x03Foo")
-                let dynamic_string_array#3: bytes = (concat array_data%17#15 "\x00\x03Bar")
+                let dynamic_string_array#3: bytes = (concat array_data%17#8 "\x00\x05Hello\x00\x05World\x00\x03Foo\x00\x03Bar\x00\x05Hello\x00\x05World\x00\x03Foo\x00\x03Bar")
                 let tmp%43#0: uint64 = (== dynamic_string_array#2 dynamic_string_array#3)
                 (assert tmp%43#0)
                 let dynamic_string_array#4: bytes = puyapy_lib_arc4.dynamic_array_replace_variable_size(dynamic_string_array#3, "\x00\x05Hello", 3u)
@@ -121,14 +108,7 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
                 let value_as_bytes%97#0: bytes = (itob next_offset%75#7)
                 let value_as_uint16%98#0: bytes = ((extract 6 2) value_as_bytes%97#0)
                 let array_data%74#8: bytes = (concat array_data%74#7 value_as_uint16%98#0)
-                let array_data%74#9: bytes = (concat array_data%74#8 "\x00\x05Hello")
-                let array_data%74#10: bytes = (concat array_data%74#9 "\x00\x05World")
-                let array_data%74#11: bytes = (concat array_data%74#10 "\x00\x03Foo")
-                let array_data%74#12: bytes = (concat array_data%74#11 "\x00\x05Hello")
-                let array_data%74#13: bytes = (concat array_data%74#12 "\x00\x05Hello")
-                let array_data%74#14: bytes = (concat array_data%74#13 "\x00\x05Hello")
-                let array_data%74#15: bytes = (concat array_data%74#14 "\x00\x03Foo")
-                let array_data%74#16: bytes = (concat array_data%74#15 "\x00\x03Bar")
+                let array_data%74#16: bytes = (concat array_data%74#8 "\x00\x05Hello\x00\x05World\x00\x03Foo\x00\x05Hello\x00\x05Hello\x00\x05Hello\x00\x03Foo\x00\x03Bar")
                 let tmp%100#0: uint64 = (== dynamic_string_array#5 array_data%74#16)
                 (assert tmp%100#0)
                 let (popped%101#1: bytes, dynamic_string_array#6: bytes) = puyapy_lib_arc4.dynamic_array_pop_variable_size(dynamic_string_array#5)
@@ -141,12 +121,7 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
                 let value_as_bytes%124#0: bytes = (itob 45u)
                 let value_as_uint16%125#0: bytes = ((extract 6 2) value_as_bytes%124#0)
                 let array_data%107#6: bytes = (concat array_data%107#5 value_as_uint16%125#0)
-                let array_data%107#7: bytes = (concat array_data%107#6 "\x00\x05Hello")
-                let array_data%107#8: bytes = (concat array_data%107#7 "\x00\x05World")
-                let array_data%107#9: bytes = (concat array_data%107#8 "\x00\x03Foo")
-                let array_data%107#10: bytes = (concat array_data%107#9 "\x00\x05Hello")
-                let array_data%107#11: bytes = (concat array_data%107#10 "\x00\x05Hello")
-                let array_data%107#12: bytes = (concat array_data%107#11 "\x00\x05Hello")
+                let array_data%107#12: bytes = (concat array_data%107#6 "\x00\x05Hello\x00\x05World\x00\x03Foo\x00\x05Hello\x00\x05Hello\x00\x05Hello")
                 let tmp%127#0: uint64 = (== dynamic_string_array#7 array_data%107#12)
                 (assert tmp%127#0)
                 return 
@@ -217,8 +192,7 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
         
         subroutine test_cases.arc4_types.mutation.Arc4MutationContract.struct_assign() -> void:
             block@0: // L131
-                let test_struct#1: any = (setbit gDIABgANAAVIYXBweQAERGF5cw== 0u 0u)
-                let test_struct#2: bytes = ((replace2 1) test_struct#1 0x0c)
+                let test_struct#2: bytes = ((replace2 1) ADIABgANAAVIYXBweQAERGF5cw== 0x0c)
                 let tmp%23#0: uint64 = (== test_struct#2 AAwABgANAAVIYXBweQAERGF5cw==)
                 (assert tmp%23#0)
                 let item_offset%25#0: uint64 = (extract_uint16 test_struct#2 2u)
@@ -241,10 +215,9 @@ contract test_cases.arc4_types.mutation.Arc4MutationContract:
         
         subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat() -> void:
             block@0: // L73
-                let array_concat_tuple#0: bytes = (concat 0x0004 0x01020304)
-                let tmp%9#0: uint64 = (== array_concat_tuple#0 0x000401020304)
+                let tmp%9#0: uint64 = (== 0x000401020304 0x000401020304)
                 (assert tmp%9#0)
-                let expr_value_trimmed%10#0: bytes = ((extract 2 0) array_concat_tuple#0)
+                let expr_value_trimmed%10#0: bytes = ((extract 2 0) 0x000401020304)
                 let concatenated%12#0: bytes = (concat expr_value_trimmed%10#0 0x05)
                 let len_%13#0: uint64 = (len concatenated%12#0)
                 let len_bytes%14#0: bytes = (itob len_%13#0)

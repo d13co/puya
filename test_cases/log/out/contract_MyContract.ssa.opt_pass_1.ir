@@ -46,9 +46,7 @@ contract test_cases.log.contract.MyContract:
                 let tmp%25#0: uint64 = (+ tmp%24#0 7u)
                 let tmp%26#0: bytes = (itob tmp%25#0)
                 let tmp%27#0: bytes = (concat tmp%23#0 tmp%26#0)
-                let tmp%28#0: bytes = (concat tmp%27#0 "_")
-                let tmp%29#0: bytes = (concat tmp%28#0 8b)
-                let tmp%30#0: bytes = (concat tmp%29#0 "_")
+                let tmp%30#0: bytes = (concat tmp%27#0 Xwhf)
                 let tmp%31#0: uint64 = (txn NumAppArgs)
                 goto tmp%31#0 ? block@7 : block@8
             block@7: // ternary_true_L23
@@ -65,9 +63,7 @@ contract test_cases.log.contract.MyContract:
                 let tmp%39#0: uint64 = (+ tmp%38#0 7u)
                 let tmp%40#0: bytes = (itob tmp%39#0)
                 let tmp%41#0: bytes = (concat tmp%23#0 tmp%40#0)
-                let tmp%42#0: bytes = (concat tmp%41#0 "_")
-                let tmp%43#0: bytes = (concat tmp%42#0 8b)
-                let tmp%44#0: bytes = (concat tmp%43#0 "_")
+                let tmp%44#0: bytes = (concat tmp%41#0 Xwhf)
                 let tmp%45#0: uint64 = (txn NumAppArgs)
                 goto tmp%45#0 ? block@10 : block@11
             block@10: // ternary_true_L31

@@ -53,54 +53,6 @@ test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program:
     int 9223372036854775807
     ==
     assert
-    // arc4_types/numeric.py:50
-    // assert really_big_int == BigUIntN[t.Literal[512]](really_big_int.decode())
-    int 64
-    bzero
-    // arc4_types/numeric.py:47
-    // really_big_int = BigUIntN[t.Literal[512]](sixty_four_byte_num)
-    byte 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-    // arc4_types/numeric.py:50
-    // assert really_big_int == BigUIntN[t.Literal[512]](really_big_int.decode())
-    dig 1
-    b|
-    // arc4_types/numeric.py:47
-    // really_big_int = BigUIntN[t.Literal[512]](sixty_four_byte_num)
-    byte 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-    // arc4_types/numeric.py:50
-    // assert really_big_int == BigUIntN[t.Literal[512]](really_big_int.decode())
-    ==
-    assert
-    // arc4_types/numeric.py:53
-    // BigUInt(sixty_four_byte_num)
-    byte 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-    // arc4_types/numeric.py:52-54
-    // really_big_decimal = BigUFixedNxM[t.Literal[512], t.Literal[2]].encode(
-    //     BigUInt(sixty_four_byte_num)
-    // )
-    len
-    int 64
-    <=
-    assert // overflow
-    // arc4_types/numeric.py:53
-    // BigUInt(sixty_four_byte_num)
-    byte 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-    // arc4_types/numeric.py:52-54
-    // really_big_decimal = BigUFixedNxM[t.Literal[512], t.Literal[2]].encode(
-    //     BigUInt(sixty_four_byte_num)
-    // )
-    b|
-    // arc4_types/numeric.py:58
-    // arc4_biguint_dynamic = ARC4BigUInt(biguint + 1)
-    byte 0x02
-    len
-    int 16
-    <=
-    assert // overflow
-    int 16
-    bzero
-    byte 0x02
-    b|
     // arc4_types/numeric.py:56
     // biguint = BigUInt(1)
     byte 0x01
@@ -110,18 +62,6 @@ test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program:
     // arc4_types/numeric.py:60
     // assert biguint == arc4_biguint_const.decode()
     b==
-    assert
-    // arc4_types/numeric.py:62
-    // assert arc4_biguint_dynamic.bytes.length == (128 // 8)
-    len
-    int 16
-    ==
-    assert
-    // arc4_types/numeric.py:64
-    // assert really_big_decimal.bytes.length == 64
-    len
-    int 64
-    ==
     assert
     // arc4_types/numeric.py:66
     // return True

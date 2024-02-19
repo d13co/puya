@@ -5,19 +5,15 @@ contract test_cases.arc4_types.tuples.Arc4TuplesTypeContract:
                 let tmp%50#0: uint64 = (btoi 0x04)
                 let tmp%51#0: uint64 = (== tmp%50#0 4u)
                 (assert tmp%51#0) // a is 4
-                let tmp%64#0: uint64 = (!= 0x80 0x00)
-                (assert tmp%64#0) // b,d,e,f,g,i,j are true
                 let tmp%68#0: uint64 = (btoi 0x10)
                 let tmp%69#0: uint64 = (== tmp%68#0 16u)
                 (assert tmp%69#0) // k is 16
-                let encoded_tuple_buffer%91#4: any = (setbit 0x0480 10u 1u)
-                let encoded_tuple_buffer%91#5: any = (setbit encoded_tuple_buffer%91#4 11u 1u)
+                let encoded_tuple_buffer%91#5: any = (setbit 0x04a0 11u 1u)
                 let encoded_tuple_buffer%91#6: any = (setbit encoded_tuple_buffer%91#5 12u 1u)
                 let encoded_tuple_buffer%91#7: any = (setbit encoded_tuple_buffer%91#6 13u 1u)
                 let encoded_tuple_buffer%91#8: any = (setbit encoded_tuple_buffer%91#7 14u 0u)
                 let encoded_tuple_buffer%91#9: any = (setbit encoded_tuple_buffer%91#8 15u 1u)
-                let encoded_tuple_buffer%91#10: bytes = (concat encoded_tuple_buffer%91#9 0x80)
-                let encoded_tuple_buffer%91#11: bytes = (concat encoded_tuple_buffer%91#10 0x10)
+                let encoded_tuple_buffer%91#11: bytes = (concat encoded_tuple_buffer%91#9 0x8010)
                 let tmp%99#0: uint64 = (== 0x04bd8010 encoded_tuple_buffer%91#11)
                 (assert tmp%99#0)
                 let (total#0: uint64, concat#0: bytes) = test_cases.arc4_types.tuples.Arc4TuplesTypeContract.test_stuff(AQIABwAO/wAFaGVsbG8ABXdvcmxk)

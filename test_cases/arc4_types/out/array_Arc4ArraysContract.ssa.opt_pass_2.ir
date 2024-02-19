@@ -2,10 +2,9 @@ contract test_cases.arc4_types.array.Arc4ArraysContract:
     program approval:
         subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program() -> uint64:
             block@0: // L24
-                let dynamic_uint8_array#0: bytes = (concat 0x000201 0x02)
                 let total#0: uint64 = 0u
-                let array_length%1#0: uint64 = (extract_uint16 dynamic_uint8_array#0 0u)
-                let array_value%2#0: bytes = ((extract 2 0) dynamic_uint8_array#0)
+                let array_length%1#0: uint64 = (extract_uint16 0x00020102 0u)
+                let array_value%2#0: bytes = ((extract 2 0) 0x00020102)
                 let item_index_internal%3#0: uint64 = 0u
                 goto block@1
             block@1: // for_header_L27
@@ -45,8 +44,7 @@ contract test_cases.arc4_types.array.Arc4ArraysContract:
                 let value_as_bytes%23#0: bytes = (itob 11u)
                 let value_as_uint16%24#0: bytes = ((extract 6 2) value_as_bytes%23#0)
                 let array_data%18#2: bytes = (concat array_data%18#1 value_as_uint16%24#0)
-                let array_data%18#3: bytes = (concat array_data%18#2 "\x00\x05Hello")
-                let dynamic_string_array#0: bytes = (concat array_data%18#3 "\x00\x05World")
+                let dynamic_string_array#0: bytes = (concat array_data%18#2 "\x00\x05Hello\x00\x05World")
                 let tmp%26#0: uint64 = (extract_uint16 dynamic_string_array#0 0u)
                 let tmp%27#0: uint64 = (== tmp%26#0 2u)
                 (assert tmp%27#0)
@@ -89,9 +87,6 @@ contract test_cases.arc4_types.array.Arc4ArraysContract:
             block@15: // after_for_L39
                 let tmp%49#0: uint64 = (== result#2 "Hello World")
                 (assert tmp%49#0)
-                let array_data%50#2: bytes = (concat 0x00000001 0x0000000a)
-                let array_data%50#3: bytes = (concat array_data%50#2 0x000000ff)
-                let static_uint32_array#0: bytes = (concat array_data%50#3 0x00000080)
                 let item_index_internal%51#0: uint64 = 0u
                 goto block@16
             block@16: // for_header_L49
@@ -101,7 +96,7 @@ contract test_cases.arc4_types.array.Arc4ArraysContract:
                 goto continue_looping%53#0 ? block@17 : block@19
             block@17: // for_body_L49
                 let item_index%54#0: uint64 = (* item_index_internal%51#1 4u)
-                let uint32_item#0: bytes = (extract3 static_uint32_array#0 item_index%54#0 4u)
+                let uint32_item#0: bytes = (extract3 0x000000010000000a000000ff00000080 item_index%54#0 4u)
                 let tmp%55#0: uint64 = (btoi uint32_item#0)
                 let total#6: uint64 = (+ total#5 tmp%55#0)
                 let item_index_internal%51#2: uint64 = (+ item_index_internal%51#1 1u)
@@ -117,8 +112,7 @@ contract test_cases.arc4_types.array.Arc4ArraysContract:
                 let value_as_bytes%73#0: bytes = (itob 10u)
                 let value_as_uint16%74#0: bytes = ((extract 6 2) value_as_bytes%73#0)
                 let array_data%68#2: bytes = (concat 0x0004 value_as_uint16%74#0)
-                let array_data%68#3: bytes = (concat array_data%68#2 "\x00\x04Ping")
-                let static_string_array#0: bytes = (concat array_data%68#3 "\x00\x04Pong")
+                let static_string_array#0: bytes = (concat array_data%68#2 "\x00\x04Ping\x00\x04Pong")
                 let result#5: bytes = ""
                 let item_index_internal%76#0: uint64 = 0u
                 goto block@20

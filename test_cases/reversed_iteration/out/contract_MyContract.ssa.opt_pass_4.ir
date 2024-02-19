@@ -17,7 +17,7 @@ contract test_cases.reversed_iteration.contract.MyContract:
                 let item_index_internal%14#2: uint64 = (+ item_index_internal%14#1 1u)
                 goto block@7
             block@10: // after_for_L11
-                let test_array#0: bytes = (concat 0x000000 0x00)
+                let test_array#0: bytes = 0x00000000
                 let iteration_count_minus_one%25#0: uint64 = (- 4u 1u)
                 let range_index%30#0: uint64 = 0u
                 let continue_looping%31#0: uint64 = (>= iteration_count_minus_one%25#0 0u)
@@ -70,9 +70,7 @@ contract test_cases.reversed_iteration.contract.MyContract:
                 let tmp%58#0: uint64 = (== test_array#7 0x03020504)
                 (assert tmp%58#0)
                 let array_data%59#3: bytes = (concat 0x00060009 0x000c)
-                let array_data%59#4: bytes = (concat array_data%59#3 "\x00\x01a")
-                let array_data%59#5: bytes = (concat array_data%59#4 "\x00\x01b")
-                let some_strings#0: bytes = (concat array_data%59#5 "\x00\x01c")
+                let some_strings#0: bytes = (concat array_data%59#3 "\x00\x01a\x00\x01b\x00\x01c")
                 let some_string_reversed#0: bytes = "\x00\x00"
                 let item_index_internal%70#0: uint64 = 0u
                 let reverse_index_internal%71#0: uint64 = 3u

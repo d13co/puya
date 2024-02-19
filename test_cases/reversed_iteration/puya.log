@@ -618,6 +618,9 @@ debug: Folded 0u - 0u to 0u
 debug: Folded 1u * iteration_count_minus_one%6#0 to iteration_count_minus_one%6#0
 debug: Folded 0u + range_delta%7#0 to range_delta%7#0
 debug: Folded reverse_index_internal%15#2 * 1u to reverse_index_internal%15#2
+debug: Folded chained concat of 0x00and 0x00) to b'/x00/x00'
+debug: Folded chained concat of 0x0000and 0x00) to b'/x00/x00/x00'
+debug: Folded chained concat of 0x000000and 0x00) to b'/x00/x00/x00/x00'
 debug: Folded 0 < 4 to 1
 debug: Folded 4u - 0u to 4u
 debug: Folded 1u * iteration_count_minus_one%25#0 to iteration_count_minus_one%25#0
@@ -629,6 +632,8 @@ debug: Folded index#1 * 1u to index#1
 debug: Folded len("/x00/x01a") to 3
 debug: Folded len("/x00/x01b") to 3
 debug: Folded len("/x00/x01c") to 3
+debug: Folded chained concat of "/x00/x01a"and "/x00/x01b") to b'/x00/x01a/x00/x01b'
+debug: Folded chained concat of "/x00/x01a/x00/x01b"and "/x00/x01c") to b'/x00/x01a/x00/x01b/x00/x01c'
 debug: Folded len("HELLO") to 5
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -672,6 +677,9 @@ debug: Removing unused variable should_loop%0#0
 debug: Removing unused variable range_length%1#0
 debug: Removing unused variable stop%8#0
 debug: Removing unused variable array_data%18#0
+debug: Removing unused variable array_data%18#1
+debug: Removing unused variable array_data%18#2
+debug: Removing unused variable array_data%18#3
 debug: Removing unused variable should_loop%19#0
 debug: Removing unused variable range_length%20#0
 debug: Removing unused variable stop%27#0
@@ -685,6 +693,8 @@ debug: Removing unused variable element_length%63#0
 debug: Removing unused variable element_length%66#0
 debug: Removing unused variable element_length%69#0
 debug: Removing unused variable next_offset%60#3
+debug: Removing unused variable array_data%59#4
+debug: Removing unused variable array_data%59#5
 debug: Removing unused variable bytes_length%85#0
 debug: Optimizer: Simplify Control Ops
 debug: simplified terminator of block@0: // L7 from goto 0u ? block@1 : block@6 to goto block@6
@@ -782,7 +792,6 @@ debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
-debug: Removing unused variable array_data%18#1
 debug: Removing unused variable range_mod_step%21#0
 debug: Removing unused variable range_floor_div_step%23#0
 debug: Removing unused variable value_as_bytes%61#0
@@ -810,14 +819,12 @@ debug: Output IR to reversed_iteration/out/contract_MyContract.ssa.opt_pass_2.ir
 debug: Begin optimization pass 3/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x00, 0x00) to b'/x00/x00'
 debug: Folded 0 != 0 to 0
 debug: Folded 9 + 3 to 12
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
-debug: Removing unused variable array_data%18#2
 debug: Removing unused variable range_mod_step_not_zero%22#0
 debug: Removing unused variable value_as_bytes%64#0
 debug: Removing unused variable value_as_uint16%65#0
@@ -843,14 +850,12 @@ debug: Output IR to reversed_iteration/out/contract_MyContract.ssa.opt_pass_3.ir
 debug: Begin optimization pass 4/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0000, 0x00) to b'/x00/x00/x00'
 debug: Folded 4u + 0u to 4u
 debug: Folded concat(0x0006, 0x0009) to b'/x00/x06/x00/t'
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
-debug: Removing unused variable array_data%18#3
 debug: Removing unused variable iteration_count%24#0
 debug: Removing unused variable array_data%59#2
 debug: Removing unused variable value_as_bytes%67#0
@@ -876,7 +881,6 @@ debug: Output IR to reversed_iteration/out/contract_MyContract.ssa.opt_pass_4.ir
 debug: Begin optimization pass 5/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000000, 0x00) to b'/x00/x00/x00/x00'
 debug: Folded 4 - 1 to 3
 debug: Folded concat(0x00060009, 0x000c) to b'/x00/x06/x00/t/x00/x0c'
 debug: Optimizer: Constant Replacer
@@ -906,13 +910,13 @@ debug: Begin optimization pass 6/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 3 >= 0 to 1
-debug: Folded concat(0x00060009000c, "/x00/x01a") to b'/x00/x06/x00/t/x00/x0c/x00/x01a'
+debug: Folded concat(0x00060009000c, "/x00/x01a/x00/x01b/x00/x01c") to b'/x00/x06/x00/t/x00/x0c/x00/x01a/x00/x01b/x00/x01c'
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable continue_looping%31#0
-debug: Removing unused variable array_data%59#4
+debug: Removing unused variable some_strings#0
 debug: Optimizer: Simplify Control Ops
 debug: simplified terminator of block@10: // after_for_L11 from goto 1u ? block@13 : block@16 to goto block@13
 debug: Replacing trivial Phi node: let test_array#3: bytes = φ(test_array#2 <- block@13) (test_array#3) with test_array#2
@@ -937,60 +941,6 @@ debug: Output IR to reversed_iteration/out/contract_MyContract.ssa.opt_pass_6.ir
 debug: Begin optimization pass 7/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(AAYACQAMAAFh, "/x00/x01b") to b'/x00/x06/x00/t/x00/x0c/x00/x01a/x00/x01b'
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Removing unused variable array_data%59#5
-debug: Optimizer: Simplify Control Ops
-debug: Optimizer: Remove Linear Jump
-debug: Optimizer: Remove Empty Blocks
-debug: Not removing empty block block@20: // if_body_L23 because it's used by phi nodes
-debug: Optimizer: Remove Unreachable Blocks
-debug: Optimizer: Repeated Expression Elimination
-debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.clear_state_program
-debug: Optimizer: Arithmetic Simplification
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Optimizer: Simplify Control Ops
-debug: Optimizer: Remove Linear Jump
-debug: Optimizer: Remove Empty Blocks
-debug: Optimizer: Remove Unreachable Blocks
-debug: Optimizer: Repeated Expression Elimination
-debug: Output IR to reversed_iteration/out/contract_MyContract.ssa.opt_pass_7.ir
-debug: Begin optimization pass 8/100
-debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
-debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(AAYACQAMAAFhAAFi, "/x00/x01c") to b'/x00/x06/x00/t/x00/x0c/x00/x01a/x00/x01b/x00/x01c'
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Removing unused variable some_strings#0
-debug: Optimizer: Simplify Control Ops
-debug: Optimizer: Remove Linear Jump
-debug: Optimizer: Remove Empty Blocks
-debug: Not removing empty block block@20: // if_body_L23 because it's used by phi nodes
-debug: Optimizer: Remove Unreachable Blocks
-debug: Optimizer: Repeated Expression Elimination
-debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.clear_state_program
-debug: Optimizer: Arithmetic Simplification
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Optimizer: Simplify Control Ops
-debug: Optimizer: Remove Linear Jump
-debug: Optimizer: Remove Empty Blocks
-debug: Optimizer: Remove Unreachable Blocks
-debug: Optimizer: Repeated Expression Elimination
-debug: Output IR to reversed_iteration/out/contract_MyContract.ssa.opt_pass_8.ir
-debug: Begin optimization pass 9/100
-debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
-debug: Optimizer: Arithmetic Simplification
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -1012,7 +962,7 @@ debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
-debug: No optimizations performed in pass 9, ending loop
+debug: No optimizations performed in pass 7, ending loop
 debug: Removing Phis from test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Removing Phis from test_cases.reversed_iteration.contract.MyContract.clear_state_program
 debug: Coalescing local variables in test_cases.reversed_iteration.contract.MyContract.approval_program using strategy RootOperandGrouping

@@ -416,9 +416,7 @@ contract test_cases.abi_routing.contract.Reference:
             block@0: // L22
                 (app_global_put "asa" 123u)
                 (app_global_put "an_int" 2u)
-                let array_data%0#1: bytes = (concat 0x 0x07)
-                let array_data%0#2: bytes = (concat array_data%0#1 0x08)
-                let array_data%0#3: bytes = (concat array_data%0#2 0x09)
+                let array_data%0#3: bytes = (concat 0x 0x070809)
                 (app_global_put "some_bytes" array_data%0#3)
                 let new_state_value%1#0: bytes = (txn Sender)
                 (app_global_put "creator" new_state_value%1#0)
