@@ -1,5 +1,6 @@
 import operator
 from collections.abc import Callable
+from functools import partial
 from itertools import zip_longest
 
 import attrs
@@ -7,7 +8,7 @@ import structlog
 
 from puya.avm_type import AVMType
 from puya.context import CompileContext
-from puya.ir import models
+from puya.ir import models, visitor
 from puya.ir.avm_ops import AVMOp
 from puya.ir.optimize._utils import get_definition
 from puya.ir.types_ import AVMBytesEncoding
@@ -519,9 +520,68 @@ def try_simplify_arithmetic_ops(
     return None
 
 
+def _make_uint64_folder(
+    op_callback: Callable[[int, int], int]
+) -> Callable[[int, int, SourceLocation | None], models.UInt64Constant]:
+    def folder(
+        lhs: int, rhs: int, source_location: SourceLocation | None
+    ) -> models.UInt64Constant:
+        value = op_callback(lhs, rhs)
+        return models.UInt64Constant(value=value, source_location=source_location)
+
+    return folder
+
+
+def _make_biguint_folder(
+    op_callback: Callable[[int, int], int]
+) -> Callable[[int, int, SourceLocation | None], models.BigUIntConstant]:
+    def folder(
+        lhs: int, rhs: int, source_location: SourceLocation | None
+    ) -> models.BigUIntConstant:
+        value = op_callback(lhs, rhs)
+        return models.BigUIntConstant(value=value, source_location=source_location)
+
+    return folder
+
+
+def _make_bytes_folder(
+    op_callback: Callable[[int, int], int]
+) -> Callable[
+    [models.BytesConstant, models.BytesConstant, SourceLocation | None], models.BytesConstant
+]:
+    def folder(
+        lhs: models.BytesConstant,
+        rhs: models.BytesConstant,
+        source_location: SourceLocation | None,
+    ) -> models.BytesConstant:
+        value = byte_wise(op_callback, lhs.value, rhs.value)
+        encoding = _choose_encoding(lhs, rhs)
+        return models.BytesConstant(
+            value=value, encoding=encoding, source_location=source_location
+        )
+
+    return folder
+
+
 def arithmetic_simplification(_context: CompileContext, subroutine: models.Subroutine) -> bool:
     """Simplify arithmetic expressions e.g. a-a -> 0, a*0 -> 0, a*1 -> a"""
     modified = 0
+
+    _get_byte_constant = partial(get_byte_constant, subroutine)
+
+    commutative_ops = {
+        "+": (get_int_constant, _make_uint64_folder(operator.add)),
+        "*": (get_int_constant, _make_uint64_folder(operator.mul)),
+        "&": (get_int_constant, _make_uint64_folder(operator.and_)),
+        "|": (get_int_constant, _make_uint64_folder(operator.or_)),
+        "^": (get_int_constant, _make_uint64_folder(operator.xor)),
+        "b+": (get_biguint_constant, _make_biguint_folder(operator.add)),
+        "b*": (get_biguint_constant, _make_biguint_folder(operator.mul)),
+        "b&": (_get_byte_constant, _make_bytes_folder(operator.and_)),
+        "b|": (_get_byte_constant, _make_bytes_folder(operator.or_)),
+        "b^": (_get_byte_constant, _make_bytes_folder(operator.xor)),
+        # "concat": (_get_byte_constant, _concat),
+    }
 
     for block in subroutine.body:
         for op in block.ops:
@@ -531,5 +591,164 @@ def arithmetic_simplification(_context: CompileContext, subroutine: models.Subro
                     if simplified is not None:
                         assignment.source = simplified
                         modified += 1
+                    elif source.op.code in commutative_ops:
+                        const_getter, folder = commutative_ops[source.op.code]
+                        curr_lhs, curr_rhs = source.args
+                        # if one operand is a constant but not the other
+                        curr_lhs_const = const_getter(curr_lhs)
+                        curr_rhs_const = const_getter(curr_rhs)
+                        if (curr_lhs_const is None) != (curr_rhs_const is None):
+                            if curr_lhs_const is not None:
+                                assert isinstance(curr_rhs, models.Register)
+                                the_reg = curr_rhs
+                                constant1 = curr_lhs_const
+                                constant1_loc = curr_lhs.source_location
+                            else:
+                                assert isinstance(curr_lhs, models.Register)
+                                the_reg = curr_lhs
+                                constant1 = curr_rhs_const
+                                constant1_loc = curr_rhs.source_location
+                            the_reg_usage_count = RegisterUsageCounter.collect(
+                                subroutine, find=the_reg
+                            )
+                            # can we (definitely) eliminate the_reg if we fold?
+                            if the_reg_usage_count == 1:
+                                reg_defn = get_definition(subroutine, the_reg)
+                                if (
+                                    isinstance(reg_defn, models.Assignment)
+                                    and isinstance(reg_defn.source, models.Intrinsic)
+                                    and reg_defn.source.op == source.op
+                                ):
+                                    prev_op = reg_defn.source
+                                    prev_lhs, prev_rhs = prev_op.args
+                                    prev_lhs_const = const_getter(prev_lhs)
+                                    prev_rhs_const = const_getter(prev_rhs)
+                                    if (prev_lhs_const is None) != (prev_rhs_const is None):
+                                        if prev_lhs_const is not None:
+                                            assert isinstance(prev_rhs, models.Register)
+                                            the_reg_to_keep = prev_rhs
+                                            constant2 = prev_lhs_const
+                                            constant2_loc = prev_lhs.source_location
+                                        else:
+                                            assert isinstance(prev_lhs, models.Register)
+                                            the_reg_to_keep = prev_lhs
+                                            constant2 = prev_rhs_const
+                                            constant2_loc = prev_rhs.source_location
+                                        folded_location = constant1_loc or constant2_loc
+                                        folded_const = folder(
+                                            constant1, constant2, folded_location
+                                        )
+                                        modified += 1
+                                        logger.debug(
+                                            f"Triplet with {source.op.code} ({source.op}, {prev_op}) folded to ({the_reg_to_keep} {folded_const})"
+                                        )
+                                        assignment.source = attrs.evolve(
+                                            source, args=[the_reg_to_keep, folded_const]
+                                        )
+
+                        # # left constant concats will automatically get folded, like "a" + "b" + var because
+                        # # reg = "a" + "b"
+                        # # reg2 = reg + var
+                        # # of the way they're linearized, but var + "a" + "b" won't be so we special case it
+                        # # reg = var + "a"
+                        # # reg2 = reg + "b" -> reg2 = var + ("a" + "b")
+                        # # TODO: "a" + var + "b" -> var + ("a" + "b") for associative+commutative ops
+                        # if len(source.args) == 2:
+                        #     source_lhs, source_rhs = source.args
+                        #     if (
+                        #         isinstance(source_lhs, models.Register)
+                        #         and (source_rhs_const := const_getter(source_rhs)) is not None
+                        #     ):
+                        #         source_lhs_usage_count = RegisterUsageCounter.collect(
+                        #             subroutine, find=source_lhs
+                        #         )
+                        #         if source_lhs_usage_count == 1:
+                        #             lhs_defn = get_definition(subroutine, source_lhs)
+                        #             if isinstance(lhs_defn, models.Assignment):
+                        #                 prev_source = lhs_defn.source
+                        #                 if (
+                        #                     isinstance(prev_source, models.Intrinsic)
+                        #                     and prev_source.op == source.op
+                        #                     and len(prev_source.args) == 2
+                        #                 ):
+                        #                     prev_lhs, prev_rhs = prev_source.args
+                        #                     if (
+                        #                         isinstance(prev_lhs, models.Register)
+                        #                         and (prev_rhs_const := const_getter(prev_rhs))
+                        #                         is not None
+                        #                     ):
+                        #                         folded_location = (
+                        #                             source_rhs.source_location
+                        #                             or prev_rhs.source_location
+                        #                         )
+                        #                         folded = folder(
+                        #                             prev_rhs_const,
+                        #                             source_rhs_const,
+                        #                             folded_location,
+                        #                         )
+                        #                         logger.debug(
+                        #                             f"Triplet with {source.op.code} ({prev_lhs} {prev_rhs_const} {source_rhs_const}) optimised to ({prev_lhs} {folded})"
+                        #                         )
+                        #                         assignment.source = attrs.evolve(
+                        #                             source, args=[prev_lhs, folded]
+                        #                         )
+                        #                         modified += 1
+                        #                     elif (
+                        #                         source.op.code != "concat"
+                        #                         and isinstance(prev_rhs, models.Register)
+                        #                         and (prev_lhs_const := const_getter(prev_lhs))
+                        #                         is not None
+                        #                     ):
+                        #                         folded_location = (
+                        #                             source_rhs.source_location
+                        #                             or prev_lhs.source_location
+                        #                         )
+                        #                         folded = folder(
+                        #                             prev_lhs_const,
+                        #                             source_rhs_const,
+                        #                             folded_location,
+                        #                         )
+                        #                         logger.debug(
+                        #                             f"Triplet with {source.op.code} ({prev_lhs} {prev_lhs_const} {source_rhs_const}) optimised to ({prev_lhs} {folded})"
+                        #                         )
+                        #                         assignment.source = attrs.evolve(
+                        #                             source, args=[prev_lhs, folded]
+                        #                         )
+                        #                         modified += 1
 
     return modified > 0
+
+
+def _can_get_constant(subroutine: models.Subroutine, source: models.Value) -> bool:
+    match source.atype:
+        case AVMType.uint64:
+            return get_int_constant(source) is not None
+        case AVMType.bytes:
+            return (
+                get_biguint_constant(source) is not None
+                or get_byte_constant(subroutine, source) is not None
+            )
+    return False
+
+
+@attrs.define
+class RegisterUsageCounter(visitor.IRTraverser):
+    find: models.Register
+    count: int = attrs.field(default=0, init=False)
+
+    @classmethod
+    def collect(cls, sub: models.Subroutine, find: models.Register) -> int:
+        counter = cls(find=find)
+        counter.visit_all_blocks(sub.body)
+        return counter.count
+
+    def visit_register(self, reg: models.Register) -> None:
+        if reg == self.find:
+            self.count += 1
+
+    def visit_phi(self, phi: models.Phi) -> None:
+        for arg in phi.args:
+            arg.accept(self)
+
+    def visit_assignment(self, ass: models.Assignment) -> None:
+        ass.source.accept(self)

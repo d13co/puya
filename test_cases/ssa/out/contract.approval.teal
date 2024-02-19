@@ -90,14 +90,10 @@ main_after_for@8:
     b main_after_if_else@20
 
 main_else_body@11:
-    // ssa/contract.py:27
-    // b = 2 * a
-    int 2
-    dig 2
-    *
     // ssa/contract.py:28
     // if ((3 * 4) + 2) * b:
-    int 14
+    dig 1
+    int 28
     *
     bz main_else_body@13
     // ssa/contract.py:29

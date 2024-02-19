@@ -50,7 +50,7 @@ scratch_slots                        66      63      63
 scratch_slots/contract2              66      63      63      
 simple                               53      4       4       
 simplish                             743     715     716     
-ssa                                  243     189     189     
+ssa                                  243     187     187     
 ssa2                                 52      46      46      
 string_ops                           153     148     148     
 stubs/biguint                        168     108     108     

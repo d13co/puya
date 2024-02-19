@@ -317,6 +317,7 @@ debug: Optimizer: Arithmetic Simplification
 debug: Folded 1 + 2 to 3
 debug: Folded 4 * 5 to 20
 debug: Folded 3 + 2 to 5
+debug: Triplet with * (*, (* 2u a#0)) folded to (a#0 28u)
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -324,6 +325,7 @@ debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable a#0
 debug: Removing unused variable b#0
 debug: Removing unused variable b#1
+debug: Removing unused variable b#2
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
@@ -372,7 +374,7 @@ debug: Optimizer: Arithmetic Simplification
 debug: Folded 3 == 3 to 1
 debug: Folded 20 < 2 to 0
 debug: Folded 3 + 5 to 8
-debug: Folded 2 * 3 to 6
+debug: Folded 3 * 28 to 84
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -380,19 +382,20 @@ debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable tmp%0#0
 debug: Removing unused variable tmp%1#0
 debug: Removing unused variable tmp%2#0
-debug: Removing unused variable b#2
+debug: Removing unused variable tmp%3#0
 debug: Optimizer: Simplify Control Ops
 debug: simplified terminator of block@0: // L9 from goto 1u ? block@1 : block@6 to goto block@1
 debug: simplified terminator of block@1: // if_body_L12 from goto 0u ? block@2 : block@3 to goto block@3
+debug: simplified terminator of block@3: // else_body_L13 from goto 84u ? block@4 : block@5 to goto block@4
 debug: Optimizer: Remove Linear Jump
 debug: Replaced predecessor block@1: // if_body_L12 with block@0: // L9 in block@3: // else_body_L13
 debug: Merged linear block@1: // if_body_L12 into block@0: // L9
-debug: Replaced predecessor block@3: // else_body_L13 with block@0: // L9 in block@5: // else_body_L18
 debug: Replaced predecessor block@3: // else_body_L13 with block@0: // L9 in block@4: // if_body_L18
 debug: Merged linear block@3: // else_body_L13 into block@0: // L9
+debug: Merged linear block@4: // if_body_L18 into block@0: // L9
 debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
-debug: Removing unreachable blocks: block@2: // if_body_L13, block@6: // else_body_L12
+debug: Removing unreachable blocks: block@2: // if_body_L13, block@5: // else_body_L18, block@6: // else_body_L12
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.simple.contract.MyContract.clear_state_program
 debug: Optimizer: Arithmetic Simplification
@@ -431,57 +434,6 @@ debug: Output IR to simple/out/contract_MyContract.ssa.opt_pass_2.ir
 debug: Begin optimization pass 3/100
 debug: Optimizing subroutine test_cases.simple.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded 14 * 6 to 84
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Removing unused variable tmp%3#0
-debug: Optimizer: Simplify Control Ops
-debug: simplified terminator of block@0: // L9 from goto 84u ? block@4 : block@5 to goto block@4
-debug: Optimizer: Remove Linear Jump
-debug: Merged linear block@4: // if_body_L18 into block@0: // L9
-debug: Optimizer: Remove Empty Blocks
-debug: Optimizer: Remove Unreachable Blocks
-debug: Removing unreachable blocks: block@5: // else_body_L18
-debug: Optimizer: Repeated Expression Elimination
-debug: Optimizing subroutine test_cases.simple.contract.MyContract.clear_state_program
-debug: Optimizer: Arithmetic Simplification
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Optimizer: Simplify Control Ops
-debug: Optimizer: Remove Linear Jump
-debug: Optimizer: Remove Empty Blocks
-debug: Optimizer: Remove Unreachable Blocks
-debug: Optimizer: Repeated Expression Elimination
-debug: Optimizing subroutine test_cases.simple.subs.zero
-debug: Optimizer: Arithmetic Simplification
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Optimizer: Simplify Control Ops
-debug: Optimizer: Remove Linear Jump
-debug: Optimizer: Remove Empty Blocks
-debug: Optimizer: Remove Unreachable Blocks
-debug: Optimizer: Repeated Expression Elimination
-debug: Optimizing subroutine test_cases.simple.pkg_a.pkg_1.subs.one
-debug: Optimizer: Arithmetic Simplification
-debug: Optimizer: Constant Replacer
-debug: Optimizer: Copy Propagation
-debug: Optimizer: Intrinsic Simplifier
-debug: Optimizer: Remove Unused Variables
-debug: Optimizer: Simplify Control Ops
-debug: Optimizer: Remove Linear Jump
-debug: Optimizer: Remove Empty Blocks
-debug: Optimizer: Remove Unreachable Blocks
-debug: Optimizer: Repeated Expression Elimination
-debug: Output IR to simple/out/contract_MyContract.ssa.opt_pass_3.ir
-debug: Begin optimization pass 4/100
-debug: Optimizing subroutine test_cases.simple.contract.MyContract.approval_program
-debug: Optimizer: Arithmetic Simplification
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -524,7 +476,7 @@ debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
-debug: No optimizations performed in pass 4, ending loop
+debug: No optimizations performed in pass 3, ending loop
 debug: Removing Phis from test_cases.simple.contract.MyContract.approval_program
 debug: Removing Phis from test_cases.simple.contract.MyContract.clear_state_program
 debug: Removing Phis from test_cases.simple.subs.zero

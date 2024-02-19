@@ -407,6 +407,7 @@ debug: Optimizer: Arithmetic Simplification
 debug: Folded 1 + 2 to 3
 debug: Folded 4 * 5 to 20
 debug: Folded 3 + 2 to 5
+debug: Triplet with * (*, (* 2u a#6)) folded to (a#6 28u)
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: range_item%1#1, i#0
@@ -416,6 +417,7 @@ debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable a#0
 debug: Removing unused variable b#0
 debug: Removing unused variable b#7
+debug: Removing unused variable b#8
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
 debug: Replaced predecessor block@6: // for_footer_L18 with block@5: // for_body_L18 in block@7: // for_increment_L18
@@ -616,11 +618,11 @@ debug: Removing Phis from test_cases.ssa.contract.phi_in_equiv_class
 debug: Removing Phis from test_cases.ssa.contract.MyContract.clear_state_program
 debug: Coalescing local variables in test_cases.ssa.contract.MyContract.approval_program using strategy RootOperandGrouping
 debug: Coalescing a#1 with [a#9, a#2, a#3, a#12, a#6, a#5]
-debug: Coalescing b#1 with [b#11, b#2, b#3, b#14, b#6, b#5, b#8]
+debug: Coalescing b#1 with [b#9, b#2, b#3, b#12, b#6, b#5]
 debug: Coalescing range_item%1#0 with [range_item%1#3]
 debug: Coalescing i#0 with [i#1]
 debug: Coalescing c#0 with [c#10, c#1, c#5, c#16, c#2, c#13, c#3, c#6, c#4, c#7]
-debug: Coalescing resulted in 76 replacement/s
+debug: Coalescing resulted in 74 replacement/s
 debug: Coalescing local variables in test_cases.ssa.contract.one_hundred using strategy RootOperandGrouping
 debug: Coalescing a#0 with [a#5, a#1, a#2]
 debug: Coalescing b#0 with [b#6, b#1, b#2, b#3]
@@ -716,10 +718,8 @@ debug: Inserted main_after_for@8.ops[3]: 'store tmp%3#0 to l-stack (copy)'
 debug: Replaced main_after_for@8.ops[5]: 'load tmp%3#0' with 'load tmp%3#0 from l-stack (no copy)'
 debug: Inserted main_if_body@9.ops[3]: 'store tmp%4#0 to l-stack (copy)'
 debug: Replaced main_if_body@9.ops[5]: 'load tmp%4#0' with 'load tmp%4#0 from l-stack (no copy)'
-debug: Inserted main_else_body@11.ops[7]: 'store tmp%5#0 to l-stack (copy)'
-debug: Replaced main_else_body@11.ops[9]: 'load tmp%5#0' with 'load tmp%5#0 from l-stack (no copy)'
-debug: Inserted main_else_body@11.ops[3]: 'store b#1 to l-stack (copy)'
-debug: Replaced main_else_body@11.ops[6]: 'load b#1' with 'load b#1 from l-stack (no copy)'
+debug: Inserted main_else_body@11.ops[3]: 'store tmp%5#0 to l-stack (copy)'
+debug: Replaced main_else_body@11.ops[5]: 'load tmp%5#0' with 'load tmp%5#0 from l-stack (no copy)'
 debug: Inserted main_else_body@16.ops[3]: 'store tmp%6#0 to l-stack (copy)'
 debug: Replaced main_else_body@16.ops[5]: 'load tmp%6#0' with 'load tmp%6#0 from l-stack (no copy)'
 debug: Inserted main_after_if_else@20.ops[6]: 'store c#0 to l-stack (copy)'

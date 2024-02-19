@@ -11,8 +11,7 @@ contract test_cases.simple.contract.MyContract:
                 let tmp%2#0: uint64 = (+ 3u 5u)
                 return tmp%2#0
             block@3: // else_body_L13
-                let b#2: uint64 = (* 2u 3u)
-                let tmp%3#0: uint64 = (* 14u b#2)
+                let tmp%3#0: uint64 = (* 3u 28u)
                 goto tmp%3#0 ? block@4 : block@5
             block@4: // if_body_L18
                 return 2u
