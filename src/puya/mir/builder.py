@@ -1,5 +1,3 @@
-from math import ceil
-
 import attrs
 import structlog
 

@@ -7,7 +7,6 @@ import structlog
 
 from puya.avm_type import AVMType
 from puya.context import CompileContext
-from puya.errors import CodeError
 from puya.ir import models
 from puya.ir.avm_ops import AVMOp
 from puya.ir.optimize._utils import get_definition
@@ -173,7 +172,7 @@ def try_simplify_arithmetic_ops(
             byte_const := get_byte_constant(subroutine, byte_arg)
         ) is not None:
             if E < S:
-                raise CodeError("substring would fail at runtime", op_loc)
+                return None  # would fail at runtime, lets hope this is unreachable 😬
             extracted = byte_const.value[S:E]
             return models.BytesConstant(
                 source_location=op_loc, encoding=byte_const.encoding, value=extracted
@@ -192,7 +191,7 @@ def try_simplify_arithmetic_ops(
             byte_size = bit_size // 8
             extracted = bytes_value[offset : offset + byte_size]
             if len(extracted) != byte_size:
-                raise CodeError(f"{extract_uint_op.code} would fail at runtime", op_loc)
+                return None  # would fail at runtime, lets hope this is unreachable 😬
             uint64_result = int.from_bytes(extracted, byteorder="big", signed=False)
             return models.UInt64Constant(
                 value=uint64_result,
@@ -281,17 +280,15 @@ def try_simplify_arithmetic_ops(
                 f"Folded chained concat of {format_bytes(a, encoding_a)}"
                 f"and {format_bytes(b, encoding_b)}) to {a_b!r}"
             )
+            if maybe_byte_const_a.source_location is None and byte_const_b.source_location is None:
+                loc = None
+            else:
+                loc = maybe_byte_const_a.source_location + byte_const_b.source_location  # type: ignore[operator]
             return attrs.evolve(
                 value,
                 args=[
                     prev_concat_lhs,
-                    models.BytesConstant(
-                        value=a_b,
-                        encoding=target_encoding,
-                        source_location=(
-                            maybe_byte_const_a.source_location + byte_const_b.source_location
-                        ),
-                    ),
+                    models.BytesConstant(value=a_b, encoding=target_encoding, source_location=loc),
                 ],
             )
         case models.Intrinsic(
@@ -390,7 +387,7 @@ def try_simplify_arithmetic_ops(
                         c = a_const >> b_const
                     case AVMOp.exp:
                         if a_const == 0 and b_const == 0:
-                            raise CodeError("exp would fail at runtime", value.source_location)
+                            return None  # would fail at runtime, lets hope this is unreachable 😬
                         c = a_const**b_const
                     case AVMOp.bitwise_or:
                         c = a_const | b_const
