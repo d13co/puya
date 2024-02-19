@@ -87,6 +87,15 @@ def try_simplify_arithmetic_ops(
                 logger.debug(f"Folded ~{x} to {not_x}")
             return not_x
         case models.Intrinsic(
+            op=AVMOp.btoi,
+            args=[byte_arg],
+            source_location=op_loc,
+        ) if (byte_const := get_byte_constant(subroutine, byte_arg)):
+            return models.UInt64Constant(
+                value=int.from_bytes(byte_const.value, byteorder="big", signed=False),
+                source_location=op_loc,
+            )
+        case models.Intrinsic(
             args=[byte_arg], op=AVMOp.bitwise_not_bytes, source_location=op_loc
         ) if (byte_const := get_byte_constant(subroutine, byte_arg)) is not None:
             not_bites = models.BytesConstant(

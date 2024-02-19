@@ -1144,6 +1144,7 @@ debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable array_data%18#2
+debug: Removing unused variable tmp%60#0
 debug: Removing unused variable array_data%68#2
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
@@ -1177,12 +1178,14 @@ debug: Begin optimization pass 5/100
 debug: Optimizing subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded concat(0x00020004000b, "/x00/x05Hello/x00/x05World") to b'/x00/x02/x00/x04/x00/x0b/x00/x05Hello/x00/x05World'
+debug: Folded 101 + 101 to 202
 debug: Folded concat(0x0004000a, "/x00/x04Ping/x00/x04Pong") to b'/x00/x04/x00/n/x00/x04Ping/x00/x04Pong'
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable dynamic_string_array#0
+debug: Removing unused variable tmp%66#0
 debug: Removing unused variable static_string_array#0
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
@@ -1215,12 +1218,14 @@ debug: Output IR to arc4_types/out/array_Arc4ArraysContract.ssa.opt_pass_5.ir
 debug: Begin optimization pass 6/100
 debug: Optimizing subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Optimizer: Arithmetic Simplification
+debug: Folded 202 == 202 to 1
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable tmp%26#0
 debug: Removing unused variable array_data_sans_header%30#0
+debug: Removing unused variable tmp%67#0
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
@@ -1648,16 +1653,8 @@ debug: Inserted main_for_body@17.ops[1]: 'store item_index_internal%51#0 to l-st
 debug: Replaced main_for_body@17.ops[20]: 'load item_index_internal%51#0' with 'load item_index_internal%51#0 from l-stack (no copy)'
 debug: Inserted main_after_for@19.ops[3]: 'store tmp%56#0 to l-stack (copy)'
 debug: Replaced main_after_for@19.ops[5]: 'load tmp%56#0' with 'load tmp%56#0 from l-stack (no copy)'
-debug: Inserted main_after_for@19.ops[9]: 'store tmp%60#0 to l-stack (copy)'
-debug: Replaced main_after_for@19.ops[11]: 'load tmp%60#0' with 'load tmp%60#0 from l-stack (no copy)'
-debug: Inserted main_after_for@19.ops[12]: 'store tmp%60#0 to l-stack (copy)'
-debug: Replaced main_after_for@19.ops[13]: 'load tmp%60#0' with 'load tmp%60#0 from l-stack (no copy)'
-debug: Inserted main_after_for@19.ops[15]: 'store tmp%66#0 to l-stack (copy)'
-debug: Replaced main_after_for@19.ops[17]: 'load tmp%66#0' with 'load tmp%66#0 from l-stack (no copy)'
-debug: Inserted main_after_for@19.ops[20]: 'store tmp%67#0 to l-stack (copy)'
-debug: Replaced main_after_for@19.ops[22]: 'load tmp%67#0' with 'load tmp%67#0 from l-stack (no copy)'
-debug: Inserted main_after_for@19.ops[27]: 'store item_index_internal%76#0 to l-stack (copy)'
-debug: Replaced main_after_for@19.ops[29]: 'load item_index_internal%76#0' with 'load item_index_internal%76#0 from l-stack (no copy)'
+debug: Inserted main_after_for@19.ops[10]: 'store item_index_internal%76#0 to l-stack (copy)'
+debug: Replaced main_after_for@19.ops[12]: 'load item_index_internal%76#0' with 'load item_index_internal%76#0 from l-stack (no copy)'
 debug: Inserted main_for_header@20.ops[3]: 'store continue_looping%78#0 to l-stack (copy)'
 debug: Replaced main_for_header@20.ops[5]: 'load continue_looping%78#0' with 'load continue_looping%78#0 from l-stack (no copy)'
 debug: Inserted main_for_body@21.ops[11]: 'store item_length%81#0 to l-stack (copy)'
@@ -8829,6 +8826,7 @@ debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
+debug: Removing unused variable int8_decoded#0
 debug: Removing unused variable tmp%3#0
 debug: Removing unused variable tmp%9#0
 debug: Removing unused variable tmp%15#0
@@ -8902,12 +8900,14 @@ debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.ssa.opt_pass
 debug: Begin optimization pass 4/100
 debug: Optimizing subroutine test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
+debug: Folded 255 == 255 to 1
 debug: Folded 1 <= 16 to 1
 debug: Folded len(0x00000000000000000000000000000002) to 16
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
+debug: Removing unused variable tmp%1#0
 debug: Removing unused variable awst_tmp%2#0
 debug: Removing unused variable ternary_result%4#0
 debug: Removing unused variable ternary_result%10#0
@@ -8980,6 +8980,11 @@ debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
+debug: Removing unused variable tmp%6#0
+debug: Removing unused variable tmp%12#0
+debug: Removing unused variable tmp%18#0
+debug: Removing unused variable tmp%24#0
+debug: Removing unused variable tmp%30#0
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
@@ -8996,7 +9001,65 @@ debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
 debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
-debug: No optimizations performed in pass 6, ending loop
+debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.ssa.opt_pass_6.ir
+debug: Begin optimization pass 7/100
+debug: Optimizing subroutine test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program
+debug: Optimizer: Arithmetic Simplification
+debug: Folded 127 == 127 to 1
+debug: Folded 8388607 == 8388607 to 1
+debug: Folded 32767 == 32767 to 1
+debug: Folded 2147483647 == 2147483647 to 1
+debug: Folded 9223372036854775807 == 9223372036854775807 to 1
+debug: Optimizer: Constant Replacer
+debug: Optimizer: Copy Propagation
+debug: Optimizer: Intrinsic Simplifier
+debug: Optimizer: Remove Unused Variables
+debug: Removing unused variable tmp%7#0
+debug: Removing unused variable tmp%13#0
+debug: Removing unused variable tmp%19#0
+debug: Removing unused variable tmp%25#0
+debug: Removing unused variable tmp%31#0
+debug: Optimizer: Simplify Control Ops
+debug: Optimizer: Remove Linear Jump
+debug: Optimizer: Remove Empty Blocks
+debug: Optimizer: Remove Unreachable Blocks
+debug: Optimizer: Repeated Expression Elimination
+debug: Optimizing subroutine test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program
+debug: Optimizer: Arithmetic Simplification
+debug: Optimizer: Constant Replacer
+debug: Optimizer: Copy Propagation
+debug: Optimizer: Intrinsic Simplifier
+debug: Optimizer: Remove Unused Variables
+debug: Optimizer: Simplify Control Ops
+debug: Optimizer: Remove Linear Jump
+debug: Optimizer: Remove Empty Blocks
+debug: Optimizer: Remove Unreachable Blocks
+debug: Optimizer: Repeated Expression Elimination
+debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.ssa.opt_pass_7.ir
+debug: Begin optimization pass 8/100
+debug: Optimizing subroutine test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program
+debug: Optimizer: Arithmetic Simplification
+debug: Optimizer: Constant Replacer
+debug: Optimizer: Copy Propagation
+debug: Optimizer: Intrinsic Simplifier
+debug: Optimizer: Remove Unused Variables
+debug: Optimizer: Simplify Control Ops
+debug: Optimizer: Remove Linear Jump
+debug: Optimizer: Remove Empty Blocks
+debug: Optimizer: Remove Unreachable Blocks
+debug: Optimizer: Repeated Expression Elimination
+debug: Optimizing subroutine test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program
+debug: Optimizer: Arithmetic Simplification
+debug: Optimizer: Constant Replacer
+debug: Optimizer: Copy Propagation
+debug: Optimizer: Intrinsic Simplifier
+debug: Optimizer: Remove Unused Variables
+debug: Optimizer: Simplify Control Ops
+debug: Optimizer: Remove Linear Jump
+debug: Optimizer: Remove Empty Blocks
+debug: Optimizer: Remove Unreachable Blocks
+debug: Optimizer: Repeated Expression Elimination
+debug: No optimizations performed in pass 8, ending loop
 debug: Removing Phis from test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program
 debug: Removing Phis from test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program
 debug: Coalescing local variables in test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program using strategy RootOperandGrouping
@@ -9007,32 +9070,8 @@ debug: Sequentializing parallel copies in test_cases.arc4_types.numeric.Arc4Nume
 debug: Sequentializing parallel copies in test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.destructured.ir
-debug: Inserted main_block@0.ops[6]: 'store tmp%1#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[8]: 'load tmp%1#0' with 'load tmp%1#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[12]: 'store tmp%6#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[14]: 'load tmp%6#0' with 'load tmp%6#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[17]: 'store tmp%7#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[19]: 'load tmp%7#0' with 'load tmp%7#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[23]: 'store tmp%12#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[25]: 'load tmp%12#0' with 'load tmp%12#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[28]: 'store tmp%13#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[30]: 'load tmp%13#0' with 'load tmp%13#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[34]: 'store tmp%18#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[36]: 'load tmp%18#0' with 'load tmp%18#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[39]: 'store tmp%19#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[41]: 'load tmp%19#0' with 'load tmp%19#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[45]: 'store tmp%24#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[47]: 'load tmp%24#0' with 'load tmp%24#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[50]: 'store tmp%25#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[52]: 'load tmp%25#0' with 'load tmp%25#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[56]: 'store tmp%30#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[58]: 'load tmp%30#0' with 'load tmp%30#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[61]: 'store tmp%31#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[63]: 'load tmp%31#0' with 'load tmp%31#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[68]: 'store tmp%48#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[70]: 'load tmp%48#0' with 'load tmp%48#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[2]: 'store int8_decoded#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[5]: 'load int8_decoded#0' with 'load int8_decoded#0 from l-stack (no copy)'
+debug: Inserted main_block@0.ops[3]: 'store tmp%48#0 to l-stack (copy)'
+debug: Replaced main_block@0.ops[5]: 'load tmp%48#0' with 'load tmp%48#0 from l-stack (no copy)'
 debug: Output IR to arc4_types/out/reference_types_MyContract.ssa.ir
 info: Optimizing test_cases.arc4_types.reference_types.MyContract at level 1
 debug: Begin optimization pass 1/100
@@ -11401,6 +11440,8 @@ debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
 debug: Removing unused variable c#0
+debug: Removing unused variable tmp%50#0
+debug: Removing unused variable tmp%68#0
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
@@ -11444,15 +11485,19 @@ debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.ssa.opt_pass_13
 debug: Begin optimization pass 14/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
+debug: Folded 4 == 4 to 1
+debug: Folded 16 == 16 to 1
 debug: Folded concat(0x04, 0x80) to b'/x04/x80'
 debug: Folded chained concat of 0x80and 0x10) to b'/x80/x10'
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
 debug: Optimizer: Remove Unused Variables
+debug: Removing unused variable tmp%51#0
 debug: Removing unused variable tmp%52#0
 debug: Removing unused variable tmp%65#0
 debug: Removing unused variable tmp%67#0
+debug: Removing unused variable tmp%69#0
 debug: Removing unused variable encoded_tuple_buffer%91#2
 debug: Removing unused variable is_true%92#0
 debug: Removing unused variable is_true%93#0
@@ -11910,24 +11955,16 @@ debug: Sequentializing parallel copies in test_cases.arc4_types.tuples.Arc4Tuple
 debug: Sequentializing parallel copies in test_cases.arc4_types.tuples.Arc4TuplesTypeContract.clear_state_program
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.destructured.ir
-debug: Inserted main_block@0.ops[2]: 'store tmp%50#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[4]: 'load tmp%50#0' with 'load tmp%50#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[7]: 'store tmp%51#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[9]: 'load tmp%51#0' with 'load tmp%51#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[13]: 'store tmp%68#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[15]: 'load tmp%68#0' with 'load tmp%68#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[18]: 'store tmp%69#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[20]: 'load tmp%69#0' with 'load tmp%69#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[28]: 'store tmp%102#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[30]: 'load tmp%102#0' with 'load tmp%102#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[33]: 'store tmp%103#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[35]: 'load tmp%103#0' with 'load tmp%103#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[40]: 'store tmp%104#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[42]: 'load tmp%104#0' with 'load tmp%104#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[24]: 'store concat#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[27]: 'load concat#0' with 'load concat#0 from l-stack (no copy)'
-debug: Inserted main_block@0.ops[26]: 'store total#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[39]: 'load total#0' with 'load total#0 from l-stack (no copy)'
+debug: Inserted main_block@0.ops[6]: 'store tmp%102#0 to l-stack (copy)'
+debug: Replaced main_block@0.ops[8]: 'load tmp%102#0' with 'load tmp%102#0 from l-stack (no copy)'
+debug: Inserted main_block@0.ops[11]: 'store tmp%103#0 to l-stack (copy)'
+debug: Replaced main_block@0.ops[13]: 'load tmp%103#0' with 'load tmp%103#0 from l-stack (no copy)'
+debug: Inserted main_block@0.ops[18]: 'store tmp%104#0 to l-stack (copy)'
+debug: Replaced main_block@0.ops[20]: 'load tmp%104#0' with 'load tmp%104#0 from l-stack (no copy)'
+debug: Inserted main_block@0.ops[2]: 'store concat#0 to l-stack (copy)'
+debug: Replaced main_block@0.ops[5]: 'load concat#0' with 'load concat#0 from l-stack (no copy)'
+debug: Inserted main_block@0.ops[4]: 'store total#0 to l-stack (copy)'
+debug: Replaced main_block@0.ops[17]: 'load total#0' with 'load total#0 from l-stack (no copy)'
 debug: Inserted test_stuff_block@0.ops[13]: 'store item_length%3#0 to l-stack (copy)'
 debug: Replaced test_stuff_block@0.ops[15]: 'load item_length%3#0' with 'load item_length%3#0 from l-stack (no copy)'
 debug: Inserted test_stuff_block@0.ops[31]: 'store item_length%7#0 to l-stack (copy)'
