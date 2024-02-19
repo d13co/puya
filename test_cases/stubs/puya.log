@@ -1153,7 +1153,7 @@ debug: Begin optimization pass 1/100
 debug: Optimizing subroutine test_cases.stubs.bytes.BytesContract.approval_program
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat("a", "b") to b'ab'
+debug: Folded concat of "a" and "b" to "ab"
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: awst_tmp%11#0, ternary_result%13#1
@@ -1249,7 +1249,7 @@ debug: Optimizing subroutine test_cases.stubs.bytes.BytesContract.approval_progr
 debug: Optimizer: Arithmetic Simplification
 debug: Folded len(QmFzZSA2NCBlbmNvZGVk) to 15
 debug: Folded len("") to 0
-debug: Folded concat("c", "d") to b'cd'
+debug: Folded concat of "c" and "d" to "cd"
 debug: Folded len("abc") to 3
 debug: Folded len("1") to 1
 debug: Optimizer: Constant Replacer

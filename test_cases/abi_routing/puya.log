@@ -563,8 +563,8 @@ debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.abi_routing.contract.Reference.__init__
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x07and 0x08) to b'/x07/x08'
-debug: Folded chained concat of 0x0708and 0x09) to b'/x07/x08/t'
+debug: Folded concat of 0x07 and 0x08 to 0x0708
+debug: Folded concat of 0x0708 and 0x09 to 0x070809
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier

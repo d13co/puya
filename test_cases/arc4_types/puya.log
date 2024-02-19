@@ -907,20 +907,20 @@ debug: Begin optimization pass 1/100
 debug: Optimizing subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
+debug: Folded concat of 0x01 and 0x02 to 0x0102
 debug: Folded item_index_internal%3#1 * 1u to item_index_internal%3#1
 debug: Folded len("/x00/x05Hello") to 7
 debug: Folded len("/x00/x05World") to 7
-debug: Folded chained concat of "/x00/x05Hello"and "/x00/x05World") to b'/x00/x05Hello/x00/x05World'
+debug: Folded concat of "/x00/x05Hello" and "/x00/x05World" to "/x00/x05Hello/x00/x05World"
 debug: Folded 0 * 2 to 0
-debug: Folded chained concat of 0x00000001and 0x0000000a) to b'/x00/x00/x00/x01/x00/x00/x00/n'
-debug: Folded chained concat of 0x000000010000000aand 0x000000ff) to b'/x00/x00/x00/x01/x00/x00/x00/n/x00/x00/x00/xff'
-debug: Folded chained concat of 0x000000010000000a000000ffand 0x00000080) to b'/x00/x00/x00/x01/x00/x00/x00/n/x00/x00/x00/xff/x00/x00/x00/x80'
+debug: Folded concat of 0x00000001 and 0x0000000a to 0x000000010000000a
+debug: Folded concat of 0x000000010000000a and 0x000000ff to 0x000000010000000a000000ff
+debug: Folded concat of 0x000000010000000a000000ff and 0x00000080 to 0x000000010000000a000000ff00000080
 debug: Folded 0u * 1u to 0u
 debug: Folded index#1 * 1u to index#1
 debug: Folded len("/x00/x04Ping") to 6
 debug: Folded len("/x00/x04Pong") to 6
-debug: Folded chained concat of "/x00/x04Ping"and "/x00/x04Pong") to b'/x00/x04Ping/x00/x04Pong'
+debug: Folded concat of "/x00/x04Ping" and "/x00/x04Pong" to "/x00/x04Ping/x00/x04Pong"
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: array_data%0#2, dynamic_uint8_array#0
@@ -1039,8 +1039,8 @@ debug: Output IR to arc4_types/out/array_Arc4ArraysContract.ssa.opt_pass_1.ir
 debug: Begin optimization pass 2/100
 debug: Optimizing subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x0102) to b'/x00/x02/x01/x02'
-debug: Folded concat(0x0001, 0x0001) to b'/x00/x01/x00/x01'
+debug: Folded concat of 0x0002 and 0x0102 to 0x00020102
+debug: Folded concat of 0x0001 and 0x0001 to 0x00010001
 debug: Folded 4 + 7 to 11
 debug: Folded 0 < 1 to 1
 debug: Folded 4 + 6 to 10
@@ -1091,7 +1091,7 @@ debug: Output IR to arc4_types/out/array_Arc4ArraysContract.ssa.opt_pass_2.ir
 debug: Begin optimization pass 3/100
 debug: Optimizing subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x0004) to b'/x00/x02/x00/x04'
+debug: Folded concat of 0x0002 and 0x0004 to 0x00020004
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -1137,8 +1137,8 @@ debug: Output IR to arc4_types/out/array_Arc4ArraysContract.ssa.opt_pass_3.ir
 debug: Begin optimization pass 4/100
 debug: Optimizing subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x00020004, 0x000b) to b'/x00/x02/x00/x04/x00/x0b'
-debug: Folded concat(0x0004, 0x000a) to b'/x00/x04/x00/n'
+debug: Folded concat of 0x00020004 and 0x000b to 0x00020004000b
+debug: Folded concat of 0x0004 and 0x000a to 0x0004000a
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -1177,9 +1177,9 @@ debug: Output IR to arc4_types/out/array_Arc4ArraysContract.ssa.opt_pass_4.ir
 debug: Begin optimization pass 5/100
 debug: Optimizing subroutine test_cases.arc4_types.array.Arc4ArraysContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x00020004000b, "/x00/x05Hello/x00/x05World") to b'/x00/x02/x00/x04/x00/x0b/x00/x05Hello/x00/x05World'
+debug: Folded concat of 0x00020004000b and "/x00/x05Hello/x00/x05World" to AAIABAALAAVIZWxsbwAFV29ybGQ=
 debug: Folded 101 + 101 to 202
-debug: Folded concat(0x0004000a, "/x00/x04Ping/x00/x04Pong") to b'/x00/x04/x00/n/x00/x04Ping/x00/x04Pong'
+debug: Folded concat of 0x0004000a and "/x00/x04Ping/x00/x04Pong" to AAQACgAEUGluZwAEUG9uZw==
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -1781,7 +1781,7 @@ debug: Begin optimization pass 2/100
 debug: Optimizing subroutine test_cases.arc4_types.bool.Arc4BoolTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 11 < 12 to 1
-debug: Folded concat(0x0003, 0x80) to b'/x00/x03/x80'
+debug: Folded concat of 0x0003 and 0x80 to 0x000380
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -2077,7 +2077,7 @@ debug: Output IR to arc4_types/out/bool_Arc4BoolTypeContract.ssa.opt_pass_9.ir
 debug: Begin optimization pass 10/100
 debug: Optimizing subroutine test_cases.arc4_types.bool.Arc4BoolTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0xff, 0x80) to b'/xff/x80'
+debug: Folded concat of 0xff and 0x80 to 0xff80
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -2592,7 +2592,7 @@ debug: Output IR to arc4_types/out/bool_eval_Arc4BoolEvalContract.ssa.opt_pass_6
 debug: Begin optimization pass 7/100
 debug: Optimizing subroutine test_cases.arc4_types.bool_eval.Arc4BoolEvalContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0001, 0x0000000000000000) to b'/x00/x01/x00/x00/x00/x00/x00/x00/x00/x00'
+debug: Folded concat of 0x0001 and 0x0000000000000000 to 0x00010000000000000000
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -2721,8 +2721,8 @@ debug: Optimizer: Arithmetic Simplification
 debug: Folded len("/x00/x01X") to 3
 debug: Folded len("/x00/x01Y") to 3
 debug: Folded len("/x00/x01Z") to 3
-debug: Folded chained concat of "/x00/x01X"and "/x00/x01Y") to b'/x00/x01X/x00/x01Y'
-debug: Folded chained concat of "/x00/x01X/x00/x01Y"and "/x00/x01Z") to b'/x00/x01X/x00/x01Y/x00/x01Z'
+debug: Folded concat of "/x00/x01X" and "/x00/x01Y" to "/x00/x01X/x00/x01Y"
+debug: Folded concat of "/x00/x01X/x00/x01Y" and "/x00/x01Z" to "/x00/x01X/x00/x01Y/x00/x01Z"
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -2802,9 +2802,9 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz_raw
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0001, 0x58) to b'/x00/x01X'
-debug: Folded concat(0x0001, 0x59) to b'/x00/x01Y'
-debug: Folded concat(0x0001, 0x5a) to b'/x00/x01Z'
+debug: Folded concat of 0x0001 and 0x58 to 0x000158
+debug: Folded concat of 0x0001 and 0x59 to 0x000159
+debug: Folded concat of 0x0001 and 0x5a to 0x00015a
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -2846,7 +2846,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0003, 0x0006) to b'/x00/x03/x00/x06'
+debug: Folded concat of 0x0003 and 0x0006 to 0x00030006
 debug: Folded 9 + 3 to 12
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -2863,11 +2863,11 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz_raw
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0003, 0x0006) to b'/x00/x03/x00/x06'
+debug: Folded concat of 0x0003 and 0x0006 to 0x00030006
 debug: Folded len(0x000158) to 3
 debug: Folded len(0x000159) to 3
-debug: Folded chained concat of 0x000158and 0x000159) to b'/x00/x01X/x00/x01Y'
-debug: Folded chained concat of 0x000158000159and 0x00015a) to b'/x00/x01X/x00/x01Y/x00/x01Z'
+debug: Folded concat of 0x000158 and 0x000159 to 0x000158000159
+debug: Folded concat of 0x000158000159 and 0x00015a to 0x00015800015900015a
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -2908,7 +2908,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x00030006, 0x0009) to b'/x00/x03/x00/x06/x00/t'
+debug: Folded concat of 0x00030006 and 0x0009 to 0x000300060009
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -2960,7 +2960,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000300060009, 0x000c) to b'/x00/x03/x00/x06/x00/t/x00/x0c'
+debug: Folded concat of 0x000300060009 and 0x000c to 0x000300060009000c
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -3012,7 +3012,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000300060009000c, "/x00/x01X/x00/x01Y/x00/x01Z") to b'/x00/x03/x00/x06/x00/t/x00/x0c/x00/x01X/x00/x01Y/x00/x01Z'
+debug: Folded concat of 0x000300060009000c and "/x00/x01X/x00/x01Y/x00/x01Z" to AAMABgAJAAwAAVgAAVkAAVo=
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -3025,7 +3025,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz_raw
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x00030006, 0x0009) to b'/x00/x03/x00/x06/x00/t'
+debug: Folded concat of 0x00030006 and 0x0009 to 0x000300060009
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -3075,7 +3075,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz_raw
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000300060009, 0x000c) to b'/x00/x03/x00/x06/x00/t/x00/x0c'
+debug: Folded concat of 0x000300060009 and 0x000c to 0x000300060009000c
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -3123,7 +3123,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.dynamic_string_array.Arc4DynamicStringArrayContract.xyz_raw
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000300060009000c, 0x00015800015900015a) to b'/x00/x03/x00/x06/x00/t/x00/x0c/x00/x01X/x00/x01Y/x00/x01Z'
+debug: Folded concat of 0x000300060009000c and 0x00015800015900015a to 0x000300060009000c00015800015900015a
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -3261,28 +3261,28 @@ debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x0102and 0x32) to b'/x01/x022'
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x0102and 0x32) to b'/x01/x022'
-debug: Folded chained concat of 0x010232and 0x01) to b'/x01/x022/x01'
-debug: Folded chained concat of 0x01023201and 0x02) to b'/x01/x022/x01/x02'
-debug: Folded chained concat of 0x0102320102and 0x32) to b'/x01/x022/x01/x022'
-debug: Folded chained concat of 0x04and 0x5a) to b'/x04Z'
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x0102and 0x32) to b'/x01/x022'
-debug: Folded chained concat of 0x010232and 0x01) to b'/x01/x022/x01'
-debug: Folded chained concat of 0x01023201and 0x02) to b'/x01/x022/x01/x02'
-debug: Folded chained concat of 0x0102320102and 0x32) to b'/x01/x022/x01/x022'
-debug: Folded chained concat of 0x010232010232and 0x04) to b'/x01/x022/x01/x022/x04'
-debug: Folded chained concat of 0x01023201023204and 0x5a) to b'/x01/x022/x01/x022/x04Z'
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x0102and 0x32) to b'/x01/x022'
-debug: Folded chained concat of 0x010232and 0x01) to b'/x01/x022/x01'
-debug: Folded chained concat of 0x01023201and 0x02) to b'/x01/x022/x01/x02'
-debug: Folded chained concat of 0x0102320102and 0x32) to b'/x01/x022/x01/x022'
-debug: Folded chained concat of 0x010232010232and 0x04) to b'/x01/x022/x01/x022/x04'
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x0102 and 0x32 to 0x010232
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x0102 and 0x32 to 0x010232
+debug: Folded concat of 0x010232 and 0x01 to 0x01023201
+debug: Folded concat of 0x01023201 and 0x02 to 0x0102320102
+debug: Folded concat of 0x0102320102 and 0x32 to 0x010232010232
+debug: Folded concat of 0x04 and 0x5a to 0x045a
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x0102 and 0x32 to 0x010232
+debug: Folded concat of 0x010232 and 0x01 to 0x01023201
+debug: Folded concat of 0x01023201 and 0x02 to 0x0102320102
+debug: Folded concat of 0x0102320102 and 0x32 to 0x010232010232
+debug: Folded concat of 0x010232010232 and 0x04 to 0x01023201023204
+debug: Folded concat of 0x01023201023204 and 0x5a to 0x010232010232045a
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x0102 and 0x32 to 0x010232
+debug: Folded concat of 0x010232 and 0x01 to 0x01023201
+debug: Folded concat of 0x01023201 and 0x02 to 0x0102320102
+debug: Folded concat of 0x0102320102 and 0x32 to 0x010232010232
+debug: Folded concat of 0x010232010232 and 0x04 to 0x01023201023204
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: array_data%0#2, dynamic_uint8_array#0
@@ -3687,9 +3687,9 @@ debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_of_array_static
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x0aand 0x09) to b'/n/t'
-debug: Folded chained concat of 0x40and 0x80) to b'@/x80'
-debug: Folded chained concat of 0xffand 0xfe) to b'/xff/xfe'
+debug: Folded concat of 0x0a and 0x09 to 0x0a09
+debug: Folded concat of 0x40 and 0x80 to 0x4080
+debug: Folded concat of 0xff and 0xfe to 0xfffe
 debug: Folded 1u * 2u to 2u
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -3722,8 +3722,8 @@ debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.index_assign
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x01 and 0x02 to 0x0102
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: array_data%0#2, dynamic_uint8_array#0
@@ -3772,13 +3772,13 @@ debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
 debug: Folded len("/x00/x05Happy") to 7
 debug: Folded len("/x00/x04Days") to 6
-debug: Folded chained concat of "/x00/x05Happy"and "/x00/x04Days") to b'/x00/x05Happy/x00/x04Days'
+debug: Folded concat of "/x00/x05Happy" and "/x00/x04Days" to "/x00/x05Happy/x00/x04Days"
 debug: Folded len("/x00/x05Happy") to 7
 debug: Folded len("/x00/x04Days") to 6
-debug: Folded chained concat of "/x00/x05Happy"and "/x00/x04Days") to b'/x00/x05Happy/x00/x04Days'
+debug: Folded concat of "/x00/x05Happy" and "/x00/x04Days" to "/x00/x05Happy/x00/x04Days"
 debug: Folded len("/x00/x05Hmmmm") to 7
 debug: Folded len("/x00/x07Oh well") to 9
-debug: Folded chained concat of "/x00/x05Hmmmm"and "/x00/x07Oh well") to b'/x00/x05Hmmmm/x00/x07Oh well'
+debug: Folded concat of "/x00/x05Hmmmm" and "/x00/x07Oh well" to "/x00/x05Hmmmm/x00/x07Oh well"
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: encoded_tuple_buffer%2#6, test_struct#0
@@ -3858,18 +3858,18 @@ debug: Replacing {encoded_tuple_buffer%40#4} with encoded_tuple_buffer%16#4 made
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x03and 0x04) to b'/x03/x04'
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x0102and 0x03) to b'/x01/x02/x03'
-debug: Folded chained concat of 0x010203and 0x04) to b'/x01/x02/x03/x04'
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
-debug: Folded chained concat of 0x0102and 0x03) to b'/x01/x02/x03'
-debug: Folded chained concat of 0x010203and 0x04) to b'/x01/x02/x03/x04'
-debug: Folded chained concat of 0x01020304and 0x05) to b'/x01/x02/x03/x04/x05'
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x03 and 0x04 to 0x0304
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x0102 and 0x03 to 0x010203
+debug: Folded concat of 0x010203 and 0x04 to 0x01020304
+debug: Folded concat of 0x01 and 0x02 to 0x0102
+debug: Folded concat of 0x0102 and 0x03 to 0x010203
+debug: Folded concat of 0x010203 and 0x04 to 0x01020304
+debug: Folded concat of 0x01020304 and 0x05 to 0x0102030405
 debug: Folded len("/x00/x05Hello") to 7
 debug: Folded len("/x00/x05World") to 7
-debug: Folded chained concat of "/x00/x05Hello"and "/x00/x05World") to b'/x00/x05Hello/x00/x05World'
+debug: Folded concat of "/x00/x05Hello" and "/x00/x05World" to "/x00/x05Hello/x00/x05World"
 debug: Folded len("/x00/x05World") to 7
 debug: Folded len("/x00/x05Hello") to 7
 debug: Optimizer: Constant Replacer
@@ -4067,11 +4067,11 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x0102) to b'/x00/x02/x01/x02'
-debug: Folded concat(0x0003, 0x010232) to b'/x00/x03/x01/x022'
-debug: Folded concat(0x0006, 0x010232010232) to b'/x00/x06/x01/x022/x01/x022'
-debug: Folded concat(0x0008, 0x010232010232045a) to b'/x00/x08/x01/x022/x01/x022/x04Z'
-debug: Folded concat(0x0007, 0x01023201023204) to b'/x00/x07/x01/x022/x01/x022/x04'
+debug: Folded concat of 0x0002 and 0x0102 to 0x00020102
+debug: Folded concat of 0x0003 and 0x010232 to 0x0003010232
+debug: Folded concat of 0x0006 and 0x010232010232 to 0x0006010232010232
+debug: Folded concat of 0x0008 and 0x010232010232045a to 0x0008010232010232045a
+debug: Folded concat of 0x0007 and 0x01023201023204 to 0x000701023201023204
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4090,11 +4090,11 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_bool
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x80) to b'/x00/x02/x80'
-debug: Folded concat(0x0004, 0x80) to b'/x00/x04/x80'
-debug: Folded concat(0x0008, 0x80) to b'/x00/x08/x80'
-debug: Folded concat(0x0009, 0x80) to b'/x00/t/x80'
-debug: Folded concat(0x0007, 0x80) to b'/x00/x07/x80'
+debug: Folded concat of 0x0002 and 0x80 to 0x000280
+debug: Folded concat of 0x0004 and 0x80 to 0x000480
+debug: Folded concat of 0x0008 and 0x80 to 0x000880
+debug: Folded concat of 0x0009 and 0x80 to 0x000980
+debug: Folded concat of 0x0007 and 0x80 to 0x000780
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4116,28 +4116,28 @@ debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract
 debug: Optimizer: Arithmetic Simplification
 debug: Folded len("/x00/x05Hello") to 7
 debug: Folded len("/x00/x05World") to 7
-debug: Folded chained concat of "/x00/x05Hello"and "/x00/x05World") to b'/x00/x05Hello/x00/x05World'
+debug: Folded concat of "/x00/x05Hello" and "/x00/x05World" to "/x00/x05Hello/x00/x05World"
 debug: Folded len("/x00/x03Foo") to 5
 debug: Folded len("/x00/x03Bar") to 5
-debug: Folded chained concat of "/x00/x05Hello"and "/x00/x05World") to b'/x00/x05Hello/x00/x05World'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World"and "/x00/x03Foo") to b'/x00/x05Hello/x00/x05World/x00/x03Foo'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo"and "/x00/x03Bar") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar"and "/x00/x05Hello") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello"and "/x00/x05World") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World"and "/x00/x03Foo") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo"and "/x00/x03Bar") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar'
-debug: Folded chained concat of "/x00/x05Hello"and "/x00/x05World") to b'/x00/x05Hello/x00/x05World'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World"and "/x00/x03Foo") to b'/x00/x05Hello/x00/x05World/x00/x03Foo'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo"and "/x00/x05Hello") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello"and "/x00/x05Hello") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello"and "/x00/x05Hello") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello"and "/x00/x03Foo") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo"and "/x00/x03Bar") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo/x00/x03Bar'
-debug: Folded chained concat of "/x00/x05Hello"and "/x00/x05World") to b'/x00/x05Hello/x00/x05World'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World"and "/x00/x03Foo") to b'/x00/x05Hello/x00/x05World/x00/x03Foo'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo"and "/x00/x05Hello") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello"and "/x00/x05Hello") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello'
-debug: Folded chained concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello"and "/x00/x05Hello") to b'/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello'
+debug: Folded concat of "/x00/x05Hello" and "/x00/x05World" to "/x00/x05Hello/x00/x05World"
+debug: Folded concat of "/x00/x05Hello/x00/x05World" and "/x00/x03Foo" to "/x00/x05Hello/x00/x05World/x00/x03Foo"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo" and "/x00/x03Bar" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar" and "/x00/x05Hello" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello" and "/x00/x05World" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World" and "/x00/x03Foo" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo" and "/x00/x03Bar" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar"
+debug: Folded concat of "/x00/x05Hello" and "/x00/x05World" to "/x00/x05Hello/x00/x05World"
+debug: Folded concat of "/x00/x05Hello/x00/x05World" and "/x00/x03Foo" to "/x00/x05Hello/x00/x05World/x00/x03Foo"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo" and "/x00/x05Hello" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello" and "/x00/x05Hello" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello" and "/x00/x05Hello" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello" and "/x00/x03Foo" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo" and "/x00/x03Bar" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo/x00/x03Bar"
+debug: Folded concat of "/x00/x05Hello" and "/x00/x05World" to "/x00/x05Hello/x00/x05World"
+debug: Folded concat of "/x00/x05Hello/x00/x05World" and "/x00/x03Foo" to "/x00/x05Hello/x00/x05World/x00/x03Foo"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo" and "/x00/x05Hello" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello" and "/x00/x05Hello" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello"
+debug: Folded concat of "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello" and "/x00/x05Hello" to "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello"
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4180,8 +4180,8 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_of_array_dynamic
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0001, 0x0a) to b'/x00/x01/n'
-debug: Folded concat(0x0001, 0x10) to b'/x00/x01/x10'
+debug: Folded concat of 0x0001 and 0x0a to 0x00010a
+debug: Folded concat of 0x0001 and 0x10 to 0x000110
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4214,8 +4214,8 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.index_assign
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x0102) to b'/x00/x02/x01/x02'
-debug: Folded concat(0x0002, 0x80) to b'/x00/x02/x80'
+debug: Folded concat of 0x0002 and 0x0102 to 0x00020102
+debug: Folded concat of 0x0002 and 0x80 to 0x000280
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4253,9 +4253,9 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x0102) to b'/x00/x02/x01/x02'
-debug: Folded concat(0x0004, 0x01020304) to b'/x00/x04/x01/x02/x03/x04'
-debug: Folded concat(0x0005, 0x0102030405) to b'/x00/x05/x01/x02/x03/x04/x05'
+debug: Folded concat of 0x0002 and 0x0102 to 0x00020102
+debug: Folded concat of 0x0004 and 0x01020304 to 0x000401020304
+debug: Folded concat of 0x0005 and 0x0102030405 to 0x00050102030405
 debug: Folded 4 + 7 to 11
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -4403,7 +4403,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_bool
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x80, 0x00) to b'/x80/x00'
+debug: Folded concat of 0x80 and 0x00 to 0x8000
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4421,12 +4421,12 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x0004) to b'/x00/x02/x00/x04'
+debug: Folded concat of 0x0002 and 0x0004 to 0x00020004
 debug: Folded 4 + 7 to 11
-debug: Folded concat("/x00/x03Foo", "/x00/x03Bar") to b'/x00/x03Foo/x00/x03Bar'
-debug: Folded concat(0x0008, 0x0010) to b'/x00/x08/x00/x10'
+debug: Folded concat of "/x00/x03Foo" and "/x00/x03Bar" to "/x00/x03Foo/x00/x03Bar"
+debug: Folded concat of 0x0008 and 0x0010 to 0x00080010
 debug: Folded 16 + 7 to 23
-debug: Folded concat(0x0006, 0x000c) to b'/x00/x06/x00/x0c'
+debug: Folded concat of 0x0006 and 0x000c to 0x0006000c
 debug: Folded 12 + 7 to 19
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -4457,7 +4457,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_of_array_static
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0a09, 0x4080) to b'/n/t@/x80'
+debug: Folded concat of 0x0a09 and 0x4080 to 0x0a094080
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4484,8 +4484,8 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.struct_assign
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x80, 0x32) to b'/x802'
-debug: Folded concat(0x00, 0x0c) to b'/x00/x0c'
+debug: Folded concat of 0x80 and 0x32 to 0x8032
+debug: Folded concat of 0x00 and 0x0c to 0x000c
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4501,8 +4501,8 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0002, 0x0004) to b'/x00/x02/x00/x04'
-debug: Folded concat(0x0001, 0x0002) to b'/x00/x01/x00/x02'
+debug: Folded concat of 0x0002 and 0x0004 to 0x00020004
+debug: Folded concat of 0x0001 and 0x0002 to 0x00010002
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4631,7 +4631,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0102, 0x32) to b'/x01/x022'
+debug: Folded concat of 0x0102 and 0x32 to 0x010232
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4720,11 +4720,11 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.struct_assign
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x8032, 0x0006) to b'/x802/x00/x06'
-debug: Folded chained concat of 0x000dand "/x00/x05Happy/x00/x04Days") to b'/x00/r/x00/x05Happy/x00/x04Days'
-debug: Folded concat(0x000c, 0x0006) to b'/x00/x0c/x00/x06'
-debug: Folded chained concat of 0x000dand "/x00/x05Happy/x00/x04Days") to b'/x00/r/x00/x05Happy/x00/x04Days'
-debug: Folded chained concat of 0x000dand "/x00/x05Hmmmm/x00/x07Oh well") to b'/x00/r/x00/x05Hmmmm/x00/x07Oh well'
+debug: Folded concat of 0x8032 and 0x0006 to 0x80320006
+debug: Folded concat of 0x000d and "/x00/x05Happy/x00/x04Days" to AA0ABUhhcHB5AAREYXlz
+debug: Folded concat of 0x000c and 0x0006 to 0x000c0006
+debug: Folded concat of 0x000d and "/x00/x05Happy/x00/x04Days" to AA0ABUhhcHB5AAREYXlz
+debug: Folded concat of 0x000d and "/x00/x05Hmmmm/x00/x07Oh well" to AA0ABUhtbW1tAAdPaCB3ZWxs
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4740,10 +4740,10 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0102, 0x0304) to b'/x01/x02/x03/x04'
-debug: Folded concat(0x00020004, 0x000b) to b'/x00/x02/x00/x04/x00/x0b'
-debug: Folded concat(0x00010002, "/x00/x05World") to b'/x00/x01/x00/x02/x00/x05World'
-debug: Folded concat(0x00010002, "/x00/x05Hello") to b'/x00/x01/x00/x02/x00/x05Hello'
+debug: Folded concat of 0x0102 and 0x0304 to 0x01020304
+debug: Folded concat of 0x00020004 and 0x000b to 0x00020004000b
+debug: Folded concat of 0x00010002 and "/x00/x05World" to AAEAAgAFV29ybGQ=
+debug: Folded concat of 0x00010002 and "/x00/x05Hello" to AAEAAgAFSGVsbG8=
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4903,10 +4903,10 @@ debug: Replacing {tmp%18#0} with tmp%9#0 made 1 modifications
 debug: Removing redundant assert of tmp%9#0
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x00020004, 0x000b) to b'/x00/x02/x00/x04/x00/x0b'
-debug: Folded concat(0x00080010, 0x0017) to b'/x00/x08/x00/x10/x00/x17'
+debug: Folded concat of 0x00020004 and 0x000b to 0x00020004000b
+debug: Folded concat of 0x00080010 and 0x0017 to 0x000800100017
 debug: Folded 30 + 5 to 35
-debug: Folded concat(0x0006000c, 0x0013) to b'/x00/x06/x00/x0c/x00/x13'
+debug: Folded concat of 0x0006000c and 0x0013 to 0x0006000c0013
 debug: Folded 26 + 5 to 31
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -4965,9 +4965,9 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.struct_assign
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x80320006, AA0ABUhhcHB5AAREYXlz) to b'/x802/x00/x06/x00/r/x00/x05Happy/x00/x04Days'
-debug: Folded concat(0x000c0006, AA0ABUhhcHB5AAREYXlz) to b'/x00/x0c/x00/x06/x00/r/x00/x05Happy/x00/x04Days'
-debug: Folded concat(0x000c0006, AA0ABUhtbW1tAAdPaCB3ZWxs) to b'/x00/x0c/x00/x06/x00/r/x00/x05Hmmmm/x00/x07Oh well'
+debug: Folded concat of 0x80320006 and AA0ABUhhcHB5AAREYXlz to gDIABgANAAVIYXBweQAERGF5cw==
+debug: Folded concat of 0x000c0006 and AA0ABUhhcHB5AAREYXlz to AAwABgANAAVIYXBweQAERGF5cw==
+debug: Folded concat of 0x000c0006 and AA0ABUhtbW1tAAdPaCB3ZWxs to AAwABgANAAVIbW1tbQAHT2ggd2VsbA==
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -4983,7 +4983,7 @@ debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Optimizer: Arithmetic Simplification
 debug: Folded len(0x01020304) to 4
-debug: Folded concat(0x00020004000b, "/x00/x05Hello/x00/x05World") to b'/x00/x02/x00/x04/x00/x0b/x00/x05Hello/x00/x05World'
+debug: Folded concat of 0x00020004000b and "/x00/x05Hello/x00/x05World" to AAIABAALAAVIZWxsbwAFV29ybGQ=
 debug: Folded len(AAEAAgAFV29ybGQ=) to 11
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -5139,11 +5139,11 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x00020004000b, "/x00/x05Hello/x00/x05World") to b'/x00/x02/x00/x04/x00/x0b/x00/x05Hello/x00/x05World'
-debug: Folded concat(0x000800100017, 0x001e) to b'/x00/x08/x00/x10/x00/x17/x00/x1e'
+debug: Folded concat of 0x00020004000b and "/x00/x05Hello/x00/x05World" to AAIABAALAAVIZWxsbwAFV29ybGQ=
+debug: Folded concat of 0x000800100017 and 0x001e to 0x000800100017001e
 debug: Folded 35 + 5 to 40
 debug: Folded 35 + 7 to 42
-debug: Folded concat(0x0006000c0013, 0x001a) to b'/x00/x06/x00/x0c/x00/x13/x00/x1a'
+debug: Folded concat of 0x0006000c0013 and 0x001a to 0x0006000c0013001a
 debug: Folded 31 + 7 to 38
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -5338,7 +5338,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0003, 0x010232) to b'/x00/x03/x01/x022'
+debug: Folded concat of 0x0003 and 0x010232 to 0x0003010232
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -5365,10 +5365,10 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000800100017001e, 0x0023) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#'
+debug: Folded concat of 0x000800100017001e and 0x0023 to 0x000800100017001e0023
 debug: Folded 40 + 7 to 47
 debug: Folded 42 + 7 to 49
-debug: Folded concat(0x0006000c0013001a, 0x001f) to b'/x00/x06/x00/x0c/x00/x13/x00/x1a/x00/x1f'
+debug: Folded concat of 0x0006000c0013001a and 0x001f to 0x0006000c0013001a001f
 debug: Folded 38 + 7 to 45
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -5437,7 +5437,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0004, 0x01020304) to b'/x00/x04/x01/x02/x03/x04'
+debug: Folded concat of 0x0004 and 0x01020304 to 0x000401020304
 debug: Folded 2 + 2 to 4
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -5591,11 +5591,11 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000800100017001e0023, 0x0028) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00('
+debug: Folded concat of 0x000800100017001e0023 and 0x0028 to 0x000800100017001e00230028
 debug: Folded 47 + 7 to 54
-debug: Folded concat(0x000800100017001e0023, 0x002a) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00*'
+debug: Folded concat of 0x000800100017001e0023 and 0x002a to 0x000800100017001e0023002a
 debug: Folded 49 + 7 to 56
-debug: Folded concat(0x0006000c0013001a001f, 0x0026) to b'/x00/x06/x00/x0c/x00/x13/x00/x1a/x00/x1f/x00&'
+debug: Folded concat of 0x0006000c0013001a001f and 0x0026 to 0x0006000c0013001a001f0026
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -5788,7 +5788,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x010232, 0x010232) to b'/x01/x022/x01/x022'
+debug: Folded concat of 0x010232 and 0x010232 to 0x010232010232
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -5814,11 +5814,11 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000800100017001e00230028, 0x002f) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00(/x00/'
+debug: Folded concat of 0x000800100017001e00230028 and 0x002f to 0x000800100017001e00230028002f
 debug: Folded 54 + 5 to 59
-debug: Folded concat(0x000800100017001e0023002a, 0x0031) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00*/x001'
+debug: Folded concat of 0x000800100017001e0023002a and 0x0031 to 0x000800100017001e0023002a0031
 debug: Folded 56 + 5 to 61
-debug: Folded concat(0x0006000c0013001a001f0026, 0x002d) to b'/x00/x06/x00/x0c/x00/x13/x00/x1a/x00/x1f/x00&/x00-'
+debug: Folded concat of 0x0006000c0013001a001f0026 and 0x002d to 0x0006000c0013001a001f0026002d
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -5883,7 +5883,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x01020304, 0x05) to b'/x01/x02/x03/x04/x05'
+debug: Folded concat of 0x01020304 and 0x05 to 0x0102030405
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -6021,7 +6021,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_bool
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0009aa, 0x80) to b'/x00/t/xaa/x80'
+debug: Folded concat of 0x0009aa and 0x80 to 0x0009aa80
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -6034,9 +6034,9 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000800100017001e00230028002f, 0x0036) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00(/x00//x006'
-debug: Folded concat(0x000800100017001e0023002a0031, 0x0038) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00*/x001/x008'
-debug: Folded concat(0x0006000c0013001a001f0026002d, "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello") to b'/x00/x06/x00/x0c/x00/x13/x00/x1a/x00/x1f/x00&/x00-/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello'
+debug: Folded concat of 0x000800100017001e00230028002f and 0x0036 to 0x000800100017001e00230028002f0036
+debug: Folded concat of 0x000800100017001e0023002a0031 and 0x0038 to 0x000800100017001e0023002a00310038
+debug: Folded concat of 0x0006000c0013001a001f0026002d and "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello" to AAYADAATABoAHwAmAC0ABUhlbGxvAAVXb3JsZAADRm9vAAVIZWxsbwAFSGVsbG8ABUhlbGxv
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -6248,8 +6248,8 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000800100017001e00230028002f0036, 0x003b) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00(/x00//x006/x00;'
-debug: Folded concat(0x000800100017001e0023002a00310038, 0x003d) to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00*/x001/x008/x00='
+debug: Folded concat of 0x000800100017001e00230028002f0036 and 0x003b to 0x000800100017001e00230028002f0036003b
+debug: Folded concat of 0x000800100017001e0023002a00310038 and 0x003d to 0x000800100017001e0023002a00310038003d
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -6432,7 +6432,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0006, 0x010232010232) to b'/x00/x06/x01/x022/x01/x022'
+debug: Folded concat of 0x0006 and 0x010232010232 to 0x0006010232010232
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -6456,8 +6456,8 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_string
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000800100017001e00230028002f0036003b, "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar") to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00(/x00//x006/x00;/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar'
-debug: Folded concat(0x000800100017001e0023002a00310038003d, "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo/x00/x03Bar") to b'/x00/x08/x00/x10/x00/x17/x00/x1e/x00#/x00*/x001/x008/x00=/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo/x00/x03Bar'
+debug: Folded concat of 0x000800100017001e00230028002f0036003b and "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x03Bar" to AAgAEAAXAB4AIwAoAC8ANgA7AAVIZWxsbwAFV29ybGQAA0ZvbwADQmFyAAVIZWxsbwAFV29ybGQAA0ZvbwADQmFy
+debug: Folded concat of 0x000800100017001e0023002a00310038003d and "/x00/x05Hello/x00/x05World/x00/x03Foo/x00/x05Hello/x00/x05Hello/x00/x05Hello/x00/x03Foo/x00/x03Bar" to AAgAEAAXAB4AIwAqADEAOAA9AAVIZWxsbwAFV29ybGQAA0ZvbwAFSGVsbG8ABUhlbGxvAAVIZWxsbwADRm9vAANCYXI=
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -6515,7 +6515,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.array_concat
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0005, 0x0102030405) to b'/x00/x05/x01/x02/x03/x04/x05'
+debug: Folded concat of 0x0005 and 0x0102030405 to 0x00050102030405
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -6843,7 +6843,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x010232010232, 0x045a) to b'/x01/x022/x01/x022/x04Z'
+debug: Folded concat of 0x010232010232 and 0x045a to 0x010232010232045a
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -7449,7 +7449,7 @@ debug: Optimizer: Remove Unreachable Blocks
 debug: Optimizer: Repeated Expression Elimination
 debug: Optimizing subroutine test_cases.arc4_types.mutation.Arc4MutationContract.dynamic_array_fixed_size
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0008, 0x010232010232045a) to b'/x00/x08/x01/x022/x01/x022/x04Z'
+debug: Folded concat of 0x0008 and 0x010232010232045a to 0x0008010232010232045a
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9222,7 +9222,7 @@ debug: Begin optimization pass 2/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded len("Hello World!") to 12
-debug: Folded concat("a", "b") to b'ab'
+debug: Folded concat of "a" and "b" to "ab"
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9254,8 +9254,8 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_2
 debug: Begin optimization pass 3/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat("Hello", " ") to b'Hello '
-debug: Folded concat("hi", "hi") to b'hihi'
+debug: Folded concat of "Hello" and " " to "Hello "
+debug: Folded concat of "hi" and "hi" to "hihi"
 debug: Folded len("ab") to 2
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -9287,7 +9287,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_3
 debug: Begin optimization pass 4/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000c, "Hello World!") to b'/x00/x0cHello World!'
+debug: Folded concat of 0x000c and "Hello World!" to AAxIZWxsbyBXb3JsZCE=
 debug: Folded len("Hello ") to 6
 debug: Folded len("hihi") to 4
 debug: Optimizer: Constant Replacer
@@ -9321,7 +9321,7 @@ debug: Begin optimization pass 5/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded len(AAxIZWxsbyBXb3JsZCE=) to 14
-debug: Folded concat(0x0002, "ab") to b'/x00/x02ab'
+debug: Folded concat of 0x0002 and "ab" to AAJhYg==
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9355,8 +9355,8 @@ debug: Begin optimization pass 6/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 2 < 14 to 1
-debug: Folded concat(0x0006, "Hello ") to b'/x00/x06Hello '
-debug: Folded concat(0x0004, "hihi") to b'/x00/x04hihi'
+debug: Folded concat of 0x0006 and "Hello " to AAZIZWxsbyA=
+debug: Folded concat of 0x0004 and "hihi" to AARoaWhp
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9395,7 +9395,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_6
 debug: Begin optimization pass 7/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(YWI=, "c") to b'abc'
+debug: Folded concat of YWI= and "c" to YWJj
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9426,7 +9426,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_7
 debug: Begin optimization pass 8/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(SGVsbG8g, "World!") to b'Hello World!'
+debug: Folded concat of SGVsbG8g and "World!" to SGVsbG8gV29ybGQh
 debug: Folded len(YWJj) to 3
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -9484,7 +9484,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_9
 debug: Begin optimization pass 10/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0003, YWJj) to b'/x00/x03abc'
+debug: Folded concat of 0x0003 and YWJj to AANhYmM=
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9512,7 +9512,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_1
 debug: Begin optimization pass 11/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000c, SGVsbG8gV29ybGQh) to b'/x00/x0cHello World!'
+debug: Folded concat of 0x000c and SGVsbG8gV29ybGQh to AAxIZWxsbyBXb3JsZCE=
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9539,7 +9539,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_1
 debug: Begin optimization pass 12/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(YWJj, "d") to b'abcd'
+debug: Folded concat of YWJj and "d" to YWJjZA==
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9618,7 +9618,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_1
 debug: Begin optimization pass 15/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0004, YWJjZA==) to b'/x00/x04abcd'
+debug: Folded concat of 0x0004 and YWJjZA== to AARhYmNk
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9669,7 +9669,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_1
 debug: Begin optimization pass 17/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(YWJjZA==, "e") to b'abcde'
+debug: Folded concat of YWJjZA== and "e" to YWJjZGU=
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9747,7 +9747,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_1
 debug: Begin optimization pass 20/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0005, YWJjZGU=) to b'/x00/x05abcde'
+debug: Folded concat of 0x0005 and YWJjZGU= to AAVhYmNkZQ==
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9798,7 +9798,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_2
 debug: Begin optimization pass 22/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(YWJjZGU=, "f") to b'abcdef'
+debug: Folded concat of YWJjZGU= and "f" to YWJjZGVm
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9876,7 +9876,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_2
 debug: Begin optimization pass 25/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0006, YWJjZGVm) to b'/x00/x06abcdef'
+debug: Folded concat of 0x0006 and YWJjZGVm to AAZhYmNkZWY=
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -9927,7 +9927,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_2
 debug: Begin optimization pass 27/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(YWJjZGVm, "g") to b'abcdefg'
+debug: Folded concat of YWJjZGVm and "g" to YWJjZGVmZw==
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -10005,7 +10005,7 @@ debug: Output IR to arc4_types/out/string_Arc4StringTypesContract.ssa.opt_pass_2
 debug: Begin optimization pass 30/100
 debug: Optimizing subroutine test_cases.arc4_types.string.Arc4StringTypesContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0007, YWJjZGVmZw==) to b'/x00/x07abcdefg'
+debug: Folded concat of 0x0007 and YWJjZGVmZw== to AAdhYmNkZWZn
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -10093,8 +10093,8 @@ debug: Begin optimization pass 1/100
 debug: Optimizing subroutine test_cases.arc4_types.structs.Arc4StructsTypeContract.approval_program
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x000000083cfbf217and 0x000000230384b842) to b'/x00/x00/x00/x08</xfb/xf2/x17/x00/x00/x00#/x03/x84/xb8B'
-debug: Folded chained concat of 0x000000083cfbf217and 0x000000230384b842) to b'/x00/x00/x00/x08</xfb/xf2/x17/x00/x00/x00#/x03/x84/xb8B'
+debug: Folded concat of 0x000000083cfbf217 and 0x000000230384b842 to 0x000000083cfbf217000000230384b842
+debug: Folded concat of 0x000000083cfbf217 and 0x000000230384b842 to 0x000000083cfbf217000000230384b842
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: encoded_tuple_buffer%1#2, coord_1#0
@@ -10437,7 +10437,7 @@ debug: Output IR to arc4_types/out/structs_Arc4StructsTypeContract.ssa.opt_pass_
 debug: Begin optimization pass 6/100
 debug: Optimizing subroutine test_cases.arc4_types.structs.Arc4StructsTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x000000083cfbf217000000230384b842, 0xa0) to b'/x00/x00/x00/x08</xfb/xf2/x17/x00/x00/x00#/x03/x84/xb8B/xa0'
+debug: Folded concat of 0x000000083cfbf217000000230384b842 and 0xa0 to 0x000000083cfbf217000000230384b842a0
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -10686,11 +10686,11 @@ debug: Begin optimization pass 1/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Splitting parallel copies prior to optimization
 debug: Optimizer: Arithmetic Simplification
-debug: Folded chained concat of 0x01and 0x02) to b'/x01/x02'
+debug: Folded concat of 0x01 and 0x02 to 0x0102
 debug: Folded len("/x00/x05hello") to 7
 debug: Folded len("/x00/x05world") to 7
-debug: Folded chained concat of 0xffand "/x00/x05hello") to b'/xff/x00/x05hello'
-debug: Folded chained concat of /wAFaGVsbG8=and "/x00/x05world") to b'/xff/x00/x05hello/x00/x05world'
+debug: Folded concat of 0xff and "/x00/x05hello" to /wAFaGVsbG8=
+debug: Folded concat of /wAFaGVsbG8= and "/x00/x05world" to /wAFaGVsbG8ABXdvcmxk
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Found equivalence set: encoded_tuple_buffer%1#7, my_tuple#0
@@ -10879,7 +10879,7 @@ debug: Begin optimization pass 2/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 7 + 7 to 14
-debug: Folded chained concat of 0x80and 0x10) to b'/x80/x10'
+debug: Folded concat of 0x80 and 0x10 to 0x8010
 debug: Folded k#0 == k#0 to 1
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -10936,8 +10936,8 @@ debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.ssa.opt_pass_2.
 debug: Begin optimization pass 3/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x0102, 0x0007) to b'/x01/x02/x00/x07'
-debug: Folded concat(0x04, 0x80) to b'/x04/x80'
+debug: Folded concat of 0x0102 and 0x0007 to 0x01020007
+debug: Folded concat of 0x04 and 0x80 to 0x0480
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -10986,7 +10986,7 @@ debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.ssa.opt_pass_3.
 debug: Begin optimization pass 4/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x01020007, 0x000e) to b'/x01/x02/x00/x07/x00/x0e'
+debug: Folded concat of 0x01020007 and 0x000e to 0x01020007000e
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -11033,7 +11033,7 @@ debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.ssa.opt_pass_4.
 debug: Begin optimization pass 5/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x01020007000e, /wAFaGVsbG8ABXdvcmxk) to b'/x01/x02/x00/x07/x00/x0e/xff/x00/x05hello/x00/x05world'
+debug: Folded concat of 0x01020007000e and /wAFaGVsbG8ABXdvcmxk to AQIABwAO/wAFaGVsbG8ABXdvcmxk
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -11306,7 +11306,7 @@ debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.ssa.opt_pass_10
 debug: Begin optimization pass 11/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x04bd, 0x8010) to b'/x04/xbd/x80/x10'
+debug: Folded concat of 0x04bd and 0x8010 to 0x04bd8010
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -11487,8 +11487,8 @@ debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 4 == 4 to 1
 debug: Folded 16 == 16 to 1
-debug: Folded concat(0x04, 0x80) to b'/x04/x80'
-debug: Folded chained concat of 0x80and 0x10) to b'/x80/x10'
+debug: Folded concat of 0x04 and 0x80 to 0x0480
+debug: Folded concat of 0x80 and 0x10 to 0x8010
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -11836,7 +11836,7 @@ debug: Output IR to arc4_types/out/tuples_Arc4TuplesTypeContract.ssa.opt_pass_21
 debug: Begin optimization pass 22/100
 debug: Optimizing subroutine test_cases.arc4_types.tuples.Arc4TuplesTypeContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x04bd, 0x8010) to b'/x04/xbd/x80/x10'
+debug: Folded concat of 0x04bd and 0x8010 to 0x04bd8010
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier

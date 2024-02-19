@@ -324,11 +324,11 @@ debug: Output IR to out/byte_constants_ByteConstantsContract.ssa.opt_pass_1.ir
 debug: Begin optimization pass 2/100
 debug: Optimizing subroutine test_cases.byte_constants.ByteConstantsContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(0x4261736520313620656e636f646564, "|") to b'Base 16 encoded|'
-debug: Folded chained concat of QmFzZSA2NCBlbmNvZGVkand "|") to b'Base 64 encoded|'
-debug: Folded chained concat of QmFzZSA2NCBlbmNvZGVkfA==and IJQXGZJAGMZCAZLOMNXWIZLE) to b'Base 64 encoded|Base 32 encoded'
-debug: Folded chained concat of QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZA==and "|") to b'Base 64 encoded|Base 32 encoded|'
-debug: Folded chained concat of QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZHw=and "UTF-8 Encoded") to b'Base 64 encoded|Base 32 encoded|UTF-8 Encoded'
+debug: Folded concat of 0x4261736520313620656e636f646564 and "|" to QmFzZSAxNiBlbmNvZGVkfA==
+debug: Folded concat of QmFzZSA2NCBlbmNvZGVk and "|" to QmFzZSA2NCBlbmNvZGVkfA==
+debug: Folded concat of QmFzZSA2NCBlbmNvZGVkfA== and IJQXGZJAGMZCAZLOMNXWIZLE to QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZA==
+debug: Folded concat of QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZA== and "|" to QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZHw=
+debug: Folded concat of QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZHw= and "UTF-8 Encoded" to QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZHxVVEYtOCBFbmNvZGVk
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -358,7 +358,7 @@ debug: Output IR to out/byte_constants_ByteConstantsContract.ssa.opt_pass_2.ir
 debug: Begin optimization pass 3/100
 debug: Optimizing subroutine test_cases.byte_constants.ByteConstantsContract.approval_program
 debug: Optimizer: Arithmetic Simplification
-debug: Folded concat(QmFzZSAxNiBlbmNvZGVkfA==, QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZHxVVEYtOCBFbmNvZGVk) to b'Base 16 encoded|Base 64 encoded|Base 32 encoded|UTF-8 Encoded'
+debug: Folded concat of QmFzZSAxNiBlbmNvZGVkfA== and QmFzZSA2NCBlbmNvZGVkfEJhc2UgMzIgZW5jb2RlZHxVVEYtOCBFbmNvZGVk to QmFzZSAxNiBlbmNvZGVkfEJhc2UgNjQgZW5jb2RlZHxCYXNlIDMyIGVuY29kZWR8VVRGLTggRW5jb2RlZA==
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier

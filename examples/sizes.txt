@@ -16,7 +16,7 @@ arc4_types/tuples                    795     142     142
 asset                                255     248     248     
 auction                              590     534     534     
 augmented_assignment                 155     154     154     
-avm_types_in_abi                     222     175     175     
+avm_types_in_abi                     222     169     169     
 biguint_binary_ops                   276     212     212     
 boolean_binary_ops                   304     298     298     
 byte_constants                       94      72      72      

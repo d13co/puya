@@ -12,6 +12,7 @@ from puya.ir.avm_ops import AVMOp
 from puya.ir.optimize._utils import get_definition
 from puya.ir.types_ import AVMBytesEncoding
 from puya.ir.utils import format_bytes
+from puya.parse import SourceLocation
 from puya.utils import itob_eval
 
 logger: structlog.typing.FilteringBoundLogger = structlog.get_logger(__name__)
@@ -33,6 +34,36 @@ def get_biguint_constant(value: models.ValueProvider) -> int | None:
 
 def byte_wise(op: Callable[[int, int], int], lhs: bytes, rhs: bytes) -> bytes:
     return bytes([op(a, b) for a, b in zip_longest(lhs[::-1], rhs[::-1], fillvalue=0)][::-1])
+
+
+def _format_bytes_const(bytes_const: models.BytesConstant) -> str:
+    return format_bytes(bytes_const.value, bytes_const.encoding)
+
+
+def _choose_encoding(a: models.BytesConstant, b: models.BytesConstant) -> AVMBytesEncoding:
+    if a.encoding == b.encoding:
+        # preserve encoding if both equal
+        return a.encoding
+    else:
+        # go with most compact if they differ
+        return AVMBytesEncoding.base64
+
+
+def _concat(
+    a: models.BytesConstant, b: models.BytesConstant, source_location: SourceLocation | None
+) -> models.BytesConstant:
+    target_encoding = _choose_encoding(a, b)
+    result_value = a.value + b.value
+    result = models.BytesConstant(
+        value=result_value,
+        encoding=target_encoding,
+        source_location=source_location,
+    )
+    logger.debug(
+        f"Folded concat of {_format_bytes_const(a)} and {_format_bytes_const(b)}"
+        f" to {_format_bytes_const(result)}"
+    )
+    return result
 
 
 def get_byte_constant(
@@ -154,10 +185,42 @@ def try_simplify_arithmetic_ops(
         byte_const = get_byte_constant(subroutine, intrinsic.args[0])
         if byte_const is not None:
             len_x = len(byte_const.value)
-            logger.debug(
-                f"Folded len({format_bytes(byte_const.value, byte_const.encoding)}) to {len_x}"
-            )
+            logger.debug(f"Folded len({_format_bytes_const(byte_const)}) to {len_x}")
             return models.UInt64Constant(source_location=op_loc, value=len_x)
+    elif intrinsic.op is AVMOp.concat:
+        left_arg, right_arg = intrinsic.args
+        left_const = get_byte_constant(subroutine, left_arg)
+        right_const = get_byte_constant(subroutine, right_arg)
+        if left_const is not None:
+            if left_const.value == b"":
+                return right_arg
+            if right_const is not None:
+                # two constants, just fold
+                return _concat(left_const, right_const, source_location=op_loc)
+        elif right_const is not None:
+            if right_const.value == b"":
+                return left_arg
+            if (
+                # left constant concats will automatically get folded, like "a" + "b" + var because
+                # of the way they're linearized, but var + "a" + "b" won't be so we special case it
+                isinstance(left_arg, models.Register)
+                and (left_arg_defn := get_definition(subroutine, left_arg)) is not None
+                and isinstance(left_arg_defn, models.Assignment)
+                and isinstance(left_arg_defn.source, models.Intrinsic)
+                and left_arg_defn.source.op is AVMOp.concat
+                and isinstance(prev_concat_lhs := left_arg_defn.source.args[0], models.Register)
+                and isinstance(
+                    maybe_byte_const_a := left_arg_defn.source.args[1], models.BytesConstant
+                )
+            ):
+                location = right_const.source_location or maybe_byte_const_a.source_location
+                return attrs.evolve(
+                    intrinsic,
+                    args=[
+                        prev_concat_lhs,
+                        _concat(maybe_byte_const_a, right_const, source_location=location),
+                    ],
+                )
     else:
         match intrinsic:
             case models.Intrinsic(
@@ -200,19 +263,8 @@ def try_simplify_arithmetic_ops(
                     source_location=op_loc, encoding=byte_const.encoding, value=extracted
                 )
             case models.Intrinsic(
-                op=AVMOp.concat,
-                args=[models.Value(atype=AVMType.bytes) as ba, models.BytesConstant(value=b"")],
-            ):
-                return ba
-            case models.Intrinsic(
-                op=AVMOp.concat,
-                args=[models.BytesConstant(value=b""), models.Value(atype=AVMType.bytes) as bb],
-            ):
-                return bb
-            case models.Intrinsic(
                 op=(
-                    AVMOp.concat
-                    | AVMOp.eq
+                    AVMOp.eq
                     | AVMOp.neq
                     | AVMOp.bitwise_and_bytes
                     | AVMOp.bitwise_or_bytes
@@ -224,86 +276,28 @@ def try_simplify_arithmetic_ops(
                 (byte_const_a := get_byte_constant(subroutine, byte_arg_a)) is not None
                 and (byte_const_b := get_byte_constant(subroutine, byte_arg_b)) is not None
             ):
-                a = byte_const_a.value
-                encoding_a = byte_const_a.encoding
-                b = byte_const_b.value
-                encoding_b = byte_const_b.encoding
-                if encoding_a == encoding_b:
-                    target_encoding = encoding_a  # preserve encoding if both equal
-                else:
-                    target_encoding = (
-                        AVMBytesEncoding.base64
-                    )  # go with most compact if they differ
-                if bytes_op == AVMOp.concat:
-                    a_b = a + b
-                    logger.debug(
-                        f"Folded concat({format_bytes(a, encoding_a)},"
-                        f" {format_bytes(b, encoding_b)}) to {a_b!r}"
+                bytes_a = byte_const_a.value
+                bytes_b = byte_const_b.value
+                if bytes_op == AVMOp.eq:
+                    return models.UInt64Constant(
+                        value=int(bytes_a == bytes_b), source_location=op_loc
                     )
-                    return models.BytesConstant(
-                        source_location=op_loc, value=a_b, encoding=target_encoding
-                    )
-                elif bytes_op == AVMOp.eq:
-                    return models.UInt64Constant(value=int(a == b), source_location=op_loc)
                 elif bytes_op == AVMOp.neq:
-                    return models.UInt64Constant(value=int(a != b), source_location=op_loc)
+                    return models.UInt64Constant(
+                        value=int(bytes_a != bytes_b), source_location=op_loc
+                    )
                 else:
+                    target_encoding = _choose_encoding(byte_const_a, byte_const_b)
                     do_op = {
                         AVMOp.bitwise_and_bytes: operator.and_,
                         AVMOp.bitwise_or_bytes: operator.or_,
                         AVMOp.bitwise_xor_bytes: operator.xor,
                     }[bytes_op]
                     return models.BytesConstant(
-                        value=byte_wise(do_op, a, b),
+                        value=byte_wise(do_op, bytes_a, bytes_b),
                         encoding=target_encoding,
                         source_location=op_loc,
                     )
-            case models.Intrinsic(
-                op=AVMOp.concat, args=[models.Register() as byte_arg, byte_arg_b]
-            ) if (
-                (byte_const_b := get_byte_constant(subroutine, byte_arg_b)) is not None
-                # left constant concats will automatically get folded, like "a" + "b" + var because
-                # of the way they're linearized, but var + "a" + "b" won't be, so we special case it
-                and (byte_arg_defn := get_definition(subroutine, byte_arg)) is not None
-                and isinstance(byte_arg_defn, models.Assignment)
-                and isinstance(byte_arg_defn.source, models.Intrinsic)
-                and byte_arg_defn.source.op is AVMOp.concat
-                and isinstance(prev_concat_lhs := byte_arg_defn.source.args[0], models.Register)
-                and isinstance(
-                    maybe_byte_const_a := byte_arg_defn.source.args[1], models.BytesConstant
-                )
-            ):
-                a = maybe_byte_const_a.value
-                encoding_a = maybe_byte_const_a.encoding
-                b = byte_const_b.value
-                encoding_b = byte_const_b.encoding
-                if encoding_a == encoding_b:
-                    target_encoding = encoding_a  # preserve encoding if both equal
-                else:
-                    target_encoding = (
-                        AVMBytesEncoding.base64
-                    )  # go with most compact if they differ
-                a_b = a + b
-                logger.debug(
-                    f"Folded chained concat of {format_bytes(a, encoding_a)}"
-                    f"and {format_bytes(b, encoding_b)}) to {a_b!r}"
-                )
-                if (
-                    maybe_byte_const_a.source_location is None
-                    and byte_const_b.source_location is None
-                ):
-                    loc = None
-                else:
-                    loc = maybe_byte_const_a.source_location + byte_const_b.source_location  # type: ignore[operator]
-                return attrs.evolve(
-                    intrinsic,
-                    args=[
-                        prev_concat_lhs,
-                        models.BytesConstant(
-                            value=a_b, encoding=target_encoding, source_location=loc
-                        ),
-                    ],
-                )
             case models.Intrinsic(
                 args=[
                     models.Register(atype=AVMType.uint64) as reg_a,

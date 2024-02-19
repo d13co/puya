@@ -618,9 +618,9 @@ debug: Folded 0u - 0u to 0u
 debug: Folded 1u * iteration_count_minus_one%6#0 to iteration_count_minus_one%6#0
 debug: Folded 0u + range_delta%7#0 to range_delta%7#0
 debug: Folded reverse_index_internal%15#2 * 1u to reverse_index_internal%15#2
-debug: Folded chained concat of 0x00and 0x00) to b'/x00/x00'
-debug: Folded chained concat of 0x0000and 0x00) to b'/x00/x00/x00'
-debug: Folded chained concat of 0x000000and 0x00) to b'/x00/x00/x00/x00'
+debug: Folded concat of 0x00 and 0x00 to 0x0000
+debug: Folded concat of 0x0000 and 0x00 to 0x000000
+debug: Folded concat of 0x000000 and 0x00 to 0x00000000
 debug: Folded 0 < 4 to 1
 debug: Folded 4u - 0u to 4u
 debug: Folded 1u * iteration_count_minus_one%25#0 to iteration_count_minus_one%25#0
@@ -632,8 +632,8 @@ debug: Folded index#1 * 1u to index#1
 debug: Folded len("/x00/x01a") to 3
 debug: Folded len("/x00/x01b") to 3
 debug: Folded len("/x00/x01c") to 3
-debug: Folded chained concat of "/x00/x01a"and "/x00/x01b") to b'/x00/x01a/x00/x01b'
-debug: Folded chained concat of "/x00/x01a/x00/x01b"and "/x00/x01c") to b'/x00/x01a/x00/x01b/x00/x01c'
+debug: Folded concat of "/x00/x01a" and "/x00/x01b" to "/x00/x01a/x00/x01b"
+debug: Folded concat of "/x00/x01a/x00/x01b" and "/x00/x01c" to "/x00/x01a/x00/x01b/x00/x01c"
 debug: Folded len("HELLO") to 5
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
@@ -851,7 +851,7 @@ debug: Begin optimization pass 4/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 4u + 0u to 4u
-debug: Folded concat(0x0006, 0x0009) to b'/x00/x06/x00/t'
+debug: Folded concat of 0x0006 and 0x0009 to 0x00060009
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -882,7 +882,7 @@ debug: Begin optimization pass 5/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 4 - 1 to 3
-debug: Folded concat(0x00060009, 0x000c) to b'/x00/x06/x00/t/x00/x0c'
+debug: Folded concat of 0x00060009 and 0x000c to 0x00060009000c
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -910,7 +910,7 @@ debug: Begin optimization pass 6/100
 debug: Optimizing subroutine test_cases.reversed_iteration.contract.MyContract.approval_program
 debug: Optimizer: Arithmetic Simplification
 debug: Folded 3 >= 0 to 1
-debug: Folded concat(0x00060009000c, "/x00/x01a/x00/x01b/x00/x01c") to b'/x00/x06/x00/t/x00/x0c/x00/x01a/x00/x01b/x00/x01c'
+debug: Folded concat of 0x00060009000c and "/x00/x01a/x00/x01b/x00/x01c" to AAYACQAMAAFhAAFiAAFj
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
