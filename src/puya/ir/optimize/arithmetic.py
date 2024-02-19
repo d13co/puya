@@ -150,16 +150,16 @@ def try_simplify_arithmetic_ops(
                     value=uint64_result,
                     source_location=op_loc,
                 )
+    elif intrinsic.op is AVMOp.len_:
+        byte_const = get_byte_constant(subroutine, intrinsic.args[0])
+        if byte_const is not None:
+            len_x = len(byte_const.value)
+            logger.debug(
+                f"Folded len({format_bytes(byte_const.value, byte_const.encoding)}) to {len_x}"
+            )
+            return models.UInt64Constant(source_location=op_loc, value=len_x)
     else:
         match intrinsic:
-            case models.Intrinsic(op=AVMOp.len_, args=[byte_arg], source_location=op_loc) if (
-                byte_const := get_byte_constant(subroutine, byte_arg)
-            ) is not None:
-                len_x = len(byte_const.value)
-                logger.debug(
-                    f"Folded len({format_bytes(byte_const.value, byte_const.encoding)}) to {len_x}"
-                )
-                return models.UInt64Constant(source_location=op_loc, value=len_x)
             case models.Intrinsic(
                 op=AVMOp.extract | AVMOp.extract3,
                 immediates=[int(S), int(L)],
