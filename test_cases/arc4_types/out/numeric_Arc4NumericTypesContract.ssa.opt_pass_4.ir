@@ -22,8 +22,6 @@ contract test_cases.arc4_types.numeric.Arc4NumericTypesContract:
                 let tmp%30#0: uint64 = (btoi tmp%29#0)
                 let tmp%31#0: uint64 = (== tmp%30#0 9223372036854775807u)
                 (assert tmp%31#0)
-                let tmp%48#0: uint64 = (b== 1b 0x00000000000000000000000000000001)
-                (assert tmp%48#0)
                 let tmp%50#0: uint64 = (== 16u 16u)
                 (assert tmp%50#0)
                 return 1u

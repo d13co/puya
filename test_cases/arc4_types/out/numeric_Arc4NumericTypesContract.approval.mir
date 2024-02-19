@@ -1,15 +1,9 @@
-// Op                                       //                                            Op Description Stack (out)                                X stack                                       Source code                                   Source line
+// Op      // Stack (out)    Source code Source line
 
 #pragma version 10
 
 // test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program() -> uint64:
 main_block@0:
-    byte 0x01                               //                                                           0x01                                                                                     1                                             arc4_types/numeric.py:56
-    byte 0x00000000000000000000000000000001 //                                                           0x01,0x00000000000000000000000000000001                                                  1                                             arc4_types/numeric.py:57
-    b==                                     //                                                           {b==}                                                                                    biguint == arc4_biguint_const.decode()        arc4_types/numeric.py:60
-    //                                      virtual: store tmp%48#0 to l-stack (no copy)  tmp%48#0                                                  biguint == arc4_biguint_const.decode()        arc4_types/numeric.py:60
-    //                                      virtual: load tmp%48#0 from l-stack (no copy) tmp%48#0                                                  assert biguint == arc4_biguint_const.decode() arc4_types/numeric.py:60
-    assert                                  //                                                                                                                                                    assert biguint == arc4_biguint_const.decode() arc4_types/numeric.py:60
-    int 1                                   //                                                           1                                                                                        True                                          arc4_types/numeric.py:66
-    return                                  //                                                                                                                                                    return True                                   arc4_types/numeric.py:66
+    int 1  // 1              True        arc4_types/numeric.py:66
+    return //                return True arc4_types/numeric.py:66
 

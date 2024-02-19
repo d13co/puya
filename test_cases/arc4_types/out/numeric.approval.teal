@@ -1,16 +1,6 @@
 #pragma version 10
 
 test_cases.arc4_types.numeric.Arc4NumericTypesContract.approval_program:
-    // arc4_types/numeric.py:56
-    // biguint = BigUInt(1)
-    byte 0x01
-    // arc4_types/numeric.py:57
-    // arc4_biguint_const = ARC4BigUInt(1)
-    byte 0x00000000000000000000000000000001
-    // arc4_types/numeric.py:60
-    // assert biguint == arc4_biguint_const.decode()
-    b==
-    assert
     // arc4_types/numeric.py:66
     // return True
     int 1

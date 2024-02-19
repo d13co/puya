@@ -8776,6 +8776,7 @@ debug: Folded len(0x0000015333430684) to 8
 debug: Folded len(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff) to 64
 debug: Folded 64 <= 64 to 1
 debug: Folded 1 b+ 1 to 2
+debug: Folded 1 b== 1 to 1
 debug: Optimizer: Constant Replacer
 debug: Optimizer: Copy Propagation
 debug: Optimizer: Intrinsic Simplifier
@@ -8788,6 +8789,7 @@ debug: Removing unused variable b_zeros%38#0
 debug: Removing unused variable tmp%39#0
 debug: Removing unused variable no_overflow%42#0
 debug: Removing unused variable tmp%44#0
+debug: Removing unused variable tmp%48#0
 debug: Optimizer: Simplify Control Ops
 debug: Optimizer: Remove Linear Jump
 debug: Optimizer: Remove Empty Blocks
@@ -9070,8 +9072,6 @@ debug: Sequentializing parallel copies in test_cases.arc4_types.numeric.Arc4Nume
 debug: Sequentializing parallel copies in test_cases.arc4_types.numeric.Arc4NumericTypesContract.clear_state_program
 debug: Performing post-SSA optimizations
 debug: Output IR to arc4_types/out/numeric_Arc4NumericTypesContract.destructured.ir
-debug: Inserted main_block@0.ops[3]: 'store tmp%48#0 to l-stack (copy)'
-debug: Replaced main_block@0.ops[5]: 'load tmp%48#0' with 'load tmp%48#0 from l-stack (no copy)'
 debug: Output IR to arc4_types/out/reference_types_MyContract.ssa.ir
 info: Optimizing test_cases.arc4_types.reference_types.MyContract at level 1
 debug: Begin optimization pass 1/100

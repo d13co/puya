@@ -84,8 +84,6 @@ contract test_cases.arc4_types.numeric.Arc4NumericTypesContract:
                 (assert no_overflow%46#0) // overflow
                 let b_zeros%47#0: bytes = (bzero 16u)
                 let arc4_biguint_dynamic#0: bytes = (b| 2b b_zeros%47#0)
-                let tmp%48#0: uint64 = (b== 1b 0x00000000000000000000000000000001)
-                (assert tmp%48#0)
                 let tmp%49#0: uint64 = (len arc4_biguint_dynamic#0)
                 let tmp%50#0: uint64 = (== tmp%49#0 16u)
                 (assert tmp%50#0)

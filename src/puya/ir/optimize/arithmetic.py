@@ -27,6 +27,8 @@ def get_int_constant(value: models.ValueProvider) -> int | None:
 def get_biguint_constant(value: models.ValueProvider) -> int | None:
     if isinstance(value, models.BigUIntConstant):
         return value.value
+    if isinstance(value, models.BytesConstant) and len(value.value) <= 64:
+        return int.from_bytes(value.value, byteorder="big", signed=False)
     return None
 
 
@@ -86,11 +88,9 @@ def try_simplify_arithmetic_ops(
                 not_x = models.UInt64Constant(source_location=op_loc, value=x ^ 0xFFFFFFFFFFFFFFFF)
                 logger.debug(f"Folded ~{x} to {not_x}")
             return not_x
-        case models.Intrinsic(
-            op=AVMOp.btoi,
-            args=[byte_arg],
-            source_location=op_loc,
-        ) if (byte_const := get_byte_constant(subroutine, byte_arg)):
+        case models.Intrinsic(op=AVMOp.btoi, args=[byte_arg], source_location=op_loc) if (
+            byte_const := get_byte_constant(subroutine, byte_arg)
+        ):
             return models.UInt64Constant(
                 value=int.from_bytes(byte_const.value, byteorder="big", signed=False),
                 source_location=op_loc,
@@ -254,8 +254,7 @@ def try_simplify_arithmetic_ops(
                     value=byte_wise(do_op, a, b), encoding=target_encoding, source_location=op_loc
                 )
         case models.Intrinsic(
-            op=AVMOp.concat,
-            args=[models.Register() as byte_arg, byte_arg_b],
+            op=AVMOp.concat, args=[models.Register() as byte_arg, byte_arg_b]
         ) if (
             (byte_const_b := get_byte_constant(subroutine, byte_arg_b)) is not None
             # left constant concats will automatically get folded, like "a" + "b" + var because
