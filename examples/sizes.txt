@@ -5,6 +5,7 @@ amm                                  1229    1113    1113
 application                          164     157     157     
 arc4_types/array                     584     467     467     
 arc4_types/bool                      325     53      53      
+arc4_types/bool_eval                 565     40      40      
 arc4_types/dynamic_string_array      226     160     160     
 arc4_types/mutation                  2799    1659    1658    
 arc4_types/numeric                   360     214     214     
