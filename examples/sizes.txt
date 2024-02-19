@@ -3,11 +3,11 @@ abi_routing                          1175    1015    1015
 address_constant                     44      43      43      
 amm                                  1229    1113    1113    
 application                          164     157     157     
-arc4_types/array                     584     462     462     
+arc4_types/array                     584     383     383     
 arc4_types/bool                      325     53      53      
 arc4_types/bool_eval                 565     16      16      
 arc4_types/dynamic_string_array      226     108     108     
-arc4_types/mutation                  2799    1484    1483    
+arc4_types/mutation                  2799    1448    1447    
 arc4_types/numeric                   360     212     212     
 arc4_types/reference_types           43      39      39      
 arc4_types/string                    332     4       4       
