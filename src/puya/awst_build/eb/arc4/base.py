@@ -163,9 +163,37 @@ class ARC4FromLogBuilder(IntermediateExpressionBuilder):
 
 
 class CopyBuilder(IntermediateExpressionBuilder):
-    def __init__(self, expr: Expression, location: SourceLocation):
+    def __init__(
+        self, expr: Expression, location: SourceLocation, *, immutable: bool | None = None
+    ):
         super().__init__(location)
         self.expr = expr
+        self.immutable = immutable
+
+    def _change_mutability(self, wtype: wtypes.WType, *, immutable: bool) -> wtypes.WType:
+        match wtype:
+            case wtypes.ARC4DynamicArray(alias=alias, element_type=element_type):
+                return wtypes.ARC4DynamicArray.from_element_type(
+                    element_type=element_type,
+                    alias=alias,
+                    immutable=immutable,
+                )
+            case wtypes.ARC4StaticArray(
+                alias=alias, element_type=element_type, array_size=array_size
+            ):
+                return wtypes.ARC4StaticArray.from_element_type_and_size(
+                    element_type=element_type,
+                    array_size=array_size,
+                    alias=alias,
+                    immutable=immutable,
+                )
+            case _:
+                if wtype.immutable == immutable:
+                    return wtype
+                raise InternalError(
+                    f"{wtype} does not support switching between mutable and immutable",
+                    location=self.source_location,
+                )
 
     def call(
         self,
@@ -175,10 +203,15 @@ class CopyBuilder(IntermediateExpressionBuilder):
         location: SourceLocation,
         original_expr: mypy.nodes.CallExpr,
     ) -> ExpressionBuilder:
+        updated_wtype = (
+            self._change_mutability(self.expr.wtype, immutable=self.immutable)
+            if self.immutable is not None
+            else self.expr.wtype
+        )
         match args:
             case []:
                 return var_expression(
-                    Copy(value=self.expr, wtype=self.expr.wtype, source_location=location)
+                    Copy(value=self.expr, wtype=updated_wtype, source_location=location)
                 )
         raise CodeError("Invalid/Unexpected arguments", location)
 

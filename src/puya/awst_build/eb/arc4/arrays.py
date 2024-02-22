@@ -8,6 +8,7 @@ import structlog
 from puya.awst import wtypes
 from puya.awst.nodes import (
     ARC4ArrayEncode,
+    ARC4Encode,
     ArrayConcat,
     ArrayExtend,
     ArrayPop,
@@ -71,7 +72,7 @@ class DynamicArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
         match index:
             case [TypeClassExpressionBuilder() as eb]:
                 element_wtype = eb.produces()
-                wtype = wtypes.ARC4DynamicArray.from_element_type(element_wtype)
+                wtype = wtypes.ARC4DynamicArray.from_element_type(element_wtype, immutable=True)
             case _:
                 raise CodeError("Invalid/unhandled arguments", location)
         return DynamicArrayClassExpressionBuilder(location=location, wtype=wtype)
@@ -84,13 +85,38 @@ class DynamicArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
         location: SourceLocation,
         original_expr: mypy.nodes.CallExpr,
     ) -> ExpressionBuilder:
-        return dynamic_array_constructor(args=args, wtype=None, location=location)
+        return dynamic_array_constructor(args=args, wtype=None, location=location, immutable=True)
+
+
+class MutableDynamicArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
+    def index_multiple(
+        self, index: Sequence[ExpressionBuilder | Literal], location: SourceLocation
+    ) -> TypeClassExpressionBuilder:
+        match index:
+            case [TypeClassExpressionBuilder() as eb]:
+                element_wtype = eb.produces()
+                wtype = wtypes.ARC4DynamicArray.from_element_type(element_wtype, immutable=False)
+            case _:
+                raise CodeError("Invalid/unhandled arguments", location)
+        return DynamicArrayClassExpressionBuilder(location=location, wtype=wtype)
+
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+        original_expr: mypy.nodes.CallExpr,
+    ) -> ExpressionBuilder:
+        return dynamic_array_constructor(args=args, wtype=None, location=location, immutable=False)
 
 
 def dynamic_array_constructor(
     args: Sequence[ExpressionBuilder | Literal],
     wtype: wtypes.ARC4DynamicArray | None,
     location: SourceLocation,
+    *,
+    immutable: bool,
 ) -> ExpressionBuilder:
     non_literal_args = [
         require_expression_builder(a, msg="Array arguments must be non literals").rvalue()
@@ -99,7 +125,7 @@ def dynamic_array_constructor(
     if wtype is None:
         if non_literal_args:
             element_wtype = non_literal_args[0].wtype
-            wtype = wtypes.ARC4DynamicArray.from_element_type(element_wtype)
+            wtype = wtypes.ARC4DynamicArray.from_element_type(element_wtype, immutable=immutable)
         else:
             raise CodeError("Empy arrays require a type annotation to be instantiated", location)
 
@@ -128,7 +154,9 @@ class DynamicArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
         location: SourceLocation,
         original_expr: mypy.nodes.CallExpr,
     ) -> ExpressionBuilder:
-        return dynamic_array_constructor(args=args, wtype=self.wtype, location=location)
+        return dynamic_array_constructor(
+            args=args, wtype=self.wtype, location=location, immutable=True
+        )
 
     def produces(self) -> wtypes.WType:
         if not self.wtype:
@@ -148,8 +176,7 @@ class StaticArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
                 array_size_ = get_integer_literal_value(array_size, "Array size")
                 element_wtype = item_type.produces()
                 wtype = wtypes.ARC4StaticArray.from_element_type_and_size(
-                    array_size=array_size_,
-                    element_type=element_wtype,
+                    array_size=array_size_, element_type=element_wtype, immutable=True
                 )
 
             case _:
@@ -168,13 +195,94 @@ class StaticArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
         location: SourceLocation,
         original_expr: mypy.nodes.CallExpr,
     ) -> ExpressionBuilder:
-        return static_array_constructor(args=args, wtype=None, location=location)
+        return static_array_constructor(args=args, wtype=None, location=location, immutable=True)
+
+
+class MutableStaticArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
+    def index_multiple(
+        self, index: Sequence[ExpressionBuilder | Literal], location: SourceLocation
+    ) -> TypeClassExpressionBuilder:
+        match index:
+            case [TypeClassExpressionBuilder() as item_type, array_size]:
+                array_size_ = get_integer_literal_value(array_size, "Array size")
+                element_wtype = item_type.produces()
+                wtype = wtypes.ARC4StaticArray.from_element_type_and_size(
+                    array_size=array_size_, element_type=element_wtype, immutable=False
+                )
+
+            case _:
+                raise CodeError(
+                    "Invalid type arguments for MutableStaticArray. "
+                    "Expected MutableStaticArray[ItemType, typing.Literal[n]]",
+                    location,
+                )
+        return StaticArrayClassExpressionBuilder(location=location, wtype=wtype)
+
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+        original_expr: mypy.nodes.CallExpr,
+    ) -> ExpressionBuilder:
+        return static_array_constructor(args=args, wtype=None, location=location, immutable=False)
+
+
+def static_bytes_constructor(
+    args: Sequence[ExpressionBuilder | Literal],
+    wtype: wtypes.ARC4StaticArray,
+    location: SourceLocation,
+) -> ExpressionBuilder:
+    match args:
+        case (
+            ExpressionBuilder() as eb,
+        ) if eb.rvalue().wtype == wtypes.account_wtype and wtype.array_size == 32:
+            array_bytes: Expression = get_bytes_expr(eb.rvalue())
+        case (Literal(value=bytes(bytes_literal), source_location=bytes_location),):
+            if len(bytes_literal) != wtype.array_size:
+                raise CodeError(
+                    f"Argument must have a length of {wtype.array_size} bytes",
+                    location=bytes_location,
+                )
+            array_bytes = BytesConstant(value=bytes_literal, source_location=bytes_location)
+        case (ExpressionBuilder() as eb,) if eb.rvalue().wtype == wtypes.bytes_wtype:
+            address_bytes_temp = create_temporary_assignment(eb.rvalue(), location=location)
+            is_correct_length = NumericComparisonExpression(
+                operator=NumericComparison.eq,
+                source_location=location,
+                lhs=UInt64Constant(value=32, source_location=location),
+                rhs=IntrinsicCall.bytes_len(
+                    expr=address_bytes_temp.read, source_location=location
+                ),
+            )
+            array_bytes = CheckedMaybe(
+                expr=TupleExpression.from_items(
+                    (address_bytes_temp.define, is_correct_length), location=location
+                ),
+                comment=f"Argument must have a length of {wtype.array_size} bytes",
+            )
+        case _ if wtype.array_size == 32:
+            raise CodeError(
+                "Constructor expects a single argument of type"
+                f" {wtypes.account_wtype} or {wtypes.bytes_wtype}",
+                location=location,
+            )
+        case _:
+            raise CodeError(
+                f"Constructor expects a single argument of type {wtypes.bytes_wtype}",
+                location=location,
+            )
+
+    return var_expression(ReinterpretCast(expr=array_bytes, wtype=wtype, source_location=location))
 
 
 def static_array_constructor(
     args: Sequence[ExpressionBuilder | Literal],
     wtype: wtypes.ARC4StaticArray | None,
     location: SourceLocation,
+    *,
+    immutable: bool,
 ) -> ExpressionBuilder:
     non_literal_args = [
         require_expression_builder(a, msg="Array arguments must be non literals").rvalue()
@@ -185,8 +293,7 @@ def static_array_constructor(
             element_wtype = non_literal_args[0].wtype
             array_size = len(non_literal_args)
             wtype = wtypes.ARC4StaticArray.from_element_type_and_size(
-                array_size=array_size,
-                element_type=element_wtype,
+                array_size=array_size, element_type=element_wtype, immutable=immutable
             )
         else:
             raise CodeError("Empty arrays require a type annotation to be instantiated", location)
@@ -194,6 +301,10 @@ def static_array_constructor(
         raise CodeError(
             f"StaticArray should be initialized with {wtype.array_size} values",
             location,
+        )
+    elif wtype.immutable != immutable:
+        raise InternalError(
+            "wtype.immutable should match immutable parameter when wtype is provided"
         )
 
     for a in non_literal_args:
@@ -221,7 +332,9 @@ class StaticArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
         location: SourceLocation,
         original_expr: mypy.nodes.CallExpr,
     ) -> ExpressionBuilder:
-        return static_array_constructor(args=args, wtype=self.wtype, location=location)
+        return static_array_constructor(
+            args=args, wtype=self.wtype, location=location, immutable=True
+        )
 
     def produces(self) -> wtypes.WType:
         if not self.wtype:
@@ -232,13 +345,11 @@ class StaticArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
         return self.wtype
 
 
-class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
+class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
     def __init__(self, location: SourceLocation):
-        super().__init__(location=location)
-        element_wtype = wtypes.ARC4UIntN.from_scale(8, alias="byte")
-        array_size = 32
-        self.wtype = wtypes.ARC4StaticArray.from_element_type_and_size(
-            element_wtype, array_size=array_size, alias="address"
+        super().__init__(location)
+        self.wtype = wtypes.ARC4DynamicArray.from_element_type(
+            element_type=wtypes.ARC4UIntN.from_scale(8, alias="byte"), immutable=True
         )
 
     def call(
@@ -250,47 +361,103 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
         original_expr: mypy.nodes.CallExpr,
     ) -> ExpressionBuilder:
         match args:
-            case (ExpressionBuilder() as eb,) if eb.rvalue().wtype == wtypes.account_wtype:
-                address_bytes: Expression = get_bytes_expr(eb.rvalue())
-            case (Literal(value=bytes(bytes_literal), source_location=bytes_location),):
-                if len(bytes_literal) != 32:
-                    raise CodeError(
-                        "Address literals must be exactly 32 bytes", location=bytes_location
-                    )
-                address_bytes = BytesConstant(value=bytes_literal, source_location=bytes_location)
-            case (ExpressionBuilder() as eb,) if eb.rvalue().wtype == wtypes.bytes_wtype:
-                address_bytes_temp = create_temporary_assignment(eb.rvalue(), location=location)
-                is_correct_length = NumericComparisonExpression(
-                    operator=NumericComparison.eq,
+            case (data,):
+                array_bytes = expect_operand_wtype(data, wtypes.bytes_wtype)
+                array_bytes_temp = create_temporary_assignment(array_bytes, location=location)
+
+                array_length = ReinterpretCast(
+                    expr=ARC4Encode(
+                        wtype=wtypes.ARC4UIntN.from_scale(16),
+                        value=IntrinsicCall.bytes_len(
+                            expr=array_bytes_temp.define,
+                            source_location=location,
+                        ),
+                        source_location=location,
+                    ),
+                    wtype=wtypes.bytes_wtype,
                     source_location=location,
-                    lhs=UInt64Constant(value=32, source_location=location),
-                    rhs=IntrinsicCall.bytes_len(
-                        expr=address_bytes_temp.read, source_location=location
-                    ),
                 )
-                address_bytes = CheckedMaybe(
-                    expr=TupleExpression.from_items(
-                        (address_bytes_temp.define, is_correct_length), location=location
-                    ),
-                    comment="Address length is 32 bytes",
+                array_data = IntrinsicCall(
+                    op_code="concat",
+                    wtype=wtypes.bytes_wtype,
+                    stack_args=[array_length, array_bytes_temp.read],
+                    source_location=location,
+                )
+                assert self.wtype, "wtype should not be None"
+                return var_expression(
+                    ReinterpretCast(expr=array_data, wtype=self.wtype, source_location=location)
                 )
             case _:
                 raise CodeError(
-                    "Address constructor expects a single argument of type"
+                    "DynamicBytes constructor expects a single argument of type"
                     f" {wtypes.account_wtype} or {wtypes.bytes_wtype}",
                     location=location,
                 )
-        assert self.wtype, "wtype should not be None"
-        return var_expression(
-            ReinterpretCast(expr=address_bytes, wtype=self.wtype, source_location=location)
+
+
+class StaticBytesClassExpressionBuilder(StaticArrayClassExpressionBuilder):
+    def __init__(self, location: SourceLocation, wtype: wtypes.ARC4StaticArray):
+        super().__init__(location, wtype)
+
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+        original_expr: mypy.nodes.CallExpr,
+    ) -> ExpressionBuilder:
+        assert self.wtype, "wtype should always be set"
+        return static_bytes_constructor(
+            args=args,
+            wtype=self.wtype,
+            location=location,
         )
 
+
+class StaticBytesGenericClassExpressionBuilder(StaticArrayGenericClassExpressionBuilder):
     def index_multiple(
         self, index: Sequence[ExpressionBuilder | Literal], location: SourceLocation
+    ) -> TypeClassExpressionBuilder:
+        match index:
+            case [array_size]:
+                array_size_ = get_integer_literal_value(array_size, "Array size")
+                element_wtype = wtypes.ARC4UIntN.from_scale(8, alias="byte")
+                wtype = wtypes.ARC4StaticArray.from_element_type_and_size(
+                    array_size=array_size_, element_type=element_wtype, immutable=True
+                )
+
+            case _:
+                raise CodeError(
+                    "Invalid type arguments for StaticArray. "
+                    "Expected StaticArray[ItemType, typing.Literal[n]]",
+                    location,
+                )
+        return StaticBytesClassExpressionBuilder(location=location, wtype=wtype)
+
+
+class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
+    def __init__(self, location: SourceLocation):
+        super().__init__(location=location)
+        element_wtype = wtypes.ARC4UIntN.from_scale(8, alias="byte")
+        array_size = 32
+        self.wtype = wtypes.ARC4StaticArray.from_element_type_and_size(
+            element_wtype, array_size=array_size, alias="address", immutable=True
+        )
+
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+        original_expr: mypy.nodes.CallExpr,
     ) -> ExpressionBuilder:
-        raise CodeError(
-            "Address does not support type arguments",
-            location,
+        assert self.wtype, "wtype should always be set"
+        return static_bytes_constructor(
+            args=args,
+            wtype=self.wtype,
+            location=location,
         )
 
 
@@ -329,6 +496,10 @@ class ARC4ArrayExpressionBuilder(ValueExpressionBuilder, ABC):
         match name:
             case "bytes":
                 return get_bytes_expr_builder(self.expr)
+            case "copy_to_immutable":
+                return CopyBuilder(self.expr, location, immutable=True)
+            case "copy_to_mutable":
+                return CopyBuilder(self.expr, location, immutable=False)
             case "copy":
                 return CopyBuilder(self.expr, location)
             case _:
@@ -370,11 +541,11 @@ class DynamicArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
                         wtype=wtypes.uint64_wtype,
                     )
                 )
-            case "append":
+            case "append" if not self.wtype.immutable:
                 return AppendExpressionBuilder(self.expr, location)
-            case "extend":
+            case "extend" if not self.wtype.immutable:
                 return ExtendExpressionBuilder(self.expr, location)
-            case "pop":
+            case "pop" if not self.wtype.immutable:
                 return PopExpressionBuilder(self.expr, location)
             case _:
                 return super().member_access(name, location)

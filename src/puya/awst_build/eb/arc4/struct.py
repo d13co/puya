@@ -102,6 +102,10 @@ class ARC4StructExpressionBuilder(ValueExpressionBuilder):
                 )
             case "bytes":
                 return get_bytes_expr_builder(self.expr)
+            case "copy_to_immutable":
+                return CopyBuilder(self.expr, location, immutable=True)
+            case "copy_to_mutable":
+                return CopyBuilder(self.expr, location, immutable=False)
             case "copy":
                 return CopyBuilder(self.expr, location)
             case _:

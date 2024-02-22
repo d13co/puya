@@ -99,7 +99,8 @@ def arc4_encode(
             return awst_nodes.ReinterpretCast(
                 source_location=location,
                 wtype=wtypes.ARC4DynamicArray.from_element_type(
-                    wtypes.ARC4UIntN.from_scale(8, alias="byte")
+                    wtypes.ARC4UIntN.from_scale(8, alias="byte"),
+                    immutable=True,
                 ),
                 expr=awst_nodes.IntrinsicCall(
                     source_location=location,

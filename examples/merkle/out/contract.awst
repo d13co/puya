@@ -1,0 +1,73 @@
+TREE_DEPTH = 3
+RIGHT_SIBLING_PREFIX = 170
+
+contract MerkleTree
+{
+  globals {
+    ['root']: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+    ['size']: puyapy.UInt64
+  }
+  
+  constructor()
+  {
+  }
+  
+  subroutine calc_init_root(): puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+  {
+    result: puyapy.Bytes = hex<"E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855">
+    for _i in range(0u, 3u, 1u) {
+      result: puyapy.Bytes = sha256(result + result)
+    }
+    y: puyapy.arc4.DynamicArray[puyapy.arc4.UIntN[typing.Literal[8]]] = reinterpret_cast<puyapy.arc4.DynamicArray[puyapy.arc4.UIntN[typing.Literal[8]]]>(result)
+    x: puyapy.arc4.DynamicArray[puyapy.arc4.UIntN[typing.Literal[8]]] = reinterpret_cast<puyapy.arc4.DynamicArray[puyapy.arc4.UIntN[typing.Literal[8]]]>(concat(reinterpret_cast<puyapy.Bytes>(arc4_encode(len(tmp$0: puyapy.Bytes := result), puyapy.arc4.UIntN[typing.Literal[16]])), tmp$0))
+    return reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(checked_maybe((tmp$1: puyapy.Bytes := result, 32u == len(tmp$1))))
+  }
+  
+  abimethod create(): None
+  {
+    this.globals['root']: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]] = this::calc_init_root()
+  }
+  
+  subroutine is_right_sibling(elem: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[33]]): bool
+  {
+    return reinterpret_cast<puyapy.Bytes>(elem[0u]) == itob(170u)[7u]
+  }
+  
+  subroutine calc_root(leaf: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]], path: puyapy.arc4.StaticArray[puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[33]], typing.Literal[3]]): puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]
+  {
+    result: puyapy.Bytes = reinterpret_cast<puyapy.Bytes>(leaf)
+    for branch in path {
+      if (this::is_right_sibling(branch)) {
+        result: puyapy.Bytes = sha256(result + extract<1, 32>(reinterpret_cast<puyapy.Bytes>(branch)))
+      } else {
+        result: puyapy.Bytes = sha256(extract<1, 32>(reinterpret_cast<puyapy.Bytes>(branch)) + result)
+      }
+    }
+    return reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(checked_maybe((tmp$2: puyapy.Bytes := result, 32u == len(tmp$2))))
+  }
+  
+  abimethod delete_application(): None
+  {
+    assert(txn<Sender>() == checked_maybe(app_params_get<AppCreator>(reinterpret_cast<puyapy.Application>(0u))))
+  }
+  
+  subroutine verify(data: puyapy.Bytes, path: puyapy.arc4.StaticArray[puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[33]], typing.Literal[3]]): None
+  {
+    assert(reinterpret_cast<puyapy.Bytes>(this.globals['root']) == reinterpret_cast<puyapy.Bytes>(this::calc_root(reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(checked_maybe((tmp$3: puyapy.Bytes := sha256(data), 32u == len(tmp$3)))), path)))
+  }
+  
+  abimethod append_leaf(data: puyapy.Bytes, path: puyapy.arc4.StaticArray[puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[33]], typing.Literal[3]]): None
+  {
+    assert(reinterpret_cast<bool>(len(data)))
+    assert(reinterpret_cast<puyapy.Bytes>(this.globals['root']) == reinterpret_cast<puyapy.Bytes>(this::calc_root(reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(checked_maybe((tmp$4: puyapy.Bytes := hex<"E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855">, 32u == len(tmp$4)))), path)))
+    this.globals['root']: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]] = this::calc_root(reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(checked_maybe((tmp$5: puyapy.Bytes := sha256(data), 32u == len(tmp$5)))), path)
+    this.globals['size'] += 1u
+  }
+  
+  abimethod update_leaf(old_data: puyapy.Bytes, new_data: puyapy.Bytes, path: puyapy.arc4.StaticArray[puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[33]], typing.Literal[3]]): None
+  {
+    assert(reinterpret_cast<bool>(len(new_data)))
+    assert(reinterpret_cast<puyapy.Bytes>(this.globals['root']) == reinterpret_cast<puyapy.Bytes>(this::calc_root(reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(checked_maybe((tmp$6: puyapy.Bytes := old_data, 32u == len(tmp$6)))), path)))
+    this.globals['root']: puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]] = this::calc_root(reinterpret_cast<puyapy.arc4.StaticArray[puyapy.arc4.UIntN[typing.Literal[8]], typing.Literal[32]]>(checked_maybe((tmp$7: puyapy.Bytes := sha256(new_data), 32u == len(tmp$7)))), path)
+  }
+}

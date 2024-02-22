@@ -142,13 +142,25 @@ class Bool(_ABIEncoded[bool]):
     def __init__(self, value: bool) -> None: ...  # noqa: FBT001
 
 _TArrayItem = typing.TypeVar("_TArrayItem")
+_TArrayItem_co = typing.TypeVar("_TArrayItem_co", covariant=True)
 _TArrayLength = typing.TypeVar("_TArrayLength", bound=int)
+_TArrayLength_co = typing.TypeVar("_TArrayLength_co", bound=int, covariant=True)
 
-class StaticArray(
+class _StaticArrayBase(
     puyapy.BytesBacked,
-    typing.Generic[_TArrayItem, _TArrayLength],
-    Reversible[_TArrayItem],
+    typing.Protocol[_TArrayItem_co, _TArrayLength_co],
+    Reversible[_TArrayItem_co],
 ):
+    def __iter__(self) -> typing.Iterator[_TArrayItem_co]:
+        """Returns an iterator for the items in the array"""
+    def __reversed__(self) -> typing.Iterator[_TArrayItem_co]:
+        """Returns an iterator for the items in the array, in reverse order"""
+    @property
+    def length(self) -> puyapy.UInt64:
+        """Returns the current length of the array"""
+    def __getitem__(self, index: puyapy.UInt64 | int | slice) -> _TArrayItem_co: ...
+
+class StaticArray(_StaticArrayBase[_TArrayItem, _TArrayLength]):
     """A fixed length ARC4 Array of the specified type and length"""
 
     @typing.overload
@@ -245,21 +257,111 @@ class StaticArray(
     ): ...
     @typing.overload
     def __init__(self, *items: _TArrayItem): ...
-    def __iter__(self) -> typing.Iterator[_TArrayItem]:
-        """Returns an iterator for the items in the array"""
-    def __reversed__(self) -> typing.Iterator[_TArrayItem]:
-        """Returns an iterator for the items in the array, in reverse order"""
-    @property
-    def length(self) -> puyapy.UInt64:
-        """Returns the current length of the array"""
-    def __getitem__(self, index: puyapy.UInt64 | int | slice) -> _TArrayItem: ...
+    def copy_to_mutable(self) -> MutableStaticArray[_TArrayItem, _TArrayLength]:
+        """Create a copy of this array which is mutable"""
+
+class MutableStaticArray(_StaticArrayBase[_TArrayItem, _TArrayLength]):
+    @typing.overload
+    def __init__(self) -> None: ...
+    @typing.overload
+    def __init__(self: MutableStaticArray[_TArrayItem, typing.Literal[1]], item0: _TArrayItem): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[2]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[3]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[4]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+        item3: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[5]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+        item3: _TArrayItem,
+        item4: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[6]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+        item3: _TArrayItem,
+        item4: _TArrayItem,
+        item5: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[7]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+        item3: _TArrayItem,
+        item4: _TArrayItem,
+        item5: _TArrayItem,
+        item6: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[8]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+        item3: _TArrayItem,
+        item4: _TArrayItem,
+        item5: _TArrayItem,
+        item6: _TArrayItem,
+        item7: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[9]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+        item3: _TArrayItem,
+        item4: _TArrayItem,
+        item5: _TArrayItem,
+        item6: _TArrayItem,
+        item7: _TArrayItem,
+        item8: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(
+        self: MutableStaticArray[_TArrayItem, typing.Literal[10]],
+        item0: _TArrayItem,
+        item1: _TArrayItem,
+        item2: _TArrayItem,
+        item3: _TArrayItem,
+        item4: _TArrayItem,
+        item5: _TArrayItem,
+        item6: _TArrayItem,
+        item7: _TArrayItem,
+        item8: _TArrayItem,
+        item9: _TArrayItem,
+    ): ...
+    @typing.overload
+    def __init__(self, *items: _TArrayItem): ...
     def __setitem__(self, index: puyapy.UInt64 | int, value: _TArrayItem) -> _TArrayItem: ...
     def copy(self) -> typing.Self:
         """Create a copy of this array"""
 
-class DynamicArray(puyapy.BytesBacked, typing.Generic[_TArrayItem], Reversible[_TArrayItem]):
-    """A dynamically sized ARC4 Array of the specified type"""
-
+class _DynamicArrayBase(puyapy.BytesBacked, Reversible[_TArrayItem], typing.Generic[_TArrayItem]):
     def __init__(self, *items: _TArrayItem): ...
     def __iter__(self) -> typing.Iterator[_TArrayItem]:
         """Returns an iterator for the items in the array"""
@@ -269,23 +371,44 @@ class DynamicArray(puyapy.BytesBacked, typing.Generic[_TArrayItem], Reversible[_
     def length(self) -> puyapy.UInt64:
         """Returns the current length of the array"""
     def __getitem__(self, index: puyapy.UInt64 | int | slice) -> _TArrayItem: ...
+
+class DynamicArray(_DynamicArrayBase[_TArrayItem]):
+    """A dynamically sized ARC4 Array of the specified type"""
+
+    def copy_to_mutable(self) -> MutableDynamicArray[_TArrayItem]:
+        """Create a copy of this array which is mutable"""
+    def __add__(self, other: Iterable[_TArrayItem]) -> DynamicArray[_TArrayItem]: ...
+
+class MutableDynamicArray(_DynamicArrayBase[_TArrayItem]):
+    """A dynamically sized ARC4 Array of the specified type"""
+
+    def __getitem__(self, index: puyapy.UInt64 | int | slice) -> _TArrayItem: ...
     def append(self, item: _TArrayItem) -> None:
         """Append items to this array"""
     def extend(self, other: Iterable[_TArrayItem]) -> None:
         """Extend this array with the contents of another array"""
     def __setitem__(self, index: puyapy.UInt64 | int, value: _TArrayItem) -> _TArrayItem: ...
-    def __add__(self, other: Iterable[_TArrayItem]) -> DynamicArray[_TArrayItem]: ...
+    def __add__(self, other: Iterable[_TArrayItem]) -> MutableDynamicArray[_TArrayItem]: ...
     def pop(self) -> _TArrayItem: ...
     def copy(self) -> typing.Self:
         """Create a copy of this array"""
+    def copy_to_immutable(self) -> DynamicArray[_TArrayItem]:
+        """Create an immutable copy of this array"""
 
-class Address(StaticArray[Byte, typing.Literal[32]]):
+class DynamicBytes(DynamicArray[Byte]):
+    """An alias for a variable sized array of bytes"""
+
+    def __init__(self, data: puyapy.Bytes | bytes): ...
+
+class StaticBytes(StaticArray[Byte, _TArrayLength]):
+    """An alias for a fixed sized array of bytes"""
+
+    def __init__(self, data: puyapy.Bytes | bytes): ...
+
+class Address(StaticBytes[typing.Literal[32]]):
     """An alias for an array containing 32 bytes representing an Algorand address"""
 
     def __init__(self, account_or_bytes: puyapy.Bytes | puyapy.Account | bytes): ...
-
-DynamicBytes: typing.TypeAlias = DynamicArray[Byte]
-"""A variable sized array of bytes"""
 
 class ARC4Contract(puyapy.Contract):
     """A contract that conforms to the ARC4 ABI specification, functions decorated with

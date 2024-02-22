@@ -22,6 +22,8 @@ contract Arc4MutationContract
   
   clear_state_program(): bool
   {
+    mutable: puyapy.arc4.DynamicArray[puyapy.arc4.UIntN[typing.Literal[8]]] = arc4_array_encode([1arc4u8], puyapy.arc4.DynamicArray[puyapy.arc4.UIntN[typing.Literal[8]]])
+    immutable: puyapy.arc4.DynamicArray[puyapy.arc4.UIntN[typing.Literal[8]]] = mutable
     return true
   }
   

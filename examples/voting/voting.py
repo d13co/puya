@@ -74,7 +74,7 @@ class VotingRoundApp(ARC4Contract):
         self.end_time = end_time
         self.quorum = quorum
         self.nft_image_url = nft_image_url.decode()
-        self.store_option_counts(option_counts.copy())
+        self.store_option_counts(option_counts)
 
     @arc4.abimethod
     def bootstrap(self, fund_min_bal_req: gtxn.PaymentTransaction) -> None:
@@ -222,7 +222,7 @@ class VotingRoundApp(ARC4Contract):
             total_options += item.decode()
         assert total_options <= 128, "Can't have more than 128 vote options"
 
-        self.option_counts = option_counts.copy()
+        self.option_counts = option_counts
         self.total_options = total_options
 
     @subroutine

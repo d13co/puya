@@ -1,0 +1,372 @@
+#pragma version 10
+
+examples.merkle.contract.MerkleTree.approval_program:
+    txn ApplicationID
+    bnz main_entrypoint@2
+    callsub __init__
+
+main_entrypoint@2:
+    // merkle/contract.py:29
+    // class MerkleTree(arc4.ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@10
+    method "create()void"
+    method "delete_application()void"
+    method "append_leaf(byte[],byte[33][3])void"
+    method "update_leaf(byte[],byte[],byte[33][3])void"
+    txna ApplicationArgs 0
+    match main_create_route@4 main_delete_application_route@5 main_append_leaf_route@6 main_update_leaf_route@7
+    err // reject transaction
+
+main_create_route@4:
+    // merkle/contract.py:43
+    // @arc4.abimethod
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub create
+    int 1
+    return
+
+main_delete_application_route@5:
+    // merkle/contract.py:61
+    // @arc4.abimethod
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub delete_application
+    int 1
+    return
+
+main_append_leaf_route@6:
+    // merkle/contract.py:69
+    // @arc4.abimethod
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // merkle/contract.py:29
+    // class MerkleTree(arc4.ARC4Contract):
+    txna ApplicationArgs 1
+    extract 2 0
+    txna ApplicationArgs 2
+    // merkle/contract.py:69
+    // @arc4.abimethod
+    callsub append_leaf
+    int 1
+    return
+
+main_update_leaf_route@7:
+    // merkle/contract.py:81
+    // @arc4.abimethod
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // merkle/contract.py:29
+    // class MerkleTree(arc4.ARC4Contract):
+    txna ApplicationArgs 1
+    extract 2 0
+    txna ApplicationArgs 2
+    extract 2 0
+    txna ApplicationArgs 3
+    // merkle/contract.py:81
+    // @arc4.abimethod
+    callsub update_leaf
+    int 1
+    return
+
+main_bare_routing@10:
+    // merkle/contract.py:29
+    // class MerkleTree(arc4.ARC4Contract):
+    txn OnCompletion
+    !
+    assert // reject transaction
+    txn ApplicationID
+    !
+    assert // is creating
+    int 1
+    return
+
+
+// examples.merkle.contract.MerkleTree.create() -> void:
+create:
+    // merkle/contract.py:43-44
+    // @arc4.abimethod
+    // def create(self) -> None:
+    proto 0 0
+    // merkle/contract.py:45
+    // self.root.value = self.calc_init_root()
+    callsub calc_init_root
+    byte "root"
+    swap
+    app_global_put
+    retsub
+
+
+// examples.merkle.contract.MerkleTree.calc_init_root() -> bytes:
+calc_init_root:
+    // merkle/contract.py:34-35
+    // @subroutine
+    // def calc_init_root(self) -> Bytes32:
+    proto 0 1
+    // merkle/contract.py:36
+    // result = Bytes.from_hex("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    byte 0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    // merkle/contract.py:37
+    // for _i in urange(TREE_DEPTH):
+    int 0
+
+calc_init_root_for_header@1:
+    // merkle/contract.py:37
+    // for _i in urange(TREE_DEPTH):
+    frame_dig 1
+    int 3
+    <
+    bz calc_init_root_after_for@5
+    // merkle/contract.py:38
+    // result = op.sha256(result + result)
+    frame_dig 0
+    dup
+    concat
+    sha256
+    frame_bury 0
+    // merkle/contract.py:37
+    // for _i in urange(TREE_DEPTH):
+    frame_dig 1
+    int 1
+    +
+    frame_bury 1
+    b calc_init_root_for_header@1
+
+calc_init_root_after_for@5:
+    // merkle/contract.py:40
+    // x = BytesDynamic(result)
+    frame_dig 0
+    dup
+    len
+    // merkle/contract.py:41
+    // return Bytes32(result)
+    int 32
+    ==
+    assert // Argument must have a length of 32 bytes
+    frame_bury 0
+    retsub
+
+
+// examples.merkle.contract.MerkleTree.delete_application() -> void:
+delete_application:
+    // merkle/contract.py:61-62
+    // @arc4.abimethod
+    // def delete_application(self) -> None:
+    proto 0 0
+    // merkle/contract.py:63
+    // assert Txn.sender == Application(0).creator
+    txn Sender
+    int 0
+    app_params_get AppCreator
+    assert // application exists
+    ==
+    assert
+    retsub
+
+
+// examples.merkle.contract.MerkleTree.append_leaf(data: bytes, path: bytes) -> void:
+append_leaf:
+    // merkle/contract.py:69-70
+    // @arc4.abimethod
+    // def append_leaf(self, data: Bytes, path: Path) -> None:
+    proto 2 0
+    // merkle/contract.py:71
+    // assert data.length
+    frame_dig -2
+    len
+    assert
+    // merkle/contract.py:72
+    // assert self.root.value == self.calc_root(
+    int 0
+    byte "root"
+    app_global_get_ex
+    assert // check value exists
+    // merkle/contract.py:74
+    // Bytes.from_hex("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    byte 0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    // merkle/contract.py:72-77
+    // assert self.root.value == self.calc_root(
+    //     Bytes32(
+    //         Bytes.from_hex("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+    //     ),
+    //     path,
+    // )
+    frame_dig -1
+    callsub calc_root
+    ==
+    assert
+    // merkle/contract.py:78
+    // self.root.value = self.calc_root(Bytes32(op.sha256(data)), path)
+    frame_dig -2
+    sha256
+    dup
+    len
+    int 32
+    ==
+    assert // Argument must have a length of 32 bytes
+    frame_dig -1
+    callsub calc_root
+    byte "root"
+    swap
+    app_global_put
+    // merkle/contract.py:79
+    // self.size.value += 1
+    int 0
+    byte "size"
+    app_global_get_ex
+    assert // check value exists
+    int 1
+    +
+    byte "size"
+    swap
+    app_global_put
+    retsub
+
+
+// examples.merkle.contract.MerkleTree.calc_root(leaf: bytes, path: bytes) -> bytes:
+calc_root:
+    // merkle/contract.py:51-52
+    // @subroutine
+    // def calc_root(self, leaf: Bytes32, path: Path) -> Bytes32:
+    proto 2 1
+    int 0
+    frame_dig -2
+
+calc_root_for_header@1:
+    // merkle/contract.py:54
+    // for branch in path:
+    frame_dig 0
+    int 3
+    <
+    bz calc_root_after_for@7
+    frame_dig 0
+    int 33
+    *
+    frame_dig -1
+    swap
+    int 33
+    extract3
+    dup
+    // merkle/contract.py:55
+    // if self.is_right_sibling(branch):
+    callsub is_right_sibling
+    bz calc_root_else_body@4
+    // merkle/contract.py:56
+    // result = op.sha256(result + op.extract(branch.bytes, 1, 32))
+    extract 1 32
+    frame_dig 1
+    swap
+    concat
+    sha256
+    frame_bury 1
+    b calc_root_after_if_else@5
+
+calc_root_else_body@4:
+    // merkle/contract.py:58
+    // result = op.sha256(op.extract(branch.bytes, 1, 32) + result)
+    extract 1 32
+    frame_dig 1
+    concat
+    sha256
+    frame_bury 1
+
+calc_root_after_if_else@5:
+    frame_dig 0
+    int 1
+    +
+    frame_bury 0
+    b calc_root_for_header@1
+
+calc_root_after_for@7:
+    // merkle/contract.py:59
+    // return Bytes32(result)
+    frame_dig 1
+    dup
+    len
+    int 32
+    ==
+    assert // Argument must have a length of 32 bytes
+    frame_bury 0
+    retsub
+
+
+// examples.merkle.contract.MerkleTree.is_right_sibling(elem: bytes) -> uint64:
+is_right_sibling:
+    // merkle/contract.py:47-48
+    // @subroutine
+    // def is_right_sibling(self, elem: Branch) -> bool:
+    proto 1 1
+    // merkle/contract.py:49
+    // return elem[0].bytes == op.itob(RIGHT_SIBLING_PREFIX)[7]
+    frame_dig -1
+    extract 0 1
+    int 170
+    itob
+    extract 7 1
+    ==
+    retsub
+
+
+// examples.merkle.contract.MerkleTree.update_leaf(old_data: bytes, new_data: bytes, path: bytes) -> void:
+update_leaf:
+    // merkle/contract.py:81-82
+    // @arc4.abimethod
+    // def update_leaf(self, old_data: Bytes, new_data: Bytes, path: Path) -> None:
+    proto 3 0
+    // merkle/contract.py:83
+    // assert new_data.length
+    frame_dig -2
+    len
+    assert
+    // merkle/contract.py:84
+    // assert self.root.value == self.calc_root(Bytes32(old_data), path)
+    int 0
+    byte "root"
+    app_global_get_ex
+    assert // check value exists
+    frame_dig -3
+    len
+    int 32
+    ==
+    assert // Argument must have a length of 32 bytes
+    frame_dig -3
+    frame_dig -1
+    callsub calc_root
+    ==
+    assert
+    // merkle/contract.py:85
+    // self.root.value = self.calc_root(Bytes32(op.sha256(new_data)), path)
+    frame_dig -2
+    sha256
+    dup
+    len
+    int 32
+    ==
+    assert // Argument must have a length of 32 bytes
+    frame_dig -1
+    callsub calc_root
+    byte "root"
+    swap
+    app_global_put
+    retsub
+
+
+// examples.merkle.contract.MerkleTree.__init__() -> void:
+__init__:
+    // merkle/contract.py:30
+    // def __init__(self) -> None:
+    proto 0 0
+    retsub

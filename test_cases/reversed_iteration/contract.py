@@ -11,7 +11,9 @@ class MyContract(Contract):
         for x in reversed(arc4.StaticArray[arc4.UInt8, typing.Literal[0]]()):
             log(x.bytes)
 
-        test_array = arc4.StaticArray(arc4.UInt8(0), arc4.UInt8(0), arc4.UInt8(0), arc4.UInt8(0))
+        test_array = arc4.MutableStaticArray(
+            arc4.UInt8(0), arc4.UInt8(0), arc4.UInt8(0), arc4.UInt8(0)
+        )
         # urange: reversed items, forward index
         for index, item in uenumerate(reversed(urange(4))):
             test_array[index] = arc4.UInt8(item)

@@ -424,7 +424,12 @@ class ArrayConcat(Expression):
 
 @attrs.frozen
 class ArrayPop(Expression):
-    base: Expression
+    base: Expression = attrs.field()
+
+    @base.validator
+    def _validate_base(self, _attribute: object, value: Expression) -> None:
+        if value.wtype.immutable:
+            raise ValueError("base expression of ArrayPop cannot be immutable")
 
     def accept(self, visitor: ExpressionVisitor[T]) -> T:
         return visitor.visit_array_pop(self)
@@ -437,9 +442,14 @@ class ArrayExtend(Expression):
     the same element type
     """
 
-    base: Expression
+    base: Expression = attrs.field()
     other: Expression
     wtype: wtypes.WType = attrs.field(default=wtypes.void_wtype)
+
+    @base.validator
+    def _validate_base(self, _attribute: object, value: Expression) -> None:
+        if value.wtype.immutable:
+            raise ValueError("base expression of ArrayExtend cannot be immutable")
 
     def accept(self, visitor: ExpressionVisitor[T]) -> T:
         return visitor.visit_array_extend(self)

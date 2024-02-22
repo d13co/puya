@@ -323,13 +323,18 @@ class ARC4Array(ARC4Type):
 @attrs.frozen(str=False, kw_only=True)
 class ARC4DynamicArray(ARC4Array):
     @classmethod
-    def from_element_type(cls, element_type: WType) -> typing.Self:
+    def from_element_type(
+        cls, element_type: WType, *, immutable: bool, alias: str | None = None
+    ) -> typing.Self:
         if not is_arc4_encoded_type(element_type):
             raise ValueError(f"Invalid type for arc4.DynamicArray: {element_type}")
+        if immutable and not element_type.immutable:
+            raise ValueError("Immutable arrays cannot contain mutable elements")
         name = f"arc4.dynamic_array<{element_type.name}>"
         return cls(
             name=name,
-            immutable=False,
+            alias=alias,
+            immutable=immutable,
             element_type=element_type,
             stub_name=f"{constants.CLS_ARC4_DYNAMIC_ARRAY}[{element_type}]",
         )
@@ -342,15 +347,17 @@ class ARC4StaticArray(ARC4Array):
 
     @classmethod
     def from_element_type_and_size(
-        cls, element_type: WType, array_size: int, alias: str | None = None
+        cls, element_type: WType, array_size: int, *, immutable: bool, alias: str | None = None
     ) -> typing.Self:
         if not is_arc4_encoded_type(element_type):
             raise ValueError(f"Invalid type for arc4.StaticArray: {element_type}")
+        if immutable and not element_type.immutable:
+            raise ValueError("Immutable arrays cannot contain mutable elements")
         name = f"arc4.static_array<{element_type.name}, {array_size}>"
         return cls(
             array_size=array_size,
             name=name,
-            immutable=False,
+            immutable=immutable,
             element_type=element_type,
             stub_name=(
                 f"{constants.CLS_ARC4_STATIC_ARRAY}["
@@ -507,7 +514,7 @@ def avm_to_arc4_equivalent_type(wtype: WType) -> WType:
         return ARC4UIntN.from_scale(512)
     if wtype is bytes_wtype:
         return ARC4DynamicArray.from_element_type(
-            element_type=ARC4UIntN.from_scale(8, alias="byte")
+            element_type=ARC4UIntN.from_scale(8, alias="byte"), immutable=True
         )
     if isinstance(wtype, WTuple):
         return ARC4Tuple.from_types(types=[avm_to_arc4_equivalent_type(t) for t in wtype.types])

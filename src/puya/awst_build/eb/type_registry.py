@@ -52,8 +52,14 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
     constants.CLS_ARC4_BIG_UINTN: arc4.UIntNClassExpressionBuilder,
     constants.CLS_ARC4_BOOL: arc4.ARC4BoolClassExpressionBuilder,
     constants.CLS_ARC4_BYTE: arc4.ByteClassExpressionBuilder,
+    constants.CLS_ARC4_DYNAMIC_BYTES: arc4.DynamicBytesClassExpressionBuilder,
     constants.CLS_ARC4_DYNAMIC_ARRAY: arc4.DynamicArrayGenericClassExpressionBuilder,
+    constants.CLS_ARC4_MUTABLE_DYNAMIC_ARRAY: (
+        arc4.MutableDynamicArrayGenericClassExpressionBuilder
+    ),
+    constants.CLS_ARC4_STATIC_BYTES: arc4.StaticBytesGenericClassExpressionBuilder,
     constants.CLS_ARC4_STATIC_ARRAY: arc4.StaticArrayGenericClassExpressionBuilder,
+    constants.CLS_ARC4_MUTABLE_STATIC_ARRAY: arc4.MutableStaticArrayGenericClassExpressionBuilder,
     constants.CLS_ARC4_STRING: arc4.StringClassExpressionBuilder,
     constants.CLS_ARC4_TUPLE: arc4.ARC4TupleGenericClassExpressionBuilder,
     constants.CLS_ARC4_UFIXEDNXM: arc4.UFixedNxMClassExpressionBuilder,
