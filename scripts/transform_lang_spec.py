@@ -104,6 +104,7 @@ class Operation(typing.TypedDict, total=False):
     DocExtra: str
     ArgEnum: list[str]
     ArgEnumTypes: list[str]
+    ArgEnumBytes: list[int]
     ArgModes: list[int]
     ImmediateNote: list[ImmediateNote]
 
@@ -161,6 +162,7 @@ class ArgEnum:
     doc: str | None
     stack_type: StackType | None
     mode: RunMode
+    value: int
 
 
 class ImmediateKind(enum.StrEnum):
@@ -375,14 +377,15 @@ def create_indexed_enum(op: Operation) -> list[ArgEnum]:
     enum_names = op["ArgEnum"]
     enum_types: list[str] | list[None] = op.get("ArgEnumTypes", [])
     enum_docs = op["ArgEnumDoc"]
+    enum_bytes = op["ArgEnumBytes"]
     enum_modes = op["ArgModes"]
 
     if not enum_types:
         enum_types = [None] * len(enum_names)
 
     result = list[ArgEnum]()
-    for enum_name, enum_type, enum_doc, enum_mode in zip(
-        enum_names, enum_types, enum_docs, enum_modes, strict=True
+    for enum_name, enum_type, enum_doc, enum_mode, enum_byte in zip(
+        enum_names, enum_types, enum_docs, enum_modes, enum_bytes, strict=True
     ):
         stack_type = None if enum_type is None else StackType(enum_type)
         enum_value = ArgEnum(
@@ -390,6 +393,7 @@ def create_indexed_enum(op: Operation) -> list[ArgEnum]:
             doc=enum_doc if enum_doc else None,
             stack_type=stack_type,
             mode=_map_enum_mode(op["Modes"], enum_mode),
+            value=enum_byte,
         )
         result.append(enum_value)
     return result
