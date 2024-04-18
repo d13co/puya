@@ -1,3 +1,4 @@
+import base64
 import contextlib
 import functools
 import math
@@ -8,10 +9,80 @@ from pathlib import Path
 
 import attrs
 
+from puya.algo_constants import (
+    ADDRESS_CHECKSUM_LENGTH,
+    ENCODED_ADDRESS_LENGTH,
+    MAX_BYTES_LENGTH,
+    PUBLIC_KEY_HASH_LENGTH,
+)
+
 if typing.TYPE_CHECKING:
     from puya.options import PuyaOptions
 
 T_A = typing.TypeVar("T_A", bound=attrs.AttrsInstance)
+
+
+@attrs.frozen
+class Address:
+    address: str
+    public_key: bytes = b""
+    check_sum: bytes = b""
+    is_valid: bool = False
+
+    @classmethod
+    def parse(cls, address: str) -> typing.Self:
+        # Pad address so it's a valid b32 string
+        padded_address = address + (6 * "=")
+        if not (len(address) == ENCODED_ADDRESS_LENGTH and valid_base32(padded_address)):
+            return cls(address)
+        address_bytes = base64.b32decode(padded_address)
+        if len(address_bytes) != PUBLIC_KEY_HASH_LENGTH + ADDRESS_CHECKSUM_LENGTH:
+            return cls(address)
+
+        public_key_hash = address_bytes[:PUBLIC_KEY_HASH_LENGTH]
+        check_sum = address_bytes[PUBLIC_KEY_HASH_LENGTH:]
+        verified_check_sum = sha512_256_hash(public_key_hash)[-ADDRESS_CHECKSUM_LENGTH:]
+        return cls(
+            address=address,
+            public_key=public_key_hash,
+            check_sum=check_sum,
+            is_valid=verified_check_sum == check_sum,
+        )
+
+
+def valid_base32(s: str) -> bool:
+    """check if s is a valid base32 encoding string and fits into AVM bytes type"""
+    try:
+        value = base64.b32decode(s)
+    except ValueError:
+        return False
+    return len(value) <= MAX_BYTES_LENGTH
+    # regex from PyTEAL, appears to be RFC-4648
+    # ^(?:[A-Z2-7]{8})*(?:([A-Z2-7]{2}([=]{6})?)|([A-Z2-7]{4}([=]{4})?)|([A-Z2-7]{5}([=]{3})?)|([A-Z2-7]{7}([=]{1})?))?  # noqa: E501
+
+
+def valid_base16(s: str) -> bool:
+    try:
+        value = base64.b16decode(s)
+    except ValueError:
+        return False
+    return len(value) <= MAX_BYTES_LENGTH
+
+
+def valid_base64(s: str) -> bool:
+    """check if s is a valid base64 encoding string and fits into AVM bytes type"""
+    try:
+        value = base64.b64decode(s, validate=True)
+    except ValueError:
+        return False
+    return len(value) <= MAX_BYTES_LENGTH
+    # regex from PyTEAL, appears to be RFC-4648
+    # ^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$
+
+
+def valid_address(address: str) -> bool:
+    """check if address is a valid address with checksum"""
+    return Address.parse(address).is_valid
 
 
 def sha512_256_hash(value: bytes) -> bytes:

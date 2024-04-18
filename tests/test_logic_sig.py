@@ -13,6 +13,7 @@ from algosdk.atomic_transaction_composer import (
 from algosdk.transaction import AssetTransferTxn, LogicSigAccount, LogicSigTransaction, PaymentTxn
 from algosdk.v2client.algod import AlgodClient
 from puya.models import CompiledLogicSignature
+from puya.teal.output import emit_teal
 
 from tests import TEST_CASES_DIR
 from tests.utils import compile_src
@@ -39,7 +40,7 @@ def compile_logic_sig(
     assert isinstance(
         logic_sig, CompiledLogicSignature
     ), "Compilation artifact must be a logic signature"
-    teal = "\n".join(logic_sig.program)
+    teal = emit_teal(result.context, logic_sig.program)
     teal = replace_template_variables(teal, template_values or {})
     return base64.b64decode(algod_client.compile(source=teal)["result"])
 

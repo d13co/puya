@@ -145,7 +145,12 @@ def awst_to_teal(
 
 
 @functools.cache
-def compile_src(src_path: Path, optimization_level: int, debug_level: int) -> CompilationResult:
+def compile_src(
+    src_path: Path,
+    optimization_level: int,
+    debug_level: int,
+    template_vars_path: Path | None = None,
+) -> CompilationResult:
     root_dir = _get_root_dir(src_path)
     context, awst, awst_logs = get_awst_cache(root_dir)
     awst_logs = _filter_logs(awst_logs, root_dir, src_path)
@@ -172,6 +177,7 @@ def compile_src(src_path: Path, optimization_level: int, debug_level: int) -> Co
                 output_memory_ir=True,
                 output_client=True,
                 out_dir=tmp_dir,
+                template_vars_path=template_vars_path,
             ),
         )
 
@@ -203,3 +209,31 @@ def compile_src(src_path: Path, optimization_level: int, debug_level: int) -> Co
             root_dir=root_dir,
             src_path=src_path,
         )
+
+
+@attrs.frozen
+class PuyaExample:
+    root: Path
+    name: str
+
+    @property
+    def path(self) -> Path:
+        return self.root / self.name
+
+    @property
+    def template_vars_path(self) -> Path | None:
+        template_vars_path = self.path / "template.vars"
+        return template_vars_path if template_vars_path.exists() else None
+
+    @property
+    def id(self) -> str:
+        return f"{self.root.stem}_{self.name}"
+
+
+def get_all_examples() -> list[PuyaExample]:
+    return [
+        PuyaExample(root, item.name)
+        for root in (EXAMPLES_DIR, TEST_CASES_DIR)
+        for item in root.iterdir()
+        if item.is_dir() and any(item.glob("*.py"))
+    ]

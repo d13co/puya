@@ -48,6 +48,7 @@ from puya.awst_build.eb.transaction.inner_params import get_field_expr
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.utils import get_decorators_by_fullname
 from puya.errors import CodeError, InternalError
+from puya.models import TransactionType
 
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
@@ -158,7 +159,7 @@ class ABICallClassExpressionBuilder(TypeClassExpressionBuilder):
     def __init__(self, result_wtype: wtypes.WType | None, source_location: SourceLocation) -> None:
         super().__init__(source_location)
         self.result_wtype = result_wtype
-        app_itxn_wtype = wtypes.WInnerTransaction.from_type(constants.TransactionType.appl)
+        app_itxn_wtype = wtypes.WInnerTransaction.from_type(TransactionType.appl)
         if _is_typed(result_wtype):
             self.wtype: wtypes.WInnerTransaction | wtypes.WTuple = wtypes.WTuple.from_types(
                 (result_wtype, app_itxn_wtype)
@@ -324,8 +325,8 @@ def _create_abi_call_expr(
             source_location=location,
         ),
         TxnFields.type: UInt64Constant(
-            value=constants.TransactionType.appl.value,
-            teal_alias=constants.TransactionType.appl.name,
+            value=TransactionType.appl.value,
+            teal_alias=TransactionType.appl.name,
             source_location=location,
         ),
     }
@@ -354,13 +355,13 @@ def _create_abi_call_expr(
 
     create_itxn = CreateInnerTransaction(
         fields=fields,
-        wtype=wtypes.WInnerTransactionFields.from_type(constants.TransactionType.appl),
+        wtype=wtypes.WInnerTransactionFields.from_type(TransactionType.appl),
         source_location=location,
     )
     itxn = SubmitInnerTransaction(
         itxns=(create_itxn,),
         source_location=location,
-        wtype=wtypes.WInnerTransaction.from_type(constants.TransactionType.appl),
+        wtype=wtypes.WInnerTransaction.from_type(TransactionType.appl),
     )
 
     if not _is_typed(declared_result_wtype):

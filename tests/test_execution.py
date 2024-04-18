@@ -27,10 +27,11 @@ from algosdk.atomic_transaction_composer import AtomicTransactionComposer, Trans
 from algosdk.transaction import ApplicationCallTxn, ApplicationCreateTxn, OnComplete, StateSchema
 from algosdk.v2client.algod import AlgodClient
 from algosdk.v2client.models import SimulateRequest, SimulateTraceConfig
-from immutabledict import immutabledict
 from nacl.signing import SigningKey
 from puya.avm_type import AVMType
-from puya.models import CompiledContract, ContractMetaData, ContractState, StateTotals
+from puya.context import CompileContext
+from puya.models import CompiledContract, ContractState
+from puya.teal.output import emit_teal
 
 from tests import EXAMPLES_DIR, TEST_CASES_DIR
 from tests.utils import compile_src
@@ -84,24 +85,24 @@ def encode_utf8(value: str) -> str:
 
 @attrs.define(kw_only=True)
 class Compilation:
-    contract: CompiledContract
     approval: Program
     clear: Program
     local_schema: StateSchema | None
     global_schema: StateSchema | None
 
 
-def assemble_src(contract: CompiledContract, client: AlgodClient) -> Compilation:
+def assemble_src(
+    context: CompileContext, contract: CompiledContract, client: AlgodClient
+) -> Compilation:
     def state_to_schema(state: Collection[ContractState]) -> StateSchema:
         return StateSchema(
             num_uints=sum(1 for x in state if x.storage_type is AVMType.uint64),
             num_byte_slices=sum(1 for x in state if x.storage_type is AVMType.bytes),
         )
 
-    approval_program = Program("\n".join(contract.approval_program), client)
-    clear_program = Program("\n".join(contract.clear_program), client)
+    approval_program = Program(emit_teal(context, contract.approval_program), client)
+    clear_program = Program(emit_teal(context, contract.clear_program), client)
     compilation = Compilation(
-        contract=contract,
         approval=approval_program,
         clear=clear_program,
         local_schema=state_to_schema(contract.metadata.local_state.values()),
@@ -336,7 +337,7 @@ class ATCRunner:
                     raise NotImplementedError(f"Mapping not implemented: {value}")
 
         approval_source_map = self.compilation.approval.source_map
-        approval_src = self.compilation.contract.approval_program
+        approval_src = self.compilation.approval.teal.splitlines()
 
         (txn_group,) = simulate_response.simulate_response["txn-groups"]
         txn_result, *_ = txn_group["txn-results"]
@@ -497,35 +498,15 @@ class _TestHarness:
         ((contract,),) = result.teal.values()
         assert isinstance(contract, CompiledContract), "Compilation artifact must be a contract"
 
-        return assemble_src(contract=contract, client=self.client)
+        return assemble_src(result.context, contract=contract, client=self.client)
 
 
 @pytest.fixture(scope="session")
 def no_op_app_id(algod_client: AlgodClient, account: Account, worker_id: str) -> int:
-    src = [
-        "#pragma version 8",
-        "pushint 1",
-    ]
-    contract = CompiledContract(
-        approval_program=src,
-        clear_program=src,
-        metadata=ContractMetaData(
-            module_name="",
-            class_name="",
-            description=None,
-            name_override=None,
-            global_state=immutabledict(),
-            local_state=immutabledict(),
-            arc4_methods=[],
-            state_totals=StateTotals(
-                global_uints=0,
-                global_bytes=0,
-                local_uints=0,
-                local_bytes=0,
-            ),
-        ),
+    program = Program("#pragma version 8\npushint 1", algod_client)
+    compilation = Compilation(
+        approval=program, clear=program, global_schema=None, local_schema=None
     )
-    compilation = assemble_src(contract=contract, client=algod_client)
     result = (
         ATCRunner(client=algod_client, account=account, compilation=compilation)
         .add_deployment_transaction(

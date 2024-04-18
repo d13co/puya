@@ -169,12 +169,12 @@ class ImmediateKind(enum.StrEnum):
     uint8 = enum.auto()
     int8 = enum.auto()
     label = enum.auto()
-    uint64 = enum.auto()
+    varuint = enum.auto()
     bytes = enum.auto()
 
     # array types
     label_array = enum.auto()
-    uint64_array = enum.auto()
+    varuint_array = enum.auto()
     bytes_array = enum.auto()
 
     # not in original lang spec
@@ -207,6 +207,8 @@ class Cost:
 class Op:
     name: str
     """Name of op in TEAL"""
+    code: int
+    """Bytecode value"""
     size: int
     """Size in bytes of compiled op, 0 indicate size is variable"""
     doc: list[str]
@@ -421,11 +423,11 @@ def transform_encoding(value: str) -> ImmediateKind:
         case "int16 (big-endian)":
             result = ImmediateKind.label
         case "varuint":
-            result = ImmediateKind.uint64
+            result = ImmediateKind.varuint
         case "varuint length, bytes":
             result = ImmediateKind.bytes
         case "varuint count, [varuint ...]":
-            result = ImmediateKind.uint64_array
+            result = ImmediateKind.varuint_array
         case "varuint count, [varuint length, bytes ...]":
             result = ImmediateKind.bytes_array
         case "varuint count, [int16 (big-endian) ...]":
@@ -555,6 +557,7 @@ def transform_spec(lang_spec: AlgorandLanguageSpec) -> LanguageSpec:
     for op_name, algorand_op in algorand_ops.items():
         op = Op(
             name=op_name,
+            code=algorand_op["Opcode"],
             size=algorand_op["Size"],
             doc=transform_doc(algorand_op),
             cost=transform_cost(algorand_op),

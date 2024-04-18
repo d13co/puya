@@ -89,6 +89,36 @@ def main() -> None:
         help="Output MIR before lowering to TealOps",
     )
     parser.add_argument(
+        "--output-bytecode",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Output AVM bytecode",
+    )
+    parser.add_argument(
+        "--match-algod-bytecode",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="When outputting bytecode, ensure bytecode matches algod output",
+    )
+    parser.add_argument(
+        "-T",
+        "--template_var",
+        dest="template_vars",
+        metavar="VAR=VALUE",
+        action="append",
+        help="Define template vars for use when assembling via --output-bytecode,"
+        " without TMPL prefix e.g."
+        " -T SOME_INT=1234"
+        " -T SOME_BYTES=0x1A2B"
+        " -T SOME_STR=\\'hello\\'",
+    )
+    parser.add_argument(
+        "--template-vars-path",
+        help="Define path containing template vars for use when assembling via --output-bytecode",
+        type=Path,
+        default=None,
+    )
+    parser.add_argument(
         "--target-avm-version",
         type=int,
         choices=SUPPORTED_TEAL_LANGUAGE_VERSIONS,

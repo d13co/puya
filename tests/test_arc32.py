@@ -17,6 +17,7 @@ from algosdk.v2client.algod import AlgodClient
 from nacl.signing import SigningKey
 from puya.arc32 import create_arc32_json
 from puya.models import CompiledContract
+from puya.teal.output import emit_teal
 
 from tests import EXAMPLES_DIR, TEST_CASES_DIR
 from tests.test_execution import decode_logs
@@ -30,7 +31,9 @@ def compile_arc32(src_path: Path, *, optimization_level: int = 1, debug_level: i
     result = compile_src(src_path, optimization_level=optimization_level, debug_level=debug_level)
     ((contract,),) = result.teal.values()
     assert isinstance(contract, CompiledContract), "Compilation artifact must be a contract"
-    return create_arc32_json(contract)
+    approval = emit_teal(result.context, contract.approval_program)
+    clear = emit_teal(result.context, contract.clear_program)
+    return create_arc32_json(approval, clear, contract.metadata)
 
 
 @pytest.fixture()

@@ -30,11 +30,15 @@ class PuyaOptions:
     output_optimization_ir: bool = False
     output_destructured_ir: bool = False
     output_memory_ir: bool = False
+    output_bytecode: bool = False
+    match_algod_bytecode: bool = False
     out_dir: Path | None = attrs.field(default=None, repr=False)
     debug_level: int = 1
     optimization_level: int = 1
     log_level: LogLevel = LogLevel.info
     target_avm_version: int = MAINNET_TEAL_LANGUAGE_VERSION
+    template_vars: list[str] = attrs.field(factory=list)
+    template_vars_path: Path | None = attrs.field(default=None, repr=str)
     # TODO: the below is probably not scalable as a set of optimisation on/off flags,
     #       but it'll do for now
     locals_coalescing_strategy: LocalsCoalescingStrategy = LocalsCoalescingStrategy.root_operand

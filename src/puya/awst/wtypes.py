@@ -1,4 +1,3 @@
-import base64
 import typing
 from collections.abc import Callable, Iterable, Mapping, Sequence
 
@@ -6,15 +5,13 @@ import attrs
 from immutabledict import immutabledict
 
 from puya.algo_constants import (
-    ADDRESS_CHECKSUM_LENGTH,
-    ENCODED_ADDRESS_LENGTH,
     MAX_BIGUINT_BITS,
     MAX_BYTES_LENGTH,
-    PUBLIC_KEY_HASH_LENGTH,
 )
 from puya.awst_build import constants
 from puya.errors import InternalError
-from puya.utils import sha512_256_hash
+from puya.models import TransactionType
+from puya.utils import valid_address
 
 
 def _all_literals_invalid(_value: object) -> bool:
@@ -125,10 +122,10 @@ application_wtype: typing.Final = WType(
 @typing.final
 @attrs.frozen(str=False, kw_only=True)
 class WGroupTransaction(WType):
-    transaction_type: constants.TransactionType | None
+    transaction_type: TransactionType | None
 
     @classmethod
-    def from_type(cls, transaction_type: constants.TransactionType | None) -> "WGroupTransaction":
+    def from_type(cls, transaction_type: TransactionType | None) -> "WGroupTransaction":
         name = "group_transaction"
         if transaction_type:
             name = f"{name}_{transaction_type.name}"
@@ -143,12 +140,10 @@ class WGroupTransaction(WType):
 
 @attrs.define
 class WInnerTransactionFields(WType):
-    transaction_type: constants.TransactionType | None
+    transaction_type: TransactionType | None
 
     @classmethod
-    def from_type(
-        cls, transaction_type: constants.TransactionType | None
-    ) -> "WInnerTransactionFields":
+    def from_type(cls, transaction_type: TransactionType | None) -> "WInnerTransactionFields":
         name = "inner_transaction_fields"
         if transaction_type:
             name = f"{name}_{transaction_type.name}"
@@ -161,10 +156,10 @@ class WInnerTransactionFields(WType):
 
 @attrs.define
 class WInnerTransaction(WType):
-    transaction_type: constants.TransactionType | None
+    transaction_type: TransactionType | None
 
     @classmethod
-    def from_type(cls, transaction_type: constants.TransactionType | None) -> "WInnerTransaction":
+    def from_type(cls, transaction_type: TransactionType | None) -> "WInnerTransaction":
         name = "inner_transaction"
         if transaction_type:
             name = f"{name}_{transaction_type.name}"
@@ -435,53 +430,6 @@ arc4_address_type: typing.Final = ARC4StaticArray(
     stub_name=constants.CLS_ARC4_ADDRESS,
     alias="address",
 )
-
-
-# TODO: move these validation functions somewhere else
-def valid_base32(s: str) -> bool:
-    """check if s is a valid base32 encoding string and fits into AVM bytes type"""
-    try:
-        value = base64.b32decode(s)
-    except ValueError:
-        return False
-    return bytes_wtype.is_valid_literal(value)
-    # regex from PyTEAL, appears to be RFC-4648
-    # ^(?:[A-Z2-7]{8})*(?:([A-Z2-7]{2}([=]{6})?)|([A-Z2-7]{4}([=]{4})?)|([A-Z2-7]{5}([=]{3})?)|([A-Z2-7]{7}([=]{1})?))?  # noqa: E501
-
-
-def valid_base16(s: str) -> bool:
-    try:
-        value = base64.b16decode(s)
-    except ValueError:
-        return False
-    return bytes_wtype.is_valid_literal(value)
-
-
-def valid_base64(s: str) -> bool:
-    """check if s is a valid base64 encoding string and fits into AVM bytes type"""
-    try:
-        value = base64.b64decode(s, validate=True)
-    except ValueError:
-        return False
-    return bytes_wtype.is_valid_literal(value)
-    # regex from PyTEAL, appears to be RFC-4648
-    # ^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$
-
-
-def valid_address(address: str) -> bool:
-    """check if address is a valid address with checksum"""
-    # Pad address so it's a valid b32 string
-    padded_address = address + (6 * "=")
-    if not (len(address) == ENCODED_ADDRESS_LENGTH and valid_base32(padded_address)):
-        return False
-    address_bytes = base64.b32decode(padded_address)
-    if len(address_bytes) != PUBLIC_KEY_HASH_LENGTH + ADDRESS_CHECKSUM_LENGTH:
-        return False
-
-    public_key_hash = address_bytes[:PUBLIC_KEY_HASH_LENGTH]
-    check_sum = address_bytes[PUBLIC_KEY_HASH_LENGTH:]
-    verified_check_sum = sha512_256_hash(public_key_hash)[-ADDRESS_CHECKSUM_LENGTH:]
-    return check_sum == verified_check_sum
 
 
 def is_transaction_type(wtype: WType) -> typing.TypeGuard[WGroupTransaction]:

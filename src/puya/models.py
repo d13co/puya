@@ -11,8 +11,10 @@ if typing.TYPE_CHECKING:
 
     from puya.avm_type import AVMType
     from puya.parse import SourceLocation
+    from puya.teal.models import TealProgram
 
 
+# values and names are matched to AVM definitions
 class OnCompletionAction(enum.IntEnum):
     NoOp = 0
     OptIn = 1
@@ -20,6 +22,15 @@ class OnCompletionAction(enum.IntEnum):
     ClearState = 3
     UpdateApplication = 4
     DeleteApplication = 5
+
+
+class TransactionType(enum.IntEnum):
+    pay = 1
+    keyreg = 2
+    acfg = 3
+    axfer = 4
+    afrz = 5
+    appl = 6
 
 
 @attrs.frozen(kw_only=True)
@@ -124,16 +135,16 @@ class ContractMetaData:
 
 @attrs.define(kw_only=True)
 class CompiledContract:
-    approval_program: list[str]
+    approval_program: TealProgram
     """lines of the TEAL approval program for the contract"""
-    clear_program: list[str]
+    clear_program: TealProgram
     """lines of the TEAL clear program for the contract"""
     metadata: ContractMetaData
 
 
 @attrs.define(kw_only=True)
 class CompiledLogicSignature:
-    program: list[str]
+    program: TealProgram
     """lines of the TEAL program for the logic signature"""
     metadata: LogicSignatureMetaData
 

@@ -11,8 +11,15 @@ from _pytest.mark import ParameterSet
 from puya import log
 from puya.options import PuyaOptions
 
-from tests import EXAMPLES_DIR, TEST_CASES_DIR, VCS_ROOT
-from tests.utils import APPROVAL_EXTENSIONS, CompilationResult, compile_src, get_relative_path
+from tests import VCS_ROOT
+from tests.utils import (
+    APPROVAL_EXTENSIONS,
+    CompilationResult,
+    PuyaExample,
+    compile_src,
+    get_all_examples,
+    get_relative_path,
+)
 
 ENV_WITH_NO_COLOR = dict(os.environ) | {
     "NO_COLOR": "1",  # disable colour output
@@ -21,20 +28,6 @@ ENV_WITH_NO_COLOR = dict(os.environ) | {
 SUFFIX_O0 = "_unoptimized"
 SUFFIX_O1 = ""
 SUFFIX_O2 = "_O2"
-
-
-@attrs.frozen
-class PuyaExample:
-    root: Path
-    name: str
-
-    @property
-    def path(self) -> Path:
-        return self.root / self.name
-
-    @property
-    def id(self) -> str:
-        return f"{self.root.stem}_{self.name}"
 
 
 def _should_output(path: Path, puya_options: PuyaOptions) -> bool:
@@ -181,13 +174,7 @@ def compile_with_level2_optimizations(test_case: PuyaExample) -> None:
 
 
 def get_test_cases() -> Iterable[ParameterSet]:
-    all_examples = [
-        PuyaExample(root, item.name)
-        for root in (EXAMPLES_DIR, TEST_CASES_DIR)
-        for item in root.iterdir()
-        if item.is_dir() and any(item.glob("*.py"))
-    ]
-    for example in all_examples:
+    for example in get_all_examples():
         if example.name == "stress_tests":
             marks = [pytest.mark.slow]
         else:

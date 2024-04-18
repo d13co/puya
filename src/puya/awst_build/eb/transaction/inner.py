@@ -28,7 +28,7 @@ if typing.TYPE_CHECKING:
 
     import mypy.nodes
 
-    from puya.awst_build.constants import TransactionType
+    from puya.models import TransactionType
     from puya.parse import SourceLocation
 
 

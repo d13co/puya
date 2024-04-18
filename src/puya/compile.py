@@ -36,6 +36,9 @@ from puya.parse import (
     parse_and_typecheck,
 )
 from puya.teal.main import mir_to_teal
+from puya.teal.models import TealProgram
+from puya.teal.output import emit_teal
+from puya.ussemble.main import assemble_program
 from puya.utils import determine_out_dir, make_path_relative_to_cwd
 
 # this should contain the lowest version number that this compiler does NOT support
@@ -310,44 +313,65 @@ def write_artifacts(
         for artifact in compiled_artifacts:
             teal_file_stem = artifact.metadata.name
             arc32_file_stem = f"{teal_file_stem}.arc32.json"
+            artifact_base_path = out_dir / teal_file_stem
             match artifact:
                 case CompiledLogicSignature() as logic_sig:
                     if context.options.output_teal:
-                        write_logic_sig_files(
-                            base_path=out_dir / teal_file_stem, compiled_logic_sig=logic_sig
+                        program_src = emit_teal(context, logic_sig.program)
+                        write_program_teal(artifact_base_path, {".teal": program_src})
+                    if context.options.output_bytecode:
+                        write_program_bytecode(
+                            context, artifact_base_path, {".bin": logic_sig.program}
                         )
                 case CompiledContract() as contract:
+                    metadata = contract.metadata
+                    approval_src = emit_teal(context, contract.approval_program)
+                    clear_src = emit_teal(context, contract.clear_program)
                     if context.options.output_teal:
-                        teal_path = out_dir / teal_file_stem
-                        write_contract_files(base_path=teal_path, compiled_contract=contract)
-                    if artifact.metadata.is_arc4:
+                        write_program_teal(
+                            artifact_base_path,
+                            {
+                                ".approval.teal": approval_src,
+                                ".clear.teal": clear_src,
+                            },
+                        )
+                    if context.options.output_bytecode:
+                        write_program_bytecode(
+                            context,
+                            artifact_base_path,
+                            {
+                                ".approval.bin": contract.approval_program,
+                                ".clear.bin": contract.clear_program,
+                            },
+                        )
+                    if metadata.is_arc4:
                         if context.options.output_arc32:
                             arc32_path = out_dir / arc32_file_stem
                             logger.info(f"Writing {make_path_relative_to_cwd(arc32_path)}")
-                            json_text = create_arc32_json(contract)
+                            json_text = create_arc32_json(
+                                approval_src,
+                                clear_src,
+                                contract.metadata,
+                            )
                             arc32_path.write_text(json_text)
                         if context.options.output_client:
-                            write_arc32_client(
-                                contract.metadata.name, contract.metadata.arc4_methods, out_dir
-                            )
+                            write_arc32_client(metadata.name, metadata.arc4_methods, out_dir)
                 case _:
                     typing.assert_never(artifact)
 
 
-def write_contract_files(base_path: Path, compiled_contract: CompiledContract) -> None:
-    output_paths = {
-        ".approval.teal": compiled_contract.approval_program,
-        ".clear.teal": compiled_contract.clear_program,
-    }
-    for suffix, src in output_paths.items():
+def write_program_teal(base_path: Path, programs: dict[str, str]) -> None:
+    for suffix, program in programs.items():
         output_path = base_path.with_suffix(suffix)
-        output_text = "\n".join(src)
         logger.info(f"Writing {make_path_relative_to_cwd(output_path)}")
-        output_path.write_text(output_text, encoding="utf-8")
+        output_path.write_text(program, encoding="utf-8")
 
 
-def write_logic_sig_files(base_path: Path, compiled_logic_sig: CompiledLogicSignature) -> None:
-    output_path = base_path.with_suffix(".teal")
-    output_text = "\n".join(compiled_logic_sig.program)
-    logger.info(f"Writing {make_path_relative_to_cwd(output_path)}")
-    output_path.write_text(output_text, encoding="utf-8")
+def write_program_bytecode(
+    context: CompileContext, base_path: Path, programs: dict[str, TealProgram]
+) -> None:
+    for suffix, program in programs.items():
+        output_path = base_path.with_suffix(suffix)
+        assembled = assemble_program(context, program)
+        logger.info(f"Writing {make_path_relative_to_cwd(output_path)}")
+        output_path.write_bytes(assembled.bytecode)

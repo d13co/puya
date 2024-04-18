@@ -33,6 +33,7 @@ from puya.awst_build.eb.reference_types.base import ReferenceValueExpressionBuil
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.utils import convert_literal_to_expr, expect_operand_wtype
 from puya.errors import CodeError
+from puya.utils import valid_address
 
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
@@ -60,7 +61,7 @@ class AccountClassExpressionBuilder(BytesBackedClassExpressionBuilder):
             case []:
                 value: Expression = intrinsic_factory.zero_address(location)
             case [Literal(value=str(addr_value))]:
-                if not wtypes.valid_address(addr_value):
+                if not valid_address(addr_value):
                     raise CodeError(
                         f"Invalid address value. Address literals should be"
                         f" {ENCODED_ADDRESS_LENGTH} characters and not include base32 padding",

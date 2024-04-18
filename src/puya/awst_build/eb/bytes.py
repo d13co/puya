@@ -5,7 +5,7 @@ import typing
 
 import mypy.nodes
 
-from puya import log
+from puya import log, utils
 from puya.awst import wtypes
 from puya.awst.nodes import (
     BytesAugmentedAssignment,
@@ -111,16 +111,16 @@ class BytesFromEncodedStrBuilder(IntermediateExpressionBuilder):
                 raise CodeError("Invalid/unhandled arguments", location)
         match self.encoding:
             case BytesEncoding.base64:
-                if not wtypes.valid_base64(encoded_value):
+                if not utils.valid_base64(encoded_value):
                     raise CodeError("Invalid base64 value", location)
                 bytes_value = base64.b64decode(encoded_value)
             case BytesEncoding.base32:
-                if not wtypes.valid_base32(encoded_value):
+                if not utils.valid_base32(encoded_value):
                     raise CodeError("Invalid base32 value", location)
                 bytes_value = base64.b32decode(encoded_value)
             case BytesEncoding.base16:
                 encoded_value = encoded_value.upper()
-                if not wtypes.valid_base16(encoded_value):
+                if not utils.valid_base16(encoded_value):
                     raise CodeError("Invalid base16 value", location)
                 bytes_value = base64.b16decode(encoded_value)
             case _:

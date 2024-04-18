@@ -1,6 +1,6 @@
 import enum
 
-from puya.models import OnCompletionAction
+from puya.models import OnCompletionAction, TransactionType
 
 ALGOPY_PREFIX = "algopy."
 ARC4_PREFIX = f"{ALGOPY_PREFIX}arc4."
@@ -85,16 +85,6 @@ KNOWN_METHOD_DECORATORS = [
     ABIMETHOD_DECORATOR,
     BAREMETHOD_DECORATOR,
 ]
-
-
-# values and names are matched to AVM definitions
-class TransactionType(enum.IntEnum):
-    pay = 1
-    keyreg = 2
-    acfg = 3
-    axfer = 4
-    afrz = 5
-    appl = 6
 
 
 class _TransactionTypeNames:
