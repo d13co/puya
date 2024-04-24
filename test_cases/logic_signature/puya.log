@@ -1,4 +1,4 @@
-debug: PuyaOptions(paths=['logic_signature'], output_teal=True, output_arc32=True, output_client=True, output_awst=True, output_ssa_ir=True, output_optimization_ir=True, output_destructured_ir=True, output_memory_ir=True, debug_level=1, optimization_level=1, log_level=<LogLevel.debug: 10>, target_avm_version=10, locals_coalescing_strategy=<LocalsCoalescingStrategy.root_operand: 'root_operand'>)
+debug: PuyaOptions(paths=['logic_signature'], output_teal=True, output_arc32=True, output_client=True, output_awst=True, output_ssa_ir=True, output_optimization_ir=True, output_destructured_ir=True, output_memory_ir=True, output_bytecode=True, match_algod_bytecode=False, debug_level=1, optimization_level=1, log_level=<LogLevel.debug: 10>, target_avm_version=10, template_vars=[], template_vars_path=<git root>/test_cases/logic_signature/template.vars, locals_coalescing_strategy=<LocalsCoalescingStrategy.root_operand: 'root_operand'>)
 info: Found python prefix: <git root>/.venv
 debug: Sealing block@0: // L11
 debug: Terminated block@0: // L11
@@ -504,4 +504,6 @@ debug: Allocated 1 variable/s to x-stack: and_result%0#0
 debug: shared x-stack for assert_correct_asset_bool_true@5 -> assert_correct_asset_bool_merge@7: and_result%0#0
 debug: shared x-stack for assert_correct_asset_bool_false@6 -> assert_correct_asset_bool_merge@7: and_result%0#0
 info: Writing logic_signature/out/pre_approved_sale.teal
+info: Writing logic_signature/out/pre_approved_sale.bin
 info: Writing logic_signature/out/always_allow.teal
+info: Writing logic_signature/out/always_allow.bin

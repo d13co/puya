@@ -35,6 +35,9 @@ def peephole(block: models.TealBlock) -> bool:
             new_values, modified = _optimize_pair(
                 *result[start_idx : start_idx + window_size],
             )
+        if not modified:
+            window_size = 1
+            new_values, modified = _optimize_single(result[start_idx])
         if modified:
             any_modified = True
             result[start_idx : start_idx + window_size] = new_values
@@ -57,6 +60,13 @@ def is_redundant_rotate(a: models.TealOp, b: models.TealOp) -> bool:
 
 def is_stack_swap(op: models.TealOp) -> bool:
     return op.op_code == "swap" or (op.op_code in ("cover", "uncover") and op.immediates[0] == 1)
+
+
+def _optimize_single(a: models.TealOp) -> tuple[list[models.TealOp], bool]:
+    match a:
+        case models.Cover(n=1, source_location=loc) | models.Uncover(n=1, source_location=loc):
+            return [models.Swap(source_location=loc)], True
+    return [a], False
 
 
 def _optimize_pair(a: models.TealOp, b: models.TealOp) -> tuple[list[models.TealOp], bool]:

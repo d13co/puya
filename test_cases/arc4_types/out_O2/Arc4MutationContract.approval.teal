@@ -274,9 +274,10 @@ struct_assign:
     swap
     dig 3
     len
+    swap
     uncover 4
     uncover 3
-    uncover 2
+    uncover 3
     substring3
     uncover 2
     byte "\x00\x05Hmmmm"

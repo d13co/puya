@@ -1,4 +1,4 @@
-debug: PuyaOptions(paths=['state_proxies'], output_teal=True, output_arc32=True, output_client=True, output_awst=True, output_ssa_ir=True, output_optimization_ir=True, output_destructured_ir=True, output_memory_ir=True, debug_level=1, optimization_level=1, log_level=<LogLevel.debug: 10>, target_avm_version=10, locals_coalescing_strategy=<LocalsCoalescingStrategy.root_operand: 'root_operand'>)
+debug: PuyaOptions(paths=['state_proxies'], output_teal=True, output_arc32=True, output_client=True, output_awst=True, output_ssa_ir=True, output_optimization_ir=True, output_destructured_ir=True, output_memory_ir=True, output_bytecode=True, match_algod_bytecode=False, debug_level=1, optimization_level=1, log_level=<LogLevel.debug: 10>, target_avm_version=10, template_vars=[], template_vars_path=None, locals_coalescing_strategy=<LocalsCoalescingStrategy.root_operand: 'root_operand'>)
 info: Found python prefix: <git root>/.venv
 debug: Sealing block@0: // L11
 debug: Terminated block@0: // L11
@@ -446,5 +446,7 @@ debug: Inserted create_block@0.ops[11]: 'store tmp%1#0 to l-stack (copy)'
 debug: Replaced create_block@0.ops[13]: 'load tmp%1#0' with 'load tmp%1#0 from l-stack (no copy)'
 info: Writing state_proxies/out/StateProxyContract.approval.teal
 info: Writing state_proxies/out/StateProxyContract.clear.teal
+info: Writing state_proxies/out/StateProxyContract.approval.bin
+info: Writing state_proxies/out/StateProxyContract.clear.bin
 info: Writing state_proxies/out/StateProxyContract.arc32.json
 info: Writing state_proxies/out/client_StateProxyContract.py

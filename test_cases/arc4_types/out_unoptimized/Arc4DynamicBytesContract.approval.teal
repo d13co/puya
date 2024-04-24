@@ -35,7 +35,7 @@ test_cases.arc4_types.dynamic_bytes.Arc4DynamicBytesContract.approval_program:
     dup
     int 0
     extract_uint16
-    swap
+    cover 1
     extract 2 0
     int 0
 
@@ -50,14 +50,14 @@ main_for_header@1:
     int 1
     *
     dig 2
-    swap
+    uncover 1
     int 1
     extract3
     // arc4_types/dynamic_bytes.py:17
     // total += uint8_item.native
     btoi
     dig 4
-    swap
+    uncover 1
     +
     bury 4
     dup
@@ -119,14 +119,14 @@ main_for_header@5:
     int 1
     *
     dig 11
-    swap
+    uncover 1
     int 1
     extract3
     // arc4_types/dynamic_bytes.py:26
     // total += uint8_item.native
     btoi
     dig 4
-    swap
+    uncover 1
     +
     bury 4
     dig 5
@@ -146,7 +146,7 @@ main_after_for@8:
     len
     itob
     extract 6 2
-    swap
+    uncover 1
     concat
     dup
     bury 10
@@ -185,14 +185,14 @@ main_for_header@9:
     int 1
     *
     dig 10
-    swap
+    uncover 1
     int 1
     extract3
     // arc4_types/dynamic_bytes.py:33
     // total += uint8_item.native
     btoi
     dig 4
-    swap
+    uncover 1
     +
     bury 4
     dig 4
@@ -219,7 +219,7 @@ main_after_for@12:
     len
     itob
     extract 6 0
-    swap
+    uncover 1
     concat
     // arc4_types/dynamic_bytes.py:38
     // assert dynamic_bytes3.bytes == b"\x00\x05\x03\x04abc"

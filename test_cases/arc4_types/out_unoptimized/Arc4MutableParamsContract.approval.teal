@@ -41,7 +41,7 @@ mutating_copies:
     //     s_val_2=String("Days"),
     // )
     byte 0x
-    swap
+    uncover 1
     concat
     // arc4_types/mutable_params.py:38
     // u_val=UInt8(50),
@@ -70,7 +70,7 @@ mutating_copies:
     // )
     len
     int 6
-    swap
+    uncover 1
     +
     itob
     extract 6 2
@@ -107,18 +107,18 @@ mutating_copies:
     cover 3
     // arc4_types/mutable_params.py:46
     // my_array[2] = UInt8(5)
-    swap
+    uncover 1
     int 2
     byte 0x05
     replace3
-    swap
+    cover 1
     // arc4_types/mutable_params.py:48
     // assert my_array_copy[2] == UInt8(3), "my_array_copy should be unchanged"
     int 2
     int 1
     *
     dig 3
-    swap
+    uncover 1
     int 1
     extract3
     byte 0x03
@@ -130,7 +130,7 @@ mutating_copies:
     int 1
     *
     dig 2
-    swap
+    uncover 1
     int 1
     extract3
     byte 0x05
@@ -159,7 +159,7 @@ mutating_copies:
     int 1
     *
     dig 1
-    swap
+    uncover 1
     int 1
     extract3
     byte 0x05
@@ -202,7 +202,7 @@ mutating_copies:
     int 1
     *
     dig 2
-    swap
+    uncover 1
     int 1
     extract3
     // arc4_types/mutable_params.py:65-67
@@ -235,7 +235,7 @@ mutating_copies:
     assert // my_struct_copy should not be mutated by the subroutine
     // arc4_types/mutable_params.py:73
     // my_array_copy_2 = my_array_copy.copy()
-    swap
+    uncover 1
     // arc4_types/mutable_params.py:75
     // my_array_copy_2 = self.other_routine_2(my_array_copy_2)
     callsub other_routine_2
@@ -246,7 +246,7 @@ mutating_copies:
     int 1
     *
     dig 1
-    swap
+    uncover 1
     int 1
     extract3
     byte 0x01
@@ -255,7 +255,7 @@ mutating_copies:
     // arc4_types/mutable_params.py:79
     // self.other_routine_2(my_array_copy_2)
     callsub other_routine_2
-    swap
+    cover 1
     pop
     // arc4_types/mutable_params.py:80
     // assert my_array_copy_2[0] == UInt8(10), "my_array_copy_2 should have mutated value"
@@ -271,7 +271,7 @@ mutating_copies:
     // # Nested array items should still require a copy
     // nested = StructWithArray(test_array=my_array.copy())
     byte 0x
-    swap
+    uncover 1
     concat
     // arc4_types/mutable_params.py:90
     // self.other_routine_2(nested.test_array.copy())
@@ -315,15 +315,15 @@ other_routine:
     uncover 2
     uncover 2
     substring3
-    swap
+    uncover 1
     byte "\x00\x07AARRGH!"
     concat
-    swap
+    uncover 1
     concat
     byte "\x00\x07AARRGH!"
     len
     uncover 2
-    swap
+    uncover 1
     +
     itob
     substring 6 8

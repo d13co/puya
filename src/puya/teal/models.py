@@ -87,11 +87,12 @@ class Cover(TealOpN):
     def _produces(self) -> int:
         return self.n + 1
 
-    def teal(self) -> str:
-        if self.n == 1:
-            return self._teal_str("swap")
-        else:
-            return super().teal()
+
+@attrs.frozen
+class Swap(TealOp):
+    op_code: str = attrs.field(default="swap", init=False)
+    consumes: int = 2
+    produces: int = 2
 
 
 @attrs.frozen
@@ -107,12 +108,6 @@ class Uncover(TealOpN):
     @produces.default
     def _produces(self) -> int:
         return self.n + 1
-
-    def teal(self) -> str:
-        if self.n == 1:
-            return self._teal_str("swap")
-        else:
-            return super().teal()
 
 
 @attrs.frozen
