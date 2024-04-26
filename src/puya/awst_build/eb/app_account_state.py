@@ -19,7 +19,7 @@ from puya.awst.nodes import (
     Statement,
 )
 from puya.awst_build import constants
-from puya.awst_build.contract_data import AppStateDeclaration
+from puya.awst_build.contract_data import AppStateDeclaration, AppStateDeclType
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
@@ -220,6 +220,7 @@ class AppAccountStateClassExpressionBuilder(IntermediateExpressionBuilder):
 class AppAccountStateProxyDefinitionBuilder(StateProxyDefinitionBuilder):
     kind = AppStateKind.account_local
     python_name = constants.CLS_LOCAL_STATE_ALIAS
+    decl_type = AppStateDeclType.local_proxy
 
 
 def _build_field(

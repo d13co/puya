@@ -5,9 +5,9 @@ import enum
 import typing
 
 from puya.awst.nodes import (
-    AppStateDefinition,
     AppStateKind,
     BytesConstant,
+    ContractReference,
     Expression,
     FieldExpression,
     IndexExpression,
@@ -19,6 +19,7 @@ from puya.awst.nodes import (
     TupleExpression,
     TupleItemExpression,
 )
+from puya.awst_build.contract_data import AppStorageDeclaration
 from puya.errors import CodeError, InternalError
 
 if typing.TYPE_CHECKING:
@@ -28,7 +29,7 @@ if typing.TYPE_CHECKING:
     import mypy.types
 
     from puya.awst import wtypes
-    from puya.awst_build.contract_data import AppStateDeclaration
+    from puya.awst_build.contract_data import AppStateDeclaration, AppStateDeclType
     from puya.parse import SourceLocation
 
 __all__ = [
@@ -255,6 +256,7 @@ class StateProxyMemberBuilder(IntermediateExpressionBuilder):
 class StateProxyDefinitionBuilder(ExpressionBuilder, abc.ABC):
     kind: AppStateKind
     python_name: str
+    decl_type: AppStateDeclType
 
     def __init__(
         self,
@@ -270,14 +272,18 @@ class StateProxyDefinitionBuilder(ExpressionBuilder, abc.ABC):
         self.description = description
         self.initial_value = initial_value
 
-    def build_definition(self, member_name: str, location: SourceLocation) -> AppStateDefinition:
-        return AppStateDefinition(
+    def build_definition(
+        self, member_name: str, defined_in: ContractReference, location: SourceLocation
+    ) -> AppStorageDeclaration:
+        return AppStorageDeclaration(
             description=self.description,
             member_name=member_name,
             key_override=self.key_override,
             source_location=location,
             storage_wtype=self.storage,
             kind=self.kind,
+            defined_in=defined_in,
+            decl_type=self.decl_type,
         )
 
     def rvalue(self) -> Expression:
