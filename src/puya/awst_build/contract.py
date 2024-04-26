@@ -9,7 +9,6 @@ from puya.awst import wtypes
 from puya.awst.nodes import (
     AppStateDefinition,
     AppStateKind,
-    BytesEncoding,
     ContractFragment,
     ContractMethod,
     ContractReference,
@@ -60,7 +59,7 @@ class ContractASTConverter(BaseMyPyStatementVisitor[None]):
         self._init_method: ContractMethod | None = None
         self._subroutines = list[ContractMethod]()
         this_app_state = list(_gather_app_storage(context, class_def.info))
-        self.app_state = _gather_app_storage_recursive(context, class_def, this_app_state)
+        _combined_app_state = _gather_app_storage_recursive(context, class_def, this_app_state)
 
         # if the class has an __init__ method, we need to visit it first, so any storage
         # fields cane be resolved to a (static) key
@@ -90,15 +89,11 @@ class ContractASTConverter(BaseMyPyStatementVisitor[None]):
                 collected_app_state_definitions[decl.member_name] = AppStateDefinition(
                     member_name=decl.member_name,
                     storage_wtype=decl.storage_wtype,
-                    key=decl.member_name.encode("utf8"),
-                    key_encoding=BytesEncoding.utf8,
+                    key_override=None,
                     description=None,
                     source_location=decl.source_location,
                     kind=decl.kind,
                 )
-        collected_box_definitions = {
-            box_def.member_name: box_def for box_def in context.static_box_defs[self.cref]
-        }
         self.result_ = ContractFragment(
             module_name=self.cref.module_name,
             name=self.cref.class_name,
@@ -111,7 +106,6 @@ class ContractASTConverter(BaseMyPyStatementVisitor[None]):
             clear_program=self._clear_program,
             subroutines=self._subroutines,
             app_state=collected_app_state_definitions,
-            static_boxes=collected_box_definitions,
             docstring=class_def.docstring,
             source_location=self._location(class_def),
             reserved_scratch_space=class_options.scratch_slot_reservations,

@@ -10,7 +10,6 @@ from puya import log
 from puya.awst import wtypes
 from puya.awst.nodes import (
     AppStateDefinition,
-    BoxProxyDefinition,
     ConstantValue,
     ContractReference,
     Literal as AWSTLiteral,
@@ -38,9 +37,6 @@ class ASTConversionContext(CompileContext):
 class ASTConversionModuleContext(ASTConversionContext):
     current_module: mypy.nodes.MypyFile
     state_defs: defaultdict[ContractReference, list[AppStateDefinition]] = attrs.field(
-        factory=lambda: defaultdict(list)
-    )
-    static_box_defs: defaultdict[ContractReference, list[BoxProxyDefinition]] = attrs.field(
         factory=lambda: defaultdict(list)
     )
 

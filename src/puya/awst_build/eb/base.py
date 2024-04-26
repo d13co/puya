@@ -7,7 +7,7 @@ import typing
 from puya.awst.nodes import (
     AppStateDefinition,
     AppStateKind,
-    BytesEncoding,
+    BytesConstant,
     Expression,
     FieldExpression,
     IndexExpression,
@@ -20,7 +20,6 @@ from puya.awst.nodes import (
     TupleItemExpression,
 )
 from puya.errors import CodeError, InternalError
-from puya.utils import coalesce
 
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
@@ -261,29 +260,22 @@ class StateProxyDefinitionBuilder(ExpressionBuilder, abc.ABC):
         self,
         location: SourceLocation,
         storage: wtypes.WType,
-        key: bytes | None,
-        key_encoding: BytesEncoding | None,
+        key_override: BytesConstant | None,
         description: str | None,
         initial_value: Expression | None = None,
     ):
         super().__init__(location)
-        if (key is None) != (key_encoding is None):
-            raise InternalError(
-                "either key and key_encoding should be specified or neither", location
-            )
         self.storage = storage
-        self.key = key
-        self.key_encoding = key_encoding
+        self.key_override = key_override
         self.description = description
         self.initial_value = initial_value
 
     def build_definition(self, member_name: str, location: SourceLocation) -> AppStateDefinition:
         return AppStateDefinition(
             description=self.description,
-            key=coalesce(self.key, member_name.encode("utf8")),
-            key_encoding=self.key_encoding or BytesEncoding.utf8,
-            source_location=location,
             member_name=member_name,
+            key_override=self.key_override,
+            source_location=location,
             storage_wtype=self.storage,
             kind=self.kind,
         )

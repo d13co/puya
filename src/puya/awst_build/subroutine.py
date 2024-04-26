@@ -11,6 +11,7 @@ import mypy.types
 from puya import log
 from puya.awst import wtypes
 from puya.awst.nodes import (
+    AppStateDefinition,
     AppStateExpression,
     AppStateKind,
     AssertStatement,
@@ -21,7 +22,6 @@ from puya.awst.nodes import (
     Block,
     BoolConstant,
     BooleanBinaryOperation,
-    BoxProxyDefinition,
     BoxProxyExpression,
     BreakStatement,
     BytesConstant,
@@ -389,15 +389,23 @@ class FunctionASTConverter(
             )
         key = rvalue_eb.rvalue()
         match key:
-            case BoxProxyExpression(
-                key=BytesConstant(value=key_bytes),
-            ):
-                self.context.static_box_defs[self.contract_method_info.cref].append(
-                    BoxProxyDefinition(
+            case BoxProxyExpression(key=BytesConstant() as key_override, wtype=expr_wtype):
+                if expr_wtype is wtypes.box_blob_proxy_wtype:
+                    kind = AppStateKind.box_ref
+                elif isinstance(expr_wtype, wtypes.WBoxProxy):
+                    kind = AppStateKind.box
+                elif isinstance(expr_wtype, wtypes.WBoxMapProxy):
+                    kind = AppStateKind.box_map
+                else:
+                    raise InternalError("Unexpected")
+                self.context.state_defs[self.contract_method_info.cref].append(
+                    AppStateDefinition(
                         member_name=member_name,
-                        key=key_bytes,
+                        key_override=key_override,
                         source_location=key.source_location,
-                        proxy_wtype=key.wtype,
+                        storage_wtype=key.wtype,
+                        description=None,
+                        kind=kind,
                     )
                 )
                 return []

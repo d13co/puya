@@ -403,7 +403,7 @@ def fold_state_and_special_methods(
             translated = ContractState(
                 name=state.member_name,
                 source_location=state.source_location,
-                key=state.key,
+                key=state.key.value,  # TODO: pass encoding?
                 storage_type=wtype_to_avm_type(state.storage_wtype),
                 description=state.description,
             )
