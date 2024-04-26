@@ -148,7 +148,7 @@ contract examples.voting.voting.VotingRoundApp:
                 let tmp%6#0: uint64 = ((gtxns Amount) fund_min_bal_req#0)
                 let tmp%7#0: bool = (== tmp%6#0 min_balance_req#0)
                 (assert tmp%7#0) // Payment must be for the exact min balance requirement
-                let tmp%8#0: bool = (box_create 0x56 tally_box_size#0)
+                let tmp%8#0: bool = (box_create "V" tally_box_size#0)
                 (assert tmp%8#0)
                 return 
         
@@ -313,7 +313,7 @@ contract examples.voting.voting.VotingRoundApp:
         
         subroutine examples.voting.voting.VotingRoundApp.get_vote_from_box(index: uint64) -> uint64:
             block@0: // L239
-                let tmp%0#0: bytes = (box_extract 0x56 index#0 8u)
+                let tmp%0#0: bytes = (box_extract "V" index#0 8u)
                 let tmp%1#0: uint64 = (btoi tmp%0#0)
                 return tmp%1#0
         
@@ -447,7 +447,7 @@ contract examples.voting.voting.VotingRoundApp:
                 let current_vote#0: uint64 = examples.voting.voting.VotingRoundApp.get_vote_from_box(index#0)
                 let tmp%0#0: uint64 = (+ current_vote#0 1u)
                 let tmp%1#0: bytes = (itob tmp%0#0)
-                (box_replace 0x56 index#0 tmp%1#0)
+                (box_replace "V" index#0 tmp%1#0)
                 return 
         
         subroutine examples.voting.voting.VotingRoundApp.__init__() -> void:
