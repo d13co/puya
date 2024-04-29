@@ -151,11 +151,11 @@ class Baddie(arc4.ARC4Contract):
 
     @arc4.abimethod()
     def not_okay1(self) -> None:
-        self.global_c = GlobalState(UInt64) ## E: algopy.GlobalState can only be used in the __init__ method
+        self.global_c = GlobalState(UInt64) ## E: algopy.GlobalState can only be assigned to a member variable in the __init__ method
 
     @arc4.abimethod()
     def not_okay2(self) -> None:
-        self.local_d = LocalState(UInt64) ## E: algopy.LocalState can only be used in the __init__ method
+        self.local_d = LocalState(UInt64) ## E: algopy.LocalState can only be assigned to a member variable in the __init__ method
 
 
 ## case: bad_intrinsic_call
