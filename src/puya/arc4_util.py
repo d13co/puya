@@ -56,10 +56,8 @@ _ARC4_WTYPE_MAPPING = {
     "application": wtypes.application_wtype,
     "asset": wtypes.asset_wtype,
     "void": wtypes.void_wtype,
-    **{
-        t.name if t else "txn": wtypes.WGroupTransaction.from_type(t)
-        for t in constants.TRANSACTION_TYPE_TO_CLS
-    },
+    "txn": wtypes.WGroupTransaction.from_type(None),
+    **{t.name: wtypes.WGroupTransaction.from_type(t) for t in constants.TransactionType},
     "address": wtypes.arc4_address_type,
     "byte": wtypes.arc4_byte_type,
     "byte[]": wtypes.arc4_dynamic_bytes,
@@ -71,7 +69,7 @@ def make_dynamic_array_wtype(
 ) -> wtypes.ARC4DynamicArray:
     if not wtypes.is_arc4_encoded_type(element_type):
         raise CodeError(f"Invalid element type for arc4.DynamicArray: {element_type}", location)
-    return wtypes.ARC4DynamicArray.from_element_type(element_type)
+    return wtypes.ARC4DynamicArray(element_type, location)
 
 
 def make_static_array_wtype(
@@ -79,7 +77,7 @@ def make_static_array_wtype(
 ) -> wtypes.ARC4StaticArray:
     if not wtypes.is_arc4_encoded_type(element_type):
         raise CodeError(f"Invalid element type for arc4.StaticArray: {element_type}", location)
-    return wtypes.ARC4StaticArray.from_element_type_and_size(element_type, int(size))
+    return wtypes.ARC4StaticArray(element_type, int(size), location)
 
 
 def make_tuple_wtype(
@@ -91,7 +89,7 @@ def make_tuple_wtype(
             arc4_types.append(typ)
         else:
             raise CodeError(f"Invalid type for arc4.Tuple element: {typ}", location)
-    return wtypes.ARC4Tuple.from_types(arc4_types)
+    return wtypes.ARC4Tuple(arc4_types, location)
 
 
 def arc4_to_wtype(typ: str, location: SourceLocation | None = None) -> wtypes.WType:
@@ -101,10 +99,10 @@ def arc4_to_wtype(typ: str, location: SourceLocation | None = None) -> wtypes.WT
         pass
     if uint := _UINT_REGEX.match(typ):
         n = uint.group("n")
-        return wtypes.ARC4UIntN.from_scale(int(n))
+        return wtypes.ARC4UIntN(int(n), location)
     if ufixed := _UFIXED_REGEX.match(typ):
         n, m = ufixed.group("n", "m")
-        return wtypes.ARC4UFixedNxM.from_scale_and_precision(int(n), int(m))
+        return wtypes.ARC4UFixedNxM(int(n), int(m), location)
     if fixed_array := _FIXED_ARRAY_REGEX.match(typ):
         arr_type, size = fixed_array.group("type", "size")
         element_type = arc4_to_wtype(arr_type, location)
