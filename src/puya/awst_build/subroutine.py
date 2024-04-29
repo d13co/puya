@@ -355,19 +355,14 @@ class FunctionASTConverter(
         lvalues: list[mypy.nodes.Expression],
         stmt_loc: SourceLocation,
     ) -> Sequence[Statement]:
-        try:
-            (lvalue,) = lvalues
-        except ValueError:
-            raise CodeError(
-                f"{rvalue.python_name} can only be assigned to a single variable", stmt_loc
-            ) from None
-
-        match lvalue:
-            case mypy.nodes.MemberExpr(
-                name=member_name, expr=mypy.nodes.NameExpr(node=mypy.nodes.Var(is_self=True))
-            ):
-                pass
-            case _:
+        match lvalues:
+            case [
+                mypy.nodes.MemberExpr(
+                    name=member_name, expr=mypy.nodes.NameExpr(node=mypy.nodes.Var(is_self=True))
+                ) as member_expr
+            ]:
+                member_loc = self._location(member_expr)
+            case [lvalue]:
                 return [
                     AssignmentStatement(
                         value=rvalue.build_assignment_source(),
@@ -375,9 +370,12 @@ class FunctionASTConverter(
                         source_location=stmt_loc,
                     )
                 ]
+            case _:
+                raise CodeError(
+                    f"{rvalue.python_name} can only be assigned to a single variable", stmt_loc
+                )
         if self.contract_method_info is None:
             raise InternalError("Assignment to self outside of a contract class", stmt_loc)
-
         if self.func_def.name != "__init__":
             raise CodeError(
                 f"{rvalue.python_name} can only be assigned to a member variable"
@@ -423,18 +421,14 @@ class FunctionASTConverter(
         lvalues: list[mypy.nodes.Expression],
         stmt_loc: SourceLocation,
     ) -> Sequence[Statement]:
-        try:
-            (lvalue,) = lvalues
-        except ValueError:
-            raise CodeError(
-                f"{rvalue.python_name} can only be assigned to a single variable", stmt_loc
-            ) from None
-        match lvalue:
-            case mypy.nodes.MemberExpr(
-                name=member_name, expr=mypy.nodes.NameExpr(node=mypy.nodes.Var(is_self=True))
-            ):
-                pass
-            case _:
+        match lvalues:
+            case [
+                mypy.nodes.MemberExpr(
+                    name=member_name, expr=mypy.nodes.NameExpr(node=mypy.nodes.Var(is_self=True))
+                ) as member_expr
+            ]:
+                member_loc = self._location(member_expr)
+            case [lvalue]:
                 return [
                     AssignmentStatement(
                         value=rvalue.build_assignment_source(),
@@ -442,6 +436,10 @@ class FunctionASTConverter(
                         source_location=stmt_loc,
                     )
                 ]
+            case _:
+                raise CodeError(
+                    f"{rvalue.python_name} can only be assigned to a single variable", stmt_loc
+                )
         if self.contract_method_info is None:
             raise InternalError("Assignment to self outside of a contract class", stmt_loc)
         if self.func_def.name != "__init__":
@@ -450,9 +448,7 @@ class FunctionASTConverter(
                 " in the __init__ method",
                 stmt_loc,
             )
-        defn = rvalue.build_definition(
-            member_name, self.contract_method_info.cref, self._location(lvalue)
-        )
+        defn = rvalue.build_definition(member_name, self.contract_method_info.cref, member_loc)
         self.context.state_defs[self.contract_method_info.cref][member_name] = defn
         if rvalue.initial_value is None:
             return []
