@@ -344,6 +344,7 @@ class FunctionASTConverter(
             if is_self_member(lvalue):
                 return self._handle_proxy_assignment(lvalue, rvalue, stmt_loc)
         elif len(stmt.lvalues) > 1:
+            # TODO: PyType from rvalue, since it's guaranteed to be EB
             rvalue = temporary_assignment_if_required(rvalue)
 
         return [
@@ -574,6 +575,7 @@ class FunctionASTConverter(
 
     def visit_match_stmt(self, stmt: mypy.nodes.MatchStmt) -> Switch | None:
         loc = self._location(stmt)
+        # TODO: PyType from EB
         subject = require_expression_builder(
             temporary_assignment_if_required(stmt.subject.accept(self))
         ).rvalue()
@@ -774,6 +776,7 @@ class FunctionASTConverter(
                 local_type = lazy_setdefault(
                     self._symtable,
                     key=var_name,
+                    # TODO: map to PyType instead
                     default=lambda _: self.context.mypy_expr_node_type(name_expr),
                 )
                 var_expr = VarExpression(name=var_name, wtype=local_type, source_location=expr_loc)
@@ -980,6 +983,7 @@ class FunctionASTConverter(
         # mypy combines ast.BoolOp and ast.BinOp, but they're kinda different...
         if node.op in ("and", "or"):
             bool_op = BinaryBooleanOperator(node.op)
+            # TODO use PyType
             result_mypy_type = self.context.get_mypy_expr_type(node)
             bool_expr = self._visit_bool_op_expr(
                 bool_op, result_mypy_type, lhs=lhs, rhs=rhs, location=node_loc
@@ -1039,9 +1043,11 @@ class FunctionASTConverter(
                     location,
                 )
             target_wtype = wtypes.bool_wtype
+            # TODO: PyType is bool
             lhs_expr = bool_eval(lhs, location).rvalue()
             rhs_expr = bool_eval(rhs, location).rvalue()
         else:
+            # TODO: map to PyType instead
             target_wtype = self.context.type_to_wtype(result_mypy_type, source_location=location)
             lhs_expr = expect_operand_wtype(lhs, target_wtype)
             rhs_expr = expect_operand_wtype(rhs, target_wtype)
@@ -1101,6 +1107,7 @@ class FunctionASTConverter(
         condition = self._eval_condition(expr.cond)
         true_expr = require_expression_builder(expr.if_expr.accept(self)).rvalue()
         false_expr = require_expression_builder(expr.else_expr.accept(self)).rvalue()
+        # TODO: use PyType, and that type can be used to get result EB
         expr_wtype = self.context.mypy_expr_node_type(expr)
         if expr_wtype != true_expr.wtype:
             self._error(
@@ -1137,6 +1144,7 @@ class FunctionASTConverter(
         #       compile time, but it would always result in a constant ...
 
         operands = [o.accept(self) for o in expr.operands]
+        # TODO: operands are Literal or EB, so can get PyType
         operands[1:-1] = [temporary_assignment_if_required(operand) for operand in operands[1:-1]]
 
         comparisons = [
@@ -1153,6 +1161,7 @@ class FunctionASTConverter(
                 right=curr,
             )
             prev = curr
+        # TODO: PyType known as bool (at least with our current stubs)
         return var_expression(result)
 
     def _build_compare(
@@ -1203,6 +1212,7 @@ class FunctionASTConverter(
             require_expression_builder(
                 mypy_item.accept(self),
                 msg="Python literals (other than True/False) are not valid as tuple elements",
+                # TODO: grab item types from EB
             ).rvalue()
             for mypy_item in mypy_expr.items
         ]
@@ -1216,6 +1226,7 @@ class FunctionASTConverter(
             wtype=wtype,
             items=items,
         )
+        # TODO: PyType known, tuple. item types above
         return var_expression(tuple_expr)
 
     def visit_assignment_expr(self, expr: mypy.nodes.AssignmentExpr) -> ExpressionBuilder:
@@ -1231,6 +1242,7 @@ class FunctionASTConverter(
         value = source.build_assignment_source()
         target = self.resolve_lvalue(expr.target)
         result = AssignmentExpression(source_location=expr_loc, value=value, target=target)
+        # TODO: take PyType from source ExpressionBuilder
         return var_expression(result)
 
     def visit_super_expr(self, super_expr: mypy.nodes.SuperExpr) -> ExpressionBuilder:
