@@ -284,19 +284,19 @@ class Base(ARC4Contract):
 class Derived1(Base):
     def __init__(self) -> None:
         super().__init__()
-        self.foo = UInt64(2)
+        self.foo = UInt64(2) # ok
 
 class Derived2(Base):
     def __init__(self) -> None:
         super().__init__()
-        self.bar = Bytes(b"bbb") # type: ignore[assignment]
+        self.bar = Bytes(b"bbb") # type: ignore[assignment] ## E: Assignment target type algopy.UInt64 differs from expression value type algopy.Bytes
 
 class Derived3(Base):
     def __init__(self) -> None:
         super().__init__()
-        self.foo_p = GlobalState(UInt64(3))
+        self.foo_p = GlobalState(UInt64(3)) ## E: some error message here about redefining proxies
 
 class Derived4(Base):
     def __init__(self) -> None:
         super().__init__()
-        self.bar_p = GlobalState(Bytes(b"bbb")) # type: ignore[arg-type]
+        self.bar_p = GlobalState(Bytes(b"bbb")) # type: ignore[arg-type] ## E: some error message here about redefining proxies
