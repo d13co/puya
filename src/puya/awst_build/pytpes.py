@@ -39,6 +39,15 @@ class PyType(abc.ABC):
         return cls._registry.get(name)
 
 
+# https://typing.readthedocs.io/en/latest/spec/literal.html#legal-and-illegal-parameterizations
+# We don't support enums as typing.Literal parameters. MyPy encodes these as str values with
+# an additional "fallback" data member, but we don't need that complication.
+# mypy.types.LiteralValue also includes float, noting its invalid as a parameterization, but
+# we exclude this here.
+# None types are also encoded as their own type, but we have them as values here.
+TypingLiteralValue: typing.TypeAlias = int | bytes | str | bool | None
+
+
 @attrs.frozen
 class GenericType(PyType, abc.ABC):
     """Represents a typing.Generic type with unknown parameters"""
@@ -49,9 +58,9 @@ class GenericType(PyType, abc.ABC):
 
     @abc.abstractmethod
     def parameterise(
-        self, args: Sequence[PyType], source_location: SourceLocation | None
+        self, args: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
     ) -> PyType:
-        """Create a concrete type"""
+        """Create a concrete type. object arguments"""
 
 
 @attrs.frozen
@@ -142,32 +151,25 @@ class _GenericTupleType(GenericType, abc.ABC):
     name: str = attrs.field(default="builtins.tuple", init=False)
     alias: str = attrs.field(default="tuple", init=False)
 
-    _instances: typing.Final = dict[tuple[PyType, ...], TupleType]()
+    _instances: typing.Final = dict[tuple[PyType | TypingLiteralValue, ...], TupleType]()
 
     @typing.override
     def parameterise(
-        self, args: Sequence[PyType], source_location: SourceLocation | None
+        self, args_: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
     ) -> TupleType:
-        args = tuple(args)
+        args = tuple(args_)
         with contextlib.suppress(KeyError):
             return self._instances[args]
 
-        if not args:
-            raise CodeError("Empty tuples are not supported", source_location)
-        if NoneType in args:
-            raise CodeError(f"{NoneType.alias} is not allowed in tuples", source_location)
-        name = f"{self.name}[{', '.join(i.name for i in args)}]"
-        alias = f"{self.alias}[{', '.join(i.alias for i in args)}]"
-        item_wtypes = []
-        for i in args:
-            item_wtype = i.wtype
-            if item_wtype is None:
-                raise CodeError(f"Type {i.alias} is not allowed in a tuple", source_location)
-            item_wtypes.append(item_wtype)
+        py_types, item_wtypes = zip(
+            *_validate_tuple_type_args(args_, source_location), strict=True
+        )
+        name = f"{self.name}[{', '.join(i.name for i in py_types)}]"
+        alias = f"{self.alias}[{', '.join(i.alias for i in py_types)}]"
         self._instances[args] = result = TupleType(
             name=name,
             alias=alias,
-            items=tuple(args),
+            items=py_types,
             wtype=wtypes.WTuple.from_types(item_wtypes),
         )
         return result
@@ -178,34 +180,53 @@ class _GenericARC4TupleType(GenericType):
     name: str = attrs.field(default=constants.CLS_ARC4_TUPLE, init=False)
     alias: str = attrs.field(default=constants.CLS_ARC4_TUPLE, init=False)
 
-    _instances: typing.Final = dict[tuple[PyType, ...], TupleType]()
+    _instances: typing.Final = dict[tuple[PyType | TypingLiteralValue, ...], TupleType]()
 
     @typing.override
     def parameterise(
-        self, args: Sequence[PyType], source_location: SourceLocation | None
+        self, args_: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
     ) -> TupleType:
-        args = tuple(args)
+        args = tuple(args_)
         with contextlib.suppress(KeyError):
             return self._instances[args]
 
-        if not args:
-            raise CodeError("Empty tuples are not supported", source_location)
-        if NoneType in args:
-            raise CodeError(f"{NoneType.alias} is not allowed in tuples", source_location)
-        name = f"{self.name}[{', '.join(i.name for i in args)}]"
-        alias = f"{self.alias}[{', '.join(i.alias for i in args)}]"
-        item_wtypes = []
-        for i in args:
-            item_wtype = i.wtype
-            if not isinstance(item_wtype, wtypes.ARC4Type):
+        py_types, item_wtypes = zip(
+            *_validate_tuple_type_args(args_, source_location), strict=True
+        )
+        name = f"{self.name}[{', '.join(i.name for i in py_types)}]"
+        alias = f"{self.alias}[{', '.join(i.alias for i in py_types)}]"
+
+        item_wtypes_arc4 = []
+        for w in item_wtypes:
+            if not isinstance(w, wtypes.ARC4Type):
                 raise CodeError(
                     f"{self.name} can only contain ARC4 encoded items", source_location
                 )
-            item_wtypes.append(item_wtype)
+            item_wtypes_arc4.append(w)
         self._instances[args] = result = TupleType(
             name=name,
             alias=alias,
-            items=args,
-            wtype=wtypes.ARC4Tuple.from_types(item_wtypes),
+            items=py_types,
+            wtype=wtypes.ARC4Tuple.from_types(item_wtypes_arc4),
         )
         return result
+
+
+def _validate_tuple_type_args(
+    args: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
+) -> Sequence[tuple[PyType, wtypes.WType]]:
+    if not args:
+        raise CodeError("Empty tuples are not supported", source_location)
+    if NoneType in args:
+        raise CodeError(f"{NoneType.alias} is not allowed in tuples", source_location)
+    result = []
+    for i in args:
+        if not isinstance(i, PyType):
+            raise CodeError(
+                "typing.Literal cannot be used as tuple type parameter", source_location
+            )
+        item_wtype = i.wtype
+        if item_wtype is None:
+            raise CodeError(f"Type {i.alias} is not allowed in a tuple", source_location)
+        result.append((i, item_wtype))
+    return result
