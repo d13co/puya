@@ -6,6 +6,7 @@ import typing
 
 import attrs
 
+from puya import log
 from puya.awst import wtypes
 from puya.awst_build import constants
 from puya.errors import CodeError, InternalError
@@ -14,6 +15,9 @@ if typing.TYPE_CHECKING:
     from collections.abc import Sequence
 
     from puya.parse import SourceLocation
+
+
+logger = log.get_logger(__name__)
 
 
 @attrs.frozen(kw_only=True)
@@ -29,10 +33,14 @@ class PyType(abc.ABC):
     def wtype(self) -> wtypes.WType | None:
         """The WType that this type represents, if any."""
 
-    def __attrs_post_init__(self) -> None:
-        if self.name in self._registry:
+    def register(self) -> None:
+        existing_entry = self._registry.get(self.name)
+        if existing_entry is None:
+            self._registry[self.name] = self
+        elif existing_entry is self:
+            logger.debug(f"Duplicate registration of {self}")
+        else:
             raise InternalError(f"Duplicate mapping of {self.name}")
-        self._registry[self.name] = self
 
     @classmethod
     def from_name(cls, name: str) -> PyType | None:
@@ -52,6 +60,9 @@ TypingLiteralValue: typing.TypeAlias = int | bytes | str | bool | None
 class GenericType(PyType, abc.ABC):
     """Represents a typing.Generic type with unknown parameters"""
 
+    def __attrs_post_init__(self) -> None:
+        self.register()
+
     @property
     def wtype(self) -> typing.Never:
         raise CodeError("Generic type usage requires parameters")
@@ -60,7 +71,7 @@ class GenericType(PyType, abc.ABC):
     def parameterise(
         self, args: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
     ) -> PyType:
-        """Create a concrete type. object arguments"""
+        """Create a concrete type"""
 
 
 @attrs.frozen
@@ -72,6 +83,9 @@ class TupleType(PyType):
 @attrs.frozen
 class _SimpleType(PyType):
     wtype: wtypes.WType
+
+    def __attrs_post_init__(self) -> None:
+        self.register()
 
 
 NoneType: typing.Final = _SimpleType(
