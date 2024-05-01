@@ -52,11 +52,8 @@ class PyType(abc.ABC):
 # we exclude this here.
 # None types are also encoded as their own type, but we have them as values here.
 TypingLiteralValue: typing.TypeAlias = int | bytes | str | bool | None
-
 TypeArg: typing.TypeAlias = PyType | TypingLiteralValue
 TypeArgs: typing.TypeAlias = tuple[TypeArg, ...]
-
-
 Parameterise: typing.TypeAlias = Callable[["GenericType", TypeArgs, SourceLocation | None], PyType]
 
 
@@ -96,7 +93,7 @@ class StructType(PyType):
     fields: Mapping[str, PyType] = attrs.field(
         converter=immutabledict, validator=[attrs.validators.min_len(1)]
     )
-    wtype: wtypes.WStructType | wtypes.ARC4Struct
+    wtype: wtypes.WType
     source_location: SourceLocation | None
 
     @cached_property
