@@ -19,7 +19,7 @@ from puya.awst.nodes import (
     StructureDefinition,
     StructureField,
 )
-from puya.awst_build import constants
+from puya.awst_build import constants, pytypes
 from puya.awst_build.base_mypy_visitor import BaseMyPyVisitor
 from puya.awst_build.context import ASTConversionContext, ASTConversionModuleContext
 from puya.awst_build.contract import ContractASTConverter
@@ -611,7 +611,7 @@ def _process_contract_class_options(
 def _process_struct(
     context: ASTConversionModuleContext, cdef: mypy.nodes.ClassDef
 ) -> StatementResult:
-    fields = dict[str, wtypes.WType]()
+    fields = dict[str, pytypes.PyType]()
     field_decls = list[StructureField]()
     docstring = cdef.docstring
     has_error = False
@@ -626,13 +626,13 @@ def _process_struct(
                 rvalue=mypy.nodes.TempNode(),
                 type=mypy.types.Type() as mypy_type,
             ):
-                wtype = context.type_to_wtype(mypy_type, source_location=stmt)
-                fields[field_name] = wtype
+                pytype = context.type_to_wtype(mypy_type, source_location=stmt)
+                fields[field_name] = pytype
                 field_decls.append(
                     StructureField(
                         source_location=context.node_location(stmt),
                         name=field_name,
-                        wtype=wtype,
+                        wtype=pytype,
                     )
                 )
             case mypy.nodes.SymbolNode(name=symbol_name) if (
@@ -647,19 +647,19 @@ def _process_struct(
     cls_loc = context.node_location(cdef)
     frozen = cdef.info.metadata["dataclass"]["frozen"]
     assert isinstance(frozen, bool)
-    struct_wtype = wtypes.WStructType(
-        python_name=cdef.fullname,
+    struct_typ = pytypes.StructType.native(
+        name=cdef.fullname,
         fields=fields,
-        immutable=frozen,
+        frozen=frozen,
         source_location=cls_loc,
     )
-    context.type_map[cdef.info.fullname] = struct_wtype
+    context.type_map[cdef.info.fullname] = struct_typ
     return [
         StructureDefinition(
             name=cdef.name,
             source_location=cls_loc,
             fields=field_decls,
-            wtype=struct_wtype,
+            wtype=struct_typ.wtype,
             docstring=docstring,
         )
     ]
@@ -668,7 +668,7 @@ def _process_struct(
 def _process_arc4_struct(
     context: ASTConversionModuleContext, cdef: mypy.nodes.ClassDef
 ) -> StatementResult:
-    fields = dict[str, wtypes.ARC4Type]()
+    fields = dict[str, pytypes.PyType]()
     field_decls = list[StructureField]()
     docstring = cdef.docstring
 
@@ -712,19 +712,19 @@ def _process_arc4_struct(
     cls_loc = context.node_location(cdef)
     frozen = cdef.info.metadata["dataclass"]["frozen"]
     assert isinstance(frozen, bool)
-    struct_wtype = wtypes.ARC4Struct(
-        python_name=cdef.fullname,
+    struct_typ = pytypes.StructType.arc4(
+        name=cdef.fullname,
         fields=fields,
-        immutable=frozen,
+        frozen=frozen,
         source_location=cls_loc,
     )
-    context.type_map[cdef.info.fullname] = struct_wtype
+    context.type_map[cdef.info.fullname] = struct_typ
     return [
         StructureDefinition(
             name=cdef.name,
             source_location=cls_loc,
             fields=field_decls,
-            wtype=struct_wtype,
+            wtype=struct_typ.wtype,
             docstring=docstring,
         )
     ]

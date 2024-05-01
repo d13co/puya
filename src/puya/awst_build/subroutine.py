@@ -687,7 +687,7 @@ class FunctionASTConverter(
                     return ARC4ClientClassExpressionBuilder(self.context, expr_loc, typ.defn.info)
                 if typ.has_base(constants.STRUCT_BASE) or typ.has_base(constants.CLS_ARC4_STRUCT):
                     try:
-                        wtype = self.context.type_map[fullname]
+                        wtype = self.context.type_map[fullname].wtype
                     except KeyError:
                         raise CodeError(
                             f"Unknown struct subclass {fullname}",
@@ -696,6 +696,7 @@ class FunctionASTConverter(
                     if isinstance(wtype, wtypes.WStructType):
                         return StructSubclassExpressionBuilder(wtype, expr_loc)
                     else:
+                        assert isinstance(wtype, wtypes.ARC4Struct)
                         return ARC4StructClassExpressionBuilder(wtype, expr_loc)
             case mypy.nodes.NameExpr(node=mypy.nodes.Var(is_self=True) as self_var):
                 if self.contract_method_info is None:

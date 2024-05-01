@@ -12,7 +12,7 @@ from puya.awst.nodes import (
     ContractReference,
     Literal as AWSTLiteral,
 )
-from puya.awst_build import constants
+from puya.awst_build import constants, pytypes
 from puya.awst_build.contract_data import AppStorageDeclaration
 from puya.awst_build.eb.base import TypeClassExpressionBuilder
 from puya.context import CompileContext
@@ -26,7 +26,7 @@ logger = log.get_logger(__name__)
 @attrs.frozen(kw_only=True)
 class ASTConversionContext(CompileContext):
     constants: dict[str, ConstantValue] = attrs.field(factory=dict)
-    type_map: dict[str, wtypes.WStructType | wtypes.ARC4Struct] = attrs.field(factory=dict)
+    type_map: dict[str, pytypes.StructType] = attrs.field(factory=dict)
     state_defs: dict[ContractReference, dict[str, AppStorageDeclaration]] = attrs.field(
         factory=dict
     )
@@ -107,6 +107,19 @@ class ASTConversionModuleContext(ASTConversionContext):
         with log_exceptions(self._maybe_convert_location(fallback_location)):
             yield
 
+    def mypy_expr_node_type(self, expr: mypy.nodes.Expression) -> wtypes.WType:
+        mypy_type = self.get_mypy_expr_type(expr)
+        return self.type_to_wtype(mypy_type, source_location=self.node_location(expr))
+
+    def get_mypy_expr_type(self, expr: mypy.nodes.Expression) -> mypy.types.Type:
+        try:
+            typ = self.parse_result.manager.all_types[expr]
+        except KeyError as ex:
+            raise InternalError(
+                "MyPy Expression to MyPy Type lookup failed", self.node_location(expr)
+            ) from ex
+        return mypy.types.get_proper_type(typ)
+
     def type_to_wtype(
         self, typ: mypy.types.Type, *, source_location: SourceLocation | mypy.nodes.Context
     ) -> wtypes.WType:
@@ -135,7 +148,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                     tuple_builder = ARC4TupleClassExpressionBuilder(loc)
                 return tuple_builder.index_multiple(types, loc)
             case mypy.types.Instance() as inst:
-                return self.resolve_type_from_name_and_args(
+                return self._resolve_type_from_name_and_args(
                     type_fullname=inst.type.fullname,
                     inst_args=inst.args,
                     loc=loc,
@@ -149,6 +162,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                     raise CodeError("Type unions are unsupported at this location", loc)
                 return self._type_to_builder(items[0], source_location=loc)
             case mypy.types.AnyType():
+                # TODO: look at type_of_any to improve error message
                 raise CodeError("Any type is not supported", loc)
             case _:
                 raise CodeError(
@@ -156,7 +170,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                     loc,
                 )
 
-    def resolve_type_from_name_and_args(
+    def _resolve_type_from_name_and_args(
         self, type_fullname: str, inst_args: Sequence[mypy.types.Type] | None, loc: SourceLocation
     ) -> TypeClassExpressionBuilder:
         from puya.awst_build.eb.arc4.struct import ARC4StructClassExpressionBuilder
@@ -164,13 +178,14 @@ class ASTConversionModuleContext(ASTConversionContext):
         from puya.awst_build.eb.type_registry import get_type_builder
 
         try:
-            mapped_wtype = self.type_map[type_fullname]
+            mapped_wtype = self.type_map[type_fullname].wtype
         except KeyError:
             pass
         else:
             if isinstance(mapped_wtype, wtypes.ARC4Struct):
                 return ARC4StructClassExpressionBuilder(mapped_wtype, loc)
             else:
+                assert isinstance(mapped_wtype, wtypes.WStructType)
                 return StructSubclassExpressionBuilder(mapped_wtype, loc)
 
         cls_type_builder = get_type_builder(type_fullname, loc)
@@ -199,16 +214,3 @@ class ASTConversionModuleContext(ASTConversionContext):
                 f"Expected TypeClassExpressionBuilder got: {type(indexed_type).__name__}", loc
             )
         return indexed_type
-
-    def mypy_expr_node_type(self, expr: mypy.nodes.Expression) -> wtypes.WType:
-        mypy_type = self.get_mypy_expr_type(expr)
-        return self.type_to_wtype(mypy_type, source_location=self.node_location(expr))
-
-    def get_mypy_expr_type(self, expr: mypy.nodes.Expression) -> mypy.types.Type:
-        try:
-            typ = self.parse_result.manager.all_types[expr]
-        except KeyError as ex:
-            raise InternalError(
-                "MyPy Expression to MyPy Type lookup failed", self.node_location(expr)
-            ) from ex
-        return mypy.types.get_proper_type(typ)
