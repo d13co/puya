@@ -455,3 +455,74 @@ GenericBoxMapType: typing.Final = GenericType(
     alias=constants.CLS_BOX_MAP_PROXY_ALIAS,
     parameterise=_parameterise_storage_map,
 )
+
+
+GroupTransactionBaseType: typing.Final = _SimpleType(
+    name=constants.CLS_TRANSACTION_BASE,
+    alias=constants.CLS_TRANSACTION_BASE,
+    wtype=wtypes.WGroupTransaction(
+        transaction_type=None,
+        stub_name=constants.CLS_TRANSACTION_BASE,
+        name="group_transaction_base",
+    ),
+)
+
+
+def _make_txn_types(
+    kind: constants.TransactionType | None,
+    name: str,
+    itxn_fields: str | None = None,
+    itxn_result: str | None = None,
+) -> tuple[PyType, PyType, PyType]:
+    gtxn_name = f"{constants.ALGOPY_PREFIX}gtxn.{name}Transaction"
+    itxn_fieldset_name = itxn_fields or f"{constants.ALGOPY_PREFIX}itxn.{name}"
+    itxn_result_name = itxn_result or f"{constants.ALGOPY_PREFIX}itxn.{name}InnerTransaction"
+
+    gtxn_type = _SimpleType(
+        name=gtxn_name,
+        alias=gtxn_name,
+        wtype=wtypes.WGroupTransaction(
+            stub_name=gtxn_name,
+            name="group_transaction" if not kind else f"group_transaction_{kind.name}",
+            transaction_type=kind,
+        ),
+    )
+
+    itxn_fieldset_type = _SimpleType(
+        name=itxn_fieldset_name,
+        alias=itxn_fieldset_name,
+        wtype=wtypes.WInnerTransactionFields(
+            stub_name=itxn_fieldset_name,
+            name=(
+                "inner_transaction_fields" if not kind else f"inner_transaction_fields_{kind.name}"
+            ),
+            transaction_type=kind,
+        ),
+    )
+
+    itxn_result_type = _SimpleType(
+        name=itxn_result_name,
+        alias=itxn_result_name,
+        wtype=wtypes.WInnerTransaction(
+            stub_name=itxn_result_name,
+            name="inner_transaction" if not kind else f"inner_transaction_{kind.name}",
+            transaction_type=kind,
+        ),
+    )
+
+    return gtxn_type, itxn_fieldset_type, itxn_result_type
+
+
+# TODO: assign these
+_make_txn_types(constants.TransactionType.pay, "Payment")
+_make_txn_types(constants.TransactionType.keyreg, "KeyRegistration")
+_make_txn_types(constants.TransactionType.acfg, "AssetConfig")
+_make_txn_types(constants.TransactionType.axfer, "AssetTransfer")
+_make_txn_types(constants.TransactionType.afrz, "AssetFreeze")
+_make_txn_types(constants.TransactionType.appl, "ApplicationCall")
+_make_txn_types(
+    None,
+    "",
+    f"{constants.ALGOPY_PREFIX}itxn.InnerTransaction",
+    f"{constants.ALGOPY_PREFIX}itxn.InnerTransactionResult",
+)
