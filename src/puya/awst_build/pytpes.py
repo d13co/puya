@@ -93,6 +93,7 @@ class StructType(PyType):
     fields: Mapping[str, PyType] = attrs.field(
         converter=immutabledict, validator=[attrs.validators.min_len(1)]
     )
+    frozen: bool
     wtype: wtypes.WType
     source_location: SourceLocation | None
 
@@ -106,9 +107,10 @@ class StructType(PyType):
 
     def __init__(
         self,
-        kind: type[wtypes.WStructType | wtypes.ARC4Struct],
+        typ: Callable[[Mapping[str, wtypes.WType], bool, SourceLocation | None], wtypes.WType],
         name: str,
         fields: Mapping[str, PyType],
+        frozen: bool,  # noqa: FBT001
         source_location: SourceLocation | None,
     ):
         field_wtypes = {}
@@ -119,16 +121,13 @@ class StructType(PyType):
                     f"Type {field_pytype.alias} is not allowed in a struct", source_location
                 )
             field_wtypes[field_name] = field_wtype
-        wtype = kind.from_name_and_fields(
-            python_name=name,
-            fields=field_wtypes,
-            source_location=source_location,
-        )
+        wtype = typ(field_wtypes, frozen, source_location)
         self.__attrs_init__(
             name=name,
             alias=name,
             wtype=wtype,
             fields=fields,
+            frozen=frozen,
             source_location=source_location,
         )
         self.register()

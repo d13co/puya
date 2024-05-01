@@ -611,7 +611,7 @@ def _process_contract_class_options(
 def _process_struct(
     context: ASTConversionModuleContext, cdef: mypy.nodes.ClassDef
 ) -> StatementResult:
-    field_types = dict[str, wtypes.WType]()
+    fields = dict[str, wtypes.WType]()
     field_decls = list[StructureField]()
     docstring = cdef.docstring
     has_error = False
@@ -627,7 +627,7 @@ def _process_struct(
                 type=mypy.types.Type() as mypy_type,
             ):
                 wtype = context.type_to_wtype(mypy_type, source_location=stmt)
-                field_types[field_name] = wtype
+                fields[field_name] = wtype
                 field_decls.append(
                     StructureField(
                         source_location=context.node_location(stmt),
@@ -645,7 +645,13 @@ def _process_struct(
     if has_error:
         return []
     cls_loc = context.node_location(cdef)
-    struct_wtype = wtypes.WStructType.from_name_and_fields(cdef.fullname, field_types, cls_loc)
+    frozen = cdef.info.metadata["dataclass"]["frozen"]
+    assert isinstance(frozen, bool)
+    struct_wtype = wtypes.WStructType(
+        fields=fields,
+        immutable=frozen,
+        source_location=cls_loc,
+    )
     context.type_map[cdef.info.fullname] = struct_wtype
     return [
         StructureDefinition(
@@ -661,7 +667,7 @@ def _process_struct(
 def _process_arc4_struct(
     context: ASTConversionModuleContext, cdef: mypy.nodes.ClassDef
 ) -> StatementResult:
-    field_types = dict[str, wtypes.ARC4Type]()
+    fields = dict[str, wtypes.ARC4Type]()
     field_decls = list[StructureField]()
     docstring = cdef.docstring
 
@@ -682,7 +688,7 @@ def _process_arc4_struct(
                     context.error(f"Invalid field type for arc4.Struct: {wtype}", stmt)
                     has_error = True
                 else:
-                    field_types[field_name] = wtype
+                    fields[field_name] = wtype
                     field_decls.append(
                         StructureField(
                             source_location=context.node_location(stmt),
@@ -699,13 +705,15 @@ def _process_arc4_struct(
                 has_error = True
     if has_error:
         return []
-    if not field_types:
+    if not fields:
         context.error("arc4.Struct requires at least one field", cdef)
         return []
     cls_loc = context.node_location(cdef)
-    struct_wtype = wtypes.ARC4Struct.from_name_and_fields(
-        python_name=cdef.fullname,
-        fields=field_types,
+    frozen = cdef.info.metadata["dataclass"]["frozen"]
+    assert isinstance(frozen, bool)
+    struct_wtype = wtypes.ARC4Struct(
+        fields=fields,
+        immutable=frozen,
         source_location=cls_loc,
     )
     context.type_map[cdef.info.fullname] = struct_wtype

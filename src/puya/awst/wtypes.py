@@ -1,6 +1,7 @@
 import base64
 import typing
 from collections.abc import Callable, Iterable, Mapping, Sequence
+from functools import cached_property
 
 import attrs
 from immutabledict import immutabledict
@@ -222,14 +223,16 @@ box_ref_proxy_type: typing.Final = WType(
 
 
 @typing.final
-@attrs.frozen(str=False, kw_only=True)
+@attrs.frozen(str=False, kw_only=True, init=False)
 class WStructType(WType):
     fields: Mapping[str, WType] = attrs.field(converter=immutabledict)
 
-    @classmethod
-    def from_name_and_fields(
-        cls, python_name: str, fields: Mapping[str, WType], source_location: SourceLocation | None
-    ) -> typing.Self:
+    def __init__(
+        self,
+        fields: Mapping[str, WType],
+        immutable: bool,  # noqa: FBT001
+        source_location: SourceLocation | None,
+    ):
         if not fields:
             raise CodeError("struct needs fields", source_location)
         if void_wtype in fields.values():
@@ -241,10 +244,10 @@ class WStructType(WType):
             )
             + ">"
         )
-        return cls(
+        self.__attrs_init__(
             name=name,
-            stub_name=python_name,
-            immutable=False,
+            stub_name=name,
+            immutable=immutable,
             fields=fields,
         )
 
@@ -419,31 +422,26 @@ class ARC4StaticArray(ARC4Array):
 
 
 @typing.final
-@attrs.frozen(str=False, kw_only=True)
+@attrs.frozen(str=False, kw_only=True, init=False)
 class ARC4Struct(ARC4Type):
     fields: Mapping[str, ARC4Type] = attrs.field(
         converter=immutabledict, validator=[attrs.validators.min_len(1)]
     )
-    names: Sequence[str] = attrs.field(init=False, eq=False)
-    types: Sequence[ARC4Type] = attrs.field(init=False, eq=False)
-    immutable: bool = attrs.field(default=False, init=False)
 
-    @names.default
-    def _names_factory(self) -> Sequence[str]:
+    @cached_property
+    def names(self) -> Sequence[str]:
         return list(self.fields.keys())
 
-    @types.default
-    def _types_factory(self) -> Sequence[WType]:
+    @cached_property
+    def types(self) -> Sequence[WType]:
         return list(self.fields.values())
 
-    @classmethod
-    def from_name_and_fields(
-        cls,
-        *,
-        python_name: str,
+    def __init__(
+        self,
         fields: Mapping[str, WType],
+        immutable: bool,  # noqa: FBT001
         source_location: SourceLocation | None,
-    ) -> typing.Self:
+    ):
         if not fields:
             raise CodeError("arc4.Struct needs at least one element", source_location)
         arc4_fields = {}
@@ -454,6 +452,7 @@ class ARC4Struct(ARC4Type):
                     source_location,
                 )
             arc4_fields[field_name] = field_wtype
+            immutable = immutable and field_wtype.immutable
 
         name = (
             "arc4.struct<"
@@ -462,7 +461,12 @@ class ARC4Struct(ARC4Type):
             )
             + ">"
         )
-        return cls(name=name, stub_name=python_name, fields=arc4_fields)
+        self.__attrs_init__(
+            name=name,
+            stub_name=name,
+            immutable=immutable,
+            fields=arc4_fields,
+        )
 
 
 arc4_string_wtype: typing.Final = ARC4Type(
