@@ -84,12 +84,22 @@ class GenericType(PyType, abc.ABC):
 
 @attrs.frozen
 class TupleType(PyType):
+    generic: GenericType
     items: tuple[PyType, ...] = attrs.field(validator=attrs.validators.min_len(1))
     wtype: wtypes.WType
 
 
+@attrs.frozen
+class StorageProxyType(PyType):
+    generic: GenericType
+    content: PyType
+    wtype: wtypes.WType
+
+
+@typing.final
 @attrs.frozen(init=False)
 class StructType(PyType):
+    metaclass: str
     fields: Mapping[str, PyType] = attrs.field(
         converter=immutabledict, validator=[attrs.validators.min_len(1)]
     )
@@ -107,10 +117,12 @@ class StructType(PyType):
 
     def __init__(
         self,
+        metaclass: str,
         typ: Callable[[Mapping[str, wtypes.WType], bool, SourceLocation | None], wtypes.WType],
+        *,
         name: str,
         fields: Mapping[str, PyType],
-        frozen: bool,  # noqa: FBT001
+        frozen: bool,
         source_location: SourceLocation | None,
     ):
         field_wtypes = {}
@@ -123,6 +135,7 @@ class StructType(PyType):
             field_wtypes[field_name] = field_wtype
         wtype = typ(field_wtypes, frozen, source_location)
         self.__attrs_init__(
+            metaclass=metaclass,
             name=name,
             alias=name,
             wtype=wtype,
@@ -131,6 +144,42 @@ class StructType(PyType):
             source_location=source_location,
         )
         self.register()
+
+    @classmethod
+    def native(
+        cls,
+        *,
+        name: str,
+        fields: Mapping[str, PyType],
+        frozen: bool,
+        source_location: SourceLocation | None,
+    ) -> typing.Self:
+        return cls(
+            metaclass=constants.STRUCT_BASE,
+            typ=wtypes.WStructType,
+            name=name,
+            fields=fields,
+            frozen=frozen,
+            source_location=source_location,
+        )
+
+    @classmethod
+    def arc4(
+        cls,
+        *,
+        name: str,
+        fields: Mapping[str, PyType],
+        frozen: bool,
+        source_location: SourceLocation | None,
+    ) -> typing.Self:
+        return cls(
+            metaclass=constants.CLS_ARC4_STRUCT_META,
+            typ=wtypes.ARC4Struct,
+            name=name,
+            fields=fields,
+            frozen=frozen,
+            source_location=source_location,
+        )
 
 
 @typing.final
@@ -236,6 +285,7 @@ def _make_tuple_parameterise(
         name = f"{self.name}[{', '.join(pyt.name for pyt in py_types)}]"
         alias = f"{self.alias}[{', '.join(pyt.alias for pyt in py_types)}]"
         return TupleType(
+            generic=self,
             name=name,
             alias=alias,
             items=tuple(py_types),
