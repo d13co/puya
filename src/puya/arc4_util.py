@@ -56,10 +56,8 @@ _ARC4_WTYPE_MAPPING = {
     "application": wtypes.application_wtype,
     "asset": wtypes.asset_wtype,
     "void": wtypes.void_wtype,
-    **{
-        t.name if t else "txn": wtypes.WGroupTransaction.from_type(t)
-        for t in constants.TRANSACTION_TYPE_TO_CLS
-    },
+    "txn": wtypes.WGroupTransaction.from_type(None),
+    **{t.name: wtypes.WGroupTransaction.from_type(t) for t in constants.TransactionType},
     "address": wtypes.arc4_address_type,
     "byte": wtypes.arc4_byte_type,
     "byte[]": wtypes.arc4_dynamic_bytes,
