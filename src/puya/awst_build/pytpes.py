@@ -97,6 +97,13 @@ class TupleType(PyType):
 
 
 @attrs.frozen
+class ArrayType(PyType):
+    generic: GenericType
+    items: PyType
+    wtype: wtypes.WType
+
+
+@attrs.frozen
 class StorageProxyType(PyType):
     generic: GenericType | None
     content: PyType
@@ -277,6 +284,27 @@ ARC4AddressType: typing.Final = _SimpleType(
     wtype=wtypes.arc4_address_type,
 )
 
+GenericARC4UIntNType: typing.Final = GenericType(
+    name=constants.CLS_ARC4_UINTN,
+    alias=constants.CLS_ARC4_UINTN,
+    parameterise=NotImplemented,
+)
+GenericARC4BigUIntNType: typing.Final = GenericType(
+    name=constants.CLS_ARC4_BIG_UINTN,
+    alias=constants.CLS_ARC4_BIG_UINTN,
+    parameterise=NotImplemented,
+)
+GenericARC4UFixedNxMType: typing.Final = GenericType(
+    name=constants.CLS_ARC4_UFIXEDNXM,
+    alias=constants.CLS_ARC4_UFIXEDNXM,
+    parameterise=NotImplemented,
+)
+GenericARC4BigUFixedNxMType: typing.Final = GenericType(
+    name=constants.CLS_ARC4_BIG_UFIXEDNXM,
+    alias=constants.CLS_ARC4_BIG_UFIXEDNXM,
+    parameterise=NotImplemented,
+)
+
 
 def _make_tuple_parameterise(
     typ: Callable[[Iterable[wtypes.WType], SourceLocation | None], wtypes.WType]
@@ -320,6 +348,23 @@ GenericARC4TupleType: typing.Final = GenericType(
     name=constants.CLS_ARC4_TUPLE,
     alias=constants.CLS_ARC4_TUPLE,
     parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple),
+)
+
+GenericArrayType: typing.Final = GenericType(
+    name=constants.CLS_ARRAY,
+    alias=constants.CLS_ARRAY_ALIAS,
+    parameterise=NotImplemented,
+)
+
+GenericARC4DynamicArrayType: typing.Final = GenericType(
+    name=constants.CLS_ARC4_DYNAMIC_ARRAY,
+    alias=constants.CLS_ARC4_DYNAMIC_ARRAY,
+    parameterise=NotImplemented,
+)
+GenericARC4StaticArrayType: typing.Final = GenericType(
+    name=constants.CLS_ARC4_STATIC_ARRAY,
+    alias=constants.CLS_ARC4_STATIC_ARRAY,
+    parameterise=NotImplemented,
 )
 
 
