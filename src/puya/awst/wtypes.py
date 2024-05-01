@@ -24,7 +24,7 @@ LiteralValidator: typing.TypeAlias = Callable[[object], bool]
 class WType:
     name: str
     stub_name: str
-    lvalue: bool = True
+    lvalue: bool = True  # TODO: this is currently just used by void...
     immutable: bool = True
     is_valid_literal: LiteralValidator = attrs.field(default=_all_literals_invalid, eq=False)
 
@@ -459,6 +459,10 @@ class ARC4Struct(ARC4Type):
                     source_location,
                 )
             arc4_fields[field_name] = field_wtype
+            # this seems counterintuitive, but is necessary.
+            # despite the overall collection remaining stable, since ARC4 types
+            # are encoded as a single value, if items within a "frozen" struct can be mutated,
+            # then the overall value is also mutable
             immutable = immutable and field_wtype.immutable
 
         name = (
