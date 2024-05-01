@@ -291,7 +291,7 @@ def arc4_decode(
         case wtypes.ARC4Tuple(types=tuple_types):
             decode_expression = awst_nodes.ARC4Decode(
                 source_location=location,
-                wtype=wtypes.WTuple.from_types(tuple_types, location),
+                wtype=wtypes.WTuple(tuple_types, location),
                 value=bytes_arg,
             )
             assert isinstance(

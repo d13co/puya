@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import typing
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from functools import cached_property
 
 import attrs
@@ -88,7 +88,7 @@ class GenericType(PyType, abc.ABC):
 @attrs.frozen
 class TupleType(PyType):
     items: tuple[PyType, ...] = attrs.field(validator=attrs.validators.min_len(1))
-    wtype: wtypes.WTuple | wtypes.ARC4Tuple
+    wtype: wtypes.WType
 
 
 @attrs.frozen(init=False)
@@ -218,47 +218,67 @@ ARC4AddressType: typing.Final = _SimpleType(
 )
 
 
-def _make_tuple_parameterise(typ: type[wtypes.WTuple | wtypes.ARC4Tuple]) -> Parameterise:
+_TTupleItemWType = typing.TypeVar("_TTupleItemWType", wtypes.WType, wtypes.ARC4Type)
+
+
+def _make_tuple_parameterise(
+    typ: Callable[[Iterable[_TTupleItemWType], SourceLocation | None], wtypes.WType],
+    guard: Callable[[TypeArg, SourceLocation | None], tuple[PyType, _TTupleItemWType]],
+) -> Parameterise:
     def parameterise(
         self: GenericType, args: TypeArgs, source_location: SourceLocation | None
     ) -> TupleType:
-        if not args:
-            raise CodeError("Empty tuples are not supported", source_location)
-        if NoneType in args:
-            raise CodeError(f"{NoneType.alias} is not allowed in tuples", source_location)
         py_types = []
-        item_wtypes = []
-        for i in args:
-            if not isinstance(i, PyType):
-                raise CodeError(
-                    "typing.Literal cannot be used as tuple type parameter", source_location
-                )
-            item_wtype = i.wtype
-            if item_wtype is None:
-                raise CodeError(f"Type {i.alias} is not allowed in a tuple", source_location)
-            py_types.append(i)
+        item_wtypes = list[_TTupleItemWType]()
+        for arg in args:
+            item_pytype, item_wtype = guard(arg, source_location)
+            py_types.append(item_pytype)
             item_wtypes.append(item_wtype)
 
-        name = f"{self.name}[{', '.join(i.name for i in py_types)}]"
-        alias = f"{self.alias}[{', '.join(i.alias for i in py_types)}]"
+        name = f"{self.name}[{', '.join(pyt.name for pyt in py_types)}]"
+        alias = f"{self.alias}[{', '.join(pyt.alias for pyt in py_types)}]"
         return TupleType(
             name=name,
             alias=alias,
             items=tuple(py_types),
-            wtype=typ.from_types(item_wtypes, source_location),
+            wtype=typ(item_wtypes, source_location),
         )
 
     return parameterise
 
 
+def _is_valid_native_tuple_element_type(
+    arg: TypeArg, source_location: SourceLocation | None
+) -> tuple[PyType, wtypes.WType]:
+    if not isinstance(arg, PyType):
+        raise CodeError("typing.Literal cannot be used as tuple type parameter", source_location)
+    item_wtype = arg.wtype
+    if item_wtype is None:
+        raise CodeError(f"Type {arg.alias} is not allowed in a tuple", source_location)
+    return arg, item_wtype
+
+
+def _is_valid_arc4_tuple_element_type(
+    arg: TypeArg, source_location: SourceLocation | None
+) -> tuple[PyType, wtypes.ARC4Type]:
+    py_type, item_wtype = _is_valid_native_tuple_element_type(arg, source_location)
+    if not isinstance(item_wtype, wtypes.ARC4Type):
+        raise CodeError(
+            f"Invalid type for {constants.CLS_ARC4_TUPLE}:"
+            f" {py_type.alias} is not an ARC4 encoded type",
+            source_location,
+        )
+    return py_type, item_wtype
+
+
 GenericTupleType: typing.Final = GenericType(
     name="builtins.tuple",
     alias="tuple",
-    parameterise=_make_tuple_parameterise(wtypes.WTuple),
+    parameterise=_make_tuple_parameterise(wtypes.WTuple, _is_valid_native_tuple_element_type),
 )
 
 GenericARC4TupleType: typing.Final = GenericType(
     name=constants.CLS_ARC4_TUPLE,
     alias=constants.CLS_ARC4_TUPLE,
-    parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple),
+    parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple, _is_valid_arc4_tuple_element_type),
 )

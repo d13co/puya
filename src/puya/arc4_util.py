@@ -91,7 +91,7 @@ def make_tuple_wtype(
             arc4_types.append(typ)
         else:
             raise CodeError(f"Invalid type for arc4.Tuple element: {typ}", location)
-    return wtypes.ARC4Tuple.from_types(arc4_types, location)
+    return wtypes.ARC4Tuple(arc4_types, location)
 
 
 def arc4_to_wtype(typ: str, location: SourceLocation | None = None) -> wtypes.WType:

@@ -165,7 +165,7 @@ def _return_types_to_wtype(
     elif len(types) == 1:
         return types[0]
     else:
-        return wtypes.WTuple.from_types(types, source_location)
+        return wtypes.WTuple(types, source_location)
 
 
 def _map_call(

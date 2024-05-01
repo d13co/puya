@@ -83,7 +83,7 @@ class ARC4FromLogBuilder(IntermediateExpressionBuilder):
         checked_arc4_value = CheckedMaybe(
             expr=TupleExpression(
                 items=(arc4_value, arc4_prefix_is_valid),
-                wtype=wtypes.WTuple.from_types((arc4_value.wtype, wtypes.bool_wtype), location),
+                wtype=wtypes.WTuple((arc4_value.wtype, wtypes.bool_wtype), location),
                 source_location=location,
             ),
             comment="ARC4 prefix is valid",
