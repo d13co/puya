@@ -98,7 +98,7 @@ class TupleType(PyType):
 
 @attrs.frozen
 class StorageProxyType(PyType):
-    generic: GenericType
+    generic: GenericType | None
     content: PyType
     wtype: wtypes.WType
 
@@ -370,4 +370,6 @@ BoxRefType: typing.Final = StorageProxyType(
     name=constants.CLS_BOX_REF_PROXY,
     alias=constants.CLS_BOX_REF_PROXY_ALIAS,
     content=BytesType,
+    wtype=wtypes.box_key,
+    generic=None,
 )
