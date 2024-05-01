@@ -140,7 +140,9 @@ class StructType(PyType):
     def __init__(
         self,
         metaclass: str,
-        typ: Callable[[Mapping[str, wtypes.WType], bool, SourceLocation | None], wtypes.WType],
+        typ: Callable[
+            [str, Mapping[str, wtypes.WType], bool, SourceLocation | None], wtypes.WType
+        ],
         *,
         name: str,
         fields: Mapping[str, PyType],
@@ -155,7 +157,7 @@ class StructType(PyType):
                     f"Type {field_pytype.alias} is not allowed in a struct", source_location
                 )
             field_wtypes[field_name] = field_wtype
-        wtype = typ(field_wtypes, frozen, source_location)
+        wtype = typ(name, field_wtypes, frozen, source_location)
         self.__attrs_init__(
             metaclass=metaclass,
             name=name,

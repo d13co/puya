@@ -229,6 +229,7 @@ class WStructType(WType):
 
     def __init__(
         self,
+        python_name: str,  # TODO: yeet me
         fields: Mapping[str, WType],
         immutable: bool,  # noqa: FBT001
         source_location: SourceLocation | None,
@@ -246,7 +247,7 @@ class WStructType(WType):
         )
         self.__attrs_init__(
             name=name,
-            stub_name=name,
+            stub_name=python_name,
             immutable=immutable,
             fields=fields,
         )
@@ -445,6 +446,7 @@ class ARC4Struct(ARC4Type):
 
     def __init__(
         self,
+        python_name: str,  # TODO: yeet me
         fields: Mapping[str, WType],
         immutable: bool,  # noqa: FBT001
         source_location: SourceLocation | None,
@@ -474,7 +476,7 @@ class ARC4Struct(ARC4Type):
         )
         self.__attrs_init__(
             name=name,
-            stub_name=name,
+            stub_name=python_name,
             immutable=immutable,
             fields=arc4_fields,
         )

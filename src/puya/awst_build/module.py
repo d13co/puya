@@ -648,6 +648,7 @@ def _process_struct(
     frozen = cdef.info.metadata["dataclass"]["frozen"]
     assert isinstance(frozen, bool)
     struct_wtype = wtypes.WStructType(
+        python_name=cdef.fullname,
         fields=fields,
         immutable=frozen,
         source_location=cls_loc,
@@ -712,6 +713,7 @@ def _process_arc4_struct(
     frozen = cdef.info.metadata["dataclass"]["frozen"]
     assert isinstance(frozen, bool)
     struct_wtype = wtypes.ARC4Struct(
+        python_name=cdef.fullname,
         fields=fields,
         immutable=frozen,
         source_location=cls_loc,
