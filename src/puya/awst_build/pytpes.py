@@ -24,7 +24,6 @@ class PyType(abc.ABC):
     """The fully qualified type name"""
     alias: str
     """The short name, for display purposes"""
-    _registry: typing.Final = dict[str, "PyType"]()
 
     @property
     @abc.abstractmethod
@@ -32,9 +31,9 @@ class PyType(abc.ABC):
         """The WType that this type represents, if any."""
 
     def register(self) -> None:
-        existing_entry = self._registry.get(self.name)
+        existing_entry = _type_registry.get(self.name)
         if existing_entry is None:
-            self._registry[self.name] = self
+            _type_registry[self.name] = self
         elif existing_entry is self:
             logger.debug(f"Duplicate registration of {self}")
         else:
@@ -42,8 +41,14 @@ class PyType(abc.ABC):
 
     @classmethod
     def from_name(cls, name: str) -> PyType | None:
-        return cls._registry.get(name)
+        return _type_registry.get(name)
 
+
+# Registry used for lookups from mypy types.
+# Would be nice to make it a PyType class-var, but needs to be Final
+# for mypy, and Final with an initialiser isn't picked up as a ClassVar by attrs yet,
+# and ClassVar[Final[...]] is forbidden by the typing spec
+_type_registry: typing.Final = dict[str, PyType]()
 
 # https://typing.readthedocs.io/en/latest/spec/literal.html#legal-and-illegal-parameterizations
 # We don't support enums as typing.Literal parameters. MyPy encodes these as str values with
@@ -56,6 +61,9 @@ TypeArg: typing.TypeAlias = PyType | TypingLiteralValue
 TypeArgs: typing.TypeAlias = tuple[TypeArg, ...]
 Parameterise: typing.TypeAlias = Callable[["GenericType", TypeArgs, SourceLocation | None], PyType]
 
+# Just a cache. Would be better as a class-var on GenericType, but see note on _type_registry
+_generic_instances: typing.Final = dict[TypeArgs, PyType]()
+
 
 @typing.final
 @attrs.frozen
@@ -63,7 +71,6 @@ class GenericType(PyType, abc.ABC):
     """Represents a typing.Generic type with unknown parameters"""
 
     _parameterise: Parameterise
-    _instances: typing.Final = dict[TypeArgs, PyType]()
 
     def __attrs_post_init__(self) -> None:
         self.register()
@@ -76,7 +83,7 @@ class GenericType(PyType, abc.ABC):
         self, args: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
     ) -> PyType:
         return lazy_setdefault(
-            self._instances,
+            _generic_instances,
             key=tuple(args),
             default=lambda args_: self._parameterise(self, args_, source_location),
         )
@@ -92,6 +99,14 @@ class TupleType(PyType):
 @attrs.frozen
 class StorageProxyType(PyType):
     generic: GenericType
+    content: PyType
+    wtype: wtypes.WType
+
+
+@attrs.frozen
+class StorageMapProxyType(PyType):
+    generic: GenericType
+    key: PyType
     content: PyType
     wtype: wtypes.WType
 
@@ -305,4 +320,54 @@ GenericARC4TupleType: typing.Final = GenericType(
     name=constants.CLS_ARC4_TUPLE,
     alias=constants.CLS_ARC4_TUPLE,
     parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple),
+)
+
+
+def _make_state_parameterise(key_type: wtypes.WType) -> Parameterise:
+    def parameterise(
+        self: GenericType, args: TypeArgs, source_location: SourceLocation | None
+    ) -> StorageProxyType:
+        try:
+            (arg,) = args
+        except ValueError:
+            raise CodeError(
+                f"Expected a single type parameter, got {len(args)} parameters", source_location
+            ) from None
+        if not isinstance(arg, PyType):
+            raise CodeError(
+                f"typing.Literal cannot be used to parameterise {self.alias}", source_location
+            )
+
+        name = f"{self.name}[{arg.name}]"
+        alias = f"{self.alias}[{arg.alias}]"
+        return StorageProxyType(
+            generic=self,
+            name=name,
+            alias=alias,
+            content=arg,
+            wtype=key_type,
+        )
+
+    return parameterise
+
+
+GenericGlobalStateType: typing.Final = GenericType(
+    name=constants.CLS_GLOBAL_STATE,
+    alias=constants.CLS_GLOBAL_STATE_ALIAS,
+    parameterise=_make_state_parameterise(wtypes.state_key),
+)
+GenericLocalStateType: typing.Final = GenericType(
+    name=constants.CLS_LOCAL_STATE,
+    alias=constants.CLS_LOCAL_STATE_ALIAS,
+    parameterise=_make_state_parameterise(wtypes.state_key),
+)
+GenericBoxType: typing.Final = GenericType(
+    name=constants.CLS_BOX_PROXY,
+    alias=constants.CLS_BOX_PROXY_ALIAS,
+    parameterise=_make_state_parameterise(wtypes.box_key),
+)
+BoxRefType: typing.Final = StorageProxyType(
+    name=constants.CLS_BOX_REF_PROXY,
+    alias=constants.CLS_BOX_REF_PROXY_ALIAS,
+    content=BytesType,
 )
