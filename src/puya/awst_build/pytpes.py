@@ -21,9 +21,13 @@ logger = log.get_logger(__name__)
 @attrs.frozen(kw_only=True)
 class PyType(abc.ABC):
     name: str
-    """The fully qualified type name"""
-    alias: str
-    """The short name, for display purposes"""
+    """The canonical fully qualified type name"""
+    alias: str = attrs.field()
+    """The public fully qualified type name. If not specified, defaults to name."""
+
+    @alias.default
+    def _alias_default(self) -> str:
+        return self.name
 
     @property
     @abc.abstractmethod
@@ -161,7 +165,6 @@ class StructType(PyType):
         self.__attrs_init__(
             metaclass=metaclass,
             name=name,
-            alias=name,
             wtype=wtype,
             fields=fields,
             frozen=frozen,
@@ -262,48 +265,39 @@ ApplicationType: typing.Final = _SimpleType(
 )
 ARC4StringType: typing.Final = _SimpleType(
     name=constants.CLS_ARC4_STRING,
-    alias=constants.CLS_ARC4_STRING,
     wtype=wtypes.arc4_string_wtype,
 )
 ARC4BoolType: typing.Final = _SimpleType(
     name=constants.CLS_ARC4_BOOL,
-    alias=constants.CLS_ARC4_BOOL,
     wtype=wtypes.arc4_bool_wtype,
 )
 ARC4ByteType: typing.Final = _SimpleType(
     name=constants.CLS_ARC4_BYTE,
-    alias=constants.CLS_ARC4_BYTE,
     wtype=wtypes.arc4_byte_type,
 )
 ARC4DynamicBytesType: typing.Final = _SimpleType(
     name=constants.CLS_ARC4_DYNAMIC_BYTES,
-    alias=constants.CLS_ARC4_DYNAMIC_BYTES,
     wtype=wtypes.arc4_byte_type,
 )
 ARC4AddressType: typing.Final = _SimpleType(
     name=constants.CLS_ARC4_ADDRESS,
-    alias=constants.CLS_ARC4_ADDRESS,
     wtype=wtypes.arc4_address_type,
 )
 
 GenericARC4UIntNType: typing.Final = GenericType(
     name=constants.CLS_ARC4_UINTN,
-    alias=constants.CLS_ARC4_UINTN,
     parameterise=NotImplemented,
 )
 GenericARC4BigUIntNType: typing.Final = GenericType(
     name=constants.CLS_ARC4_BIG_UINTN,
-    alias=constants.CLS_ARC4_BIG_UINTN,
     parameterise=NotImplemented,
 )
 GenericARC4UFixedNxMType: typing.Final = GenericType(
     name=constants.CLS_ARC4_UFIXEDNXM,
-    alias=constants.CLS_ARC4_UFIXEDNXM,
     parameterise=NotImplemented,
 )
 GenericARC4BigUFixedNxMType: typing.Final = GenericType(
     name=constants.CLS_ARC4_BIG_UFIXEDNXM,
-    alias=constants.CLS_ARC4_BIG_UFIXEDNXM,
     parameterise=NotImplemented,
 )
 
@@ -348,7 +342,6 @@ GenericTupleType: typing.Final = GenericType(
 
 GenericARC4TupleType: typing.Final = GenericType(
     name=constants.CLS_ARC4_TUPLE,
-    alias=constants.CLS_ARC4_TUPLE,
     parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple),
 )
 
@@ -360,12 +353,10 @@ GenericArrayType: typing.Final = GenericType(
 
 GenericARC4DynamicArrayType: typing.Final = GenericType(
     name=constants.CLS_ARC4_DYNAMIC_ARRAY,
-    alias=constants.CLS_ARC4_DYNAMIC_ARRAY,
     parameterise=NotImplemented,
 )
 GenericARC4StaticArrayType: typing.Final = GenericType(
     name=constants.CLS_ARC4_STATIC_ARRAY,
-    alias=constants.CLS_ARC4_STATIC_ARRAY,
     parameterise=NotImplemented,
 )
 
@@ -459,7 +450,6 @@ GenericBoxMapType: typing.Final = GenericType(
 
 GroupTransactionBaseType: typing.Final = _SimpleType(
     name=constants.CLS_TRANSACTION_BASE,
-    alias=constants.CLS_TRANSACTION_BASE,
     wtype=wtypes.WGroupTransaction(
         transaction_type=None,
         stub_name=constants.CLS_TRANSACTION_BASE,
@@ -480,7 +470,6 @@ def _make_txn_types(
 
     gtxn_type = _SimpleType(
         name=gtxn_name,
-        alias=gtxn_name,
         wtype=wtypes.WGroupTransaction(
             stub_name=gtxn_name,
             name="group_transaction" if not kind else f"group_transaction_{kind.name}",
@@ -490,7 +479,6 @@ def _make_txn_types(
 
     itxn_fieldset_type = _SimpleType(
         name=itxn_fieldset_name,
-        alias=itxn_fieldset_name,
         wtype=wtypes.WInnerTransactionFields(
             stub_name=itxn_fieldset_name,
             name=(
@@ -502,7 +490,6 @@ def _make_txn_types(
 
     itxn_result_type = _SimpleType(
         name=itxn_result_name,
-        alias=itxn_result_name,
         wtype=wtypes.WInnerTransaction(
             stub_name=itxn_result_name,
             name="inner_transaction" if not kind else f"inner_transaction_{kind.name}",
