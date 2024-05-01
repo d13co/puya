@@ -323,7 +323,7 @@ GenericARC4TupleType: typing.Final = GenericType(
 )
 
 
-def _make_state_parameterise(key_type: wtypes.WType) -> Parameterise:
+def _make_storage_parameterise(key_type: wtypes.WType) -> Parameterise:
     def parameterise(
         self: GenericType, args: TypeArgs, source_location: SourceLocation | None
     ) -> StorageProxyType:
@@ -351,20 +351,50 @@ def _make_state_parameterise(key_type: wtypes.WType) -> Parameterise:
     return parameterise
 
 
+def _parameterise_storage_map(
+    self: GenericType, args: TypeArgs, source_location: SourceLocation | None
+) -> StorageMapProxyType:
+    try:
+        key, content = args
+    except ValueError:
+        raise CodeError(
+            f"Expected two type parameter, got {len(args)} parameters", source_location
+        ) from None
+    if not isinstance(key, PyType):
+        raise CodeError(
+            f"typing.Literal cannot be used to parameterise {self.alias}", source_location
+        )
+    if not isinstance(content, PyType):
+        raise CodeError(
+            f"typing.Literal cannot be used to parameterise {self.alias}", source_location
+        )
+
+    name = f"{self.name}[{key.name}, {content.name}]"
+    alias = f"{self.alias}[{key.alias}, {content.alias}]"
+    return StorageMapProxyType(
+        generic=self,
+        name=name,
+        alias=alias,
+        key=key,
+        content=content,
+        wtype=wtypes.box_key,  # TODO: maybe bytes since it will just be the prefix?
+    )
+
+
 GenericGlobalStateType: typing.Final = GenericType(
     name=constants.CLS_GLOBAL_STATE,
     alias=constants.CLS_GLOBAL_STATE_ALIAS,
-    parameterise=_make_state_parameterise(wtypes.state_key),
+    parameterise=_make_storage_parameterise(wtypes.state_key),
 )
 GenericLocalStateType: typing.Final = GenericType(
     name=constants.CLS_LOCAL_STATE,
     alias=constants.CLS_LOCAL_STATE_ALIAS,
-    parameterise=_make_state_parameterise(wtypes.state_key),
+    parameterise=_make_storage_parameterise(wtypes.state_key),
 )
 GenericBoxType: typing.Final = GenericType(
     name=constants.CLS_BOX_PROXY,
     alias=constants.CLS_BOX_PROXY_ALIAS,
-    parameterise=_make_state_parameterise(wtypes.box_key),
+    parameterise=_make_storage_parameterise(wtypes.box_key),
 )
 BoxRefType: typing.Final = StorageProxyType(
     name=constants.CLS_BOX_REF_PROXY,
@@ -372,4 +402,9 @@ BoxRefType: typing.Final = StorageProxyType(
     content=BytesType,
     wtype=wtypes.box_key,
     generic=None,
+)
+GenericBoxMapType: typing.Final = GenericType(
+    name=constants.CLS_BOX_MAP_PROXY,
+    alias=constants.CLS_BOX_MAP_PROXY_ALIAS,
+    parameterise=_parameterise_storage_map,
 )
