@@ -263,7 +263,8 @@ def maybe_arc4_decode(
     if current_wtype == target_wtype:
         return item
     assert target_wtype == wtypes.arc4_to_avm_equivalent_wtype(
-        current_wtype
+        current_wtype,
+        location,
     ), "target type must be avm equivalent of current type"
     return arc4_decode(
         item,
@@ -290,7 +291,7 @@ def arc4_decode(
         case wtypes.ARC4Tuple(types=tuple_types):
             decode_expression = awst_nodes.ARC4Decode(
                 source_location=location,
-                wtype=wtypes.WTuple.from_types(tuple_types),
+                wtype=wtypes.WTuple.from_types(tuple_types, location),
                 value=bytes_arg,
             )
             assert isinstance(

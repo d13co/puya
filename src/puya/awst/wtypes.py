@@ -273,12 +273,14 @@ class WTuple(WType):
     types: tuple[WType, ...] = attrs.field(validator=[attrs.validators.min_len(1)])
 
     @classmethod
-    def from_types(cls, types: Iterable[WType]) -> typing.Self:
+    def from_types(
+        cls, types: Iterable[WType], source_location: SourceLocation | None
+    ) -> typing.Self:
         types = tuple(types)
         if not types:
-            raise ValueError("tuple needs types")
+            raise CodeError("tuple needs types", source_location)
         if void_wtype in types:
-            raise ValueError("tuple should not contain void types")
+            raise CodeError("tuple should not contain void types", source_location)
         name = f"tuple<{','.join([t.name for t in types])}>"
         python_name = f"tuple[{', '.join(map(str, types))}]"
         return cls(name=name, stub_name=python_name, types=types)
@@ -320,20 +322,28 @@ class ARC4Tuple(ARC4Type):
     types: tuple[ARC4Type, ...] = attrs.field(validator=[attrs.validators.min_len(1)])
 
     @classmethod
-    def from_types(cls, types: Iterable[ARC4Type]) -> typing.Self:
-        types = tuple(types)
-        if not types:
-            raise ValueError("arc4.Tuple needs types")
+    def from_types(
+        cls, types: Iterable[WType], source_location: SourceLocation | None
+    ) -> typing.Self:
         immutable = True
+        arc4_types = []
         for typ in types:
+            if not isinstance(typ, ARC4Type):
+                raise CodeError(
+                    f"Invalid type for ARC4 Tuple: {typ} is not an ARC4 encoded type",
+                    source_location,
+                )
+            arc4_types.append(typ)
             # this seems counterintuitive, but is necessary.
             # despite the overall collection remaining stable, since ARC4 types
             # are encoded as a single value, if items within the tuple can be mutated,
             # then the overall value is also mutable
             immutable = immutable and typ.immutable
-        name = f"arc4.tuple<{','.join([t.name for t in types])}>"
-        python_name = f"{constants.CLS_ARC4_TUPLE}[{', '.join(map(str, types))}]"
-        return cls(name=name, stub_name=python_name, types=types, immutable=immutable)
+        if not arc4_types:
+            raise CodeError("ARC4 Tuple cannot be empty", source_location)
+        name = f"arc4.tuple<{','.join([t.name for t in arc4_types])}>"
+        python_name = f"{constants.CLS_ARC4_TUPLE}[{', '.join(map(str, arc4_types))}]"
+        return cls(name=name, stub_name=python_name, types=tuple(arc4_types), immutable=immutable)
 
 
 @typing.final
@@ -450,7 +460,7 @@ class ARC4Struct(ARC4Type):
         for field_name, field_wtype in fields.items():
             if not isinstance(field_wtype, ARC4Type):
                 raise CodeError(
-                    f"Invalid type for ARC4 struct: {field_wtype} is not an ARC4 enocded type",
+                    f"Invalid type for ARC4 Struct: {field_wtype} is not an ARC4 encoded type",
                     source_location,
                 )
             arc4_fields[field_name] = field_wtype
@@ -613,17 +623,18 @@ def avm_to_arc4_equivalent_type(wtype: WType) -> ARC4Type:
             types=[
                 t if is_arc4_encoded_type(t) else avm_to_arc4_equivalent_type(t)
                 for t in wtype.types
-            ]
+            ],
+            source_location=None,
         )
     raise InternalError(f"{wtype} does not have an arc4 equivalent type")
 
 
-def arc4_to_avm_equivalent_wtype(arc4_wtype: WType) -> WType:
+def arc4_to_avm_equivalent_wtype(arc4_wtype: WType, source_location: SourceLocation) -> WType:
     match arc4_wtype:
         case ARC4UIntN(n=n) | ARC4UFixedNxM(n=n):
             return uint64_wtype if n <= 64 else biguint_wtype
         case ARC4Tuple(types=types):
-            return WTuple.from_types(types)
+            return WTuple.from_types(types, source_location=source_location)
         case ARC4DynamicArray(element_type=ARC4UIntN(n=8)):
             return bytes_wtype
     if arc4_wtype is arc4_string_wtype:
