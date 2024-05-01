@@ -7,14 +7,9 @@ import mypy.types
 
 from puya import log
 from puya.awst import wtypes
-from puya.awst.nodes import (
-    ConstantValue,
-    ContractReference,
-    Literal as AWSTLiteral,
-)
-from puya.awst_build import constants, pytypes
+from puya.awst.nodes import ConstantValue, ContractReference
+from puya.awst_build import pytypes
 from puya.awst_build.contract_data import AppStorageDeclaration
-from puya.awst_build.eb.base import TypeClassExpressionBuilder
 from puya.context import CompileContext
 from puya.errors import CodeError, InternalError, log_exceptions
 from puya.parse import SourceLocation
@@ -123,30 +118,29 @@ class ASTConversionModuleContext(ASTConversionContext):
     def type_to_wtype(
         self, typ: mypy.types.Type, *, source_location: SourceLocation | mypy.nodes.Context
     ) -> wtypes.WType:
-        return self._type_to_builder(typ, source_location=source_location).produces()
+        pytype = self.type_to_pytype(typ, source_location=source_location)
+        if pytype.wtype is None:
+            raise InternalError(
+                "fixme, need to use pytype instead", self._maybe_convert_location(source_location)
+            )
+        return pytype.wtype
 
-    def _type_to_builder(
+    def type_to_pytype(
         self, typ: mypy.types.Type, *, source_location: SourceLocation | mypy.nodes.Context
-    ) -> TypeClassExpressionBuilder:
-        from puya.awst_build.eb.arc4.tuple import ARC4TupleClassExpressionBuilder
-        from puya.awst_build.eb.tuple import TupleTypeExpressionBuilder
-        from puya.awst_build.eb.void import VoidTypeExpressionBuilder
-
+    ) -> pytypes.PyType:
         loc = self._maybe_convert_location(source_location)
         proper_type = mypy.types.get_proper_type(typ)
         match proper_type:
             case mypy.types.NoneType() | mypy.types.PartialType(type=None):
-                return VoidTypeExpressionBuilder(loc)
+                return pytypes.NoneType
             case mypy.types.LiteralType(fallback=fallback):
-                return self._type_to_builder(fallback, source_location=loc)
+                return self.type_to_pytype(fallback, source_location=loc)
             case mypy.types.TupleType(items=items, partial_fallback=true_type):
-                types = [self._type_to_builder(it, source_location=loc) for it in items]
-                tuple_builder: TupleTypeExpressionBuilder | ARC4TupleClassExpressionBuilder
-                if true_type.type.fullname != constants.CLS_ARC4_TUPLE:
-                    tuple_builder = TupleTypeExpressionBuilder(loc)
-                else:
-                    tuple_builder = ARC4TupleClassExpressionBuilder(loc)
-                return tuple_builder.index_multiple(types, loc)
+                types = [self.type_to_pytype(it, source_location=loc) for it in items]
+                generic = pytypes.PyType.from_name(true_type.type.fullname)
+                if not isinstance(generic, pytypes.GenericType):
+                    raise CodeError(f"Unknown tuple base type: {true_type.type.fullname}", loc)
+                return generic.parameterise(types, loc)
             case mypy.types.Instance() as inst:
                 return self._resolve_type_from_name_and_args(
                     type_fullname=inst.type.fullname,
@@ -160,57 +154,41 @@ class ASTConversionModuleContext(ASTConversionContext):
                     raise CodeError("Cannot resolve empty type", loc)
                 if len(items) > 1:
                     raise CodeError("Type unions are unsupported at this location", loc)
-                return self._type_to_builder(items[0], source_location=loc)
+                return self.type_to_pytype(items[0], source_location=loc)
             case mypy.types.AnyType():
                 # TODO: look at type_of_any to improve error message
                 raise CodeError("Any type is not supported", loc)
             case _:
-                raise CodeError(
-                    f"Unable to resolve mypy type {typ!r} to known algopy type",
-                    loc,
-                )
+                raise CodeError(f"Unable to resolve mypy type {typ!r} to known algopy type", loc)
 
     def _resolve_type_from_name_and_args(
         self, type_fullname: str, inst_args: Sequence[mypy.types.Type] | None, loc: SourceLocation
-    ) -> TypeClassExpressionBuilder:
-        from puya.awst_build.eb.arc4.struct import ARC4StructClassExpressionBuilder
-        from puya.awst_build.eb.struct import StructSubclassExpressionBuilder
-        from puya.awst_build.eb.type_registry import get_type_builder
+    ) -> pytypes.PyType:
+        if type_fullname in self.type_map:
+            return self.type_map[type_fullname]
 
-        try:
-            mapped_wtype = self.type_map[type_fullname].wtype
-        except KeyError:
-            pass
-        else:
-            if isinstance(mapped_wtype, wtypes.ARC4Struct):
-                return ARC4StructClassExpressionBuilder(mapped_wtype, loc)
-            else:
-                assert isinstance(mapped_wtype, wtypes.WStructType)
-                return StructSubclassExpressionBuilder(mapped_wtype, loc)
-
-        cls_type_builder = get_type_builder(type_fullname, loc)
-        if not inst_args:
-            if not isinstance(cls_type_builder, TypeClassExpressionBuilder):
-                raise CodeError(f"Missing generic type parameter(s) for {type_fullname}", loc)
-            return cls_type_builder
-
-        if any(isinstance(a, mypy.types.AnyType) for a in inst_args):
-            raise CodeError(f"Unresolved generic type parameter for {type_fullname}", loc)
-
-        type_args_resolved: list[TypeClassExpressionBuilder | AWSTLiteral] = [
-            (
-                AWSTLiteral(value=ta.value, source_location=loc)  # type: ignore[arg-type]
-                if isinstance(ta, mypy.types.LiteralType)
-                else self._type_to_builder(ta, source_location=loc)
-            )
-            for ta in inst_args
-        ]
-        if len(type_args_resolved) == 1:
-            indexed_type = cls_type_builder.index(type_args_resolved[0], loc)
-        else:
-            indexed_type = cls_type_builder.index_multiple(type_args_resolved, loc)
-        if not isinstance(indexed_type, TypeClassExpressionBuilder):
-            raise InternalError(
-                f"Expected TypeClassExpressionBuilder got: {type(indexed_type).__name__}", loc
-            )
-        return indexed_type
+        result = pytypes.PyType.from_name(type_fullname)
+        if result is None:
+            raise CodeError(f"Unknown type: {type_fullname}", loc)
+        if inst_args:
+            if not isinstance(result, pytypes.GenericType):
+                raise CodeError(f"{result.alias} does not take generic parameters", loc)
+            type_args_resolved = list[pytypes.TypeArg]()
+            for idx, ta in enumerate(inst_args):
+                if isinstance(ta, mypy.types.AnyType):
+                    raise CodeError(
+                        f"Unresolved generic type parameter for {type_fullname} at index {idx}",
+                        loc,
+                    )
+                if isinstance(ta, mypy.types.NoneType):
+                    type_args_resolved.append(None)
+                elif isinstance(ta, mypy.types.LiteralType):
+                    if isinstance(ta.value, float):
+                        raise CodeError(
+                            f"float value encountered in typing.Literal: {ta.value}", loc
+                        )
+                    type_args_resolved.append(ta.value)
+                else:
+                    type_args_resolved.append(self.type_to_pytype(ta, source_location=loc))
+            result = result.parameterise(type_args_resolved, loc)
+        return result
