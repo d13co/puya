@@ -214,21 +214,23 @@ ARC4AddressType: typing.Final = _SimpleType(
 )
 
 
-_TTupleItemWType = typing.TypeVar("_TTupleItemWType", wtypes.WType, wtypes.ARC4Type)
-
-
 def _make_tuple_parameterise(
-    typ: Callable[[Iterable[_TTupleItemWType], SourceLocation | None], wtypes.WType],
-    guard: Callable[[TypeArg, SourceLocation | None], tuple[PyType, _TTupleItemWType]],
+    typ: Callable[[Iterable[wtypes.WType], SourceLocation | None], wtypes.WType]
 ) -> Parameterise:
     def parameterise(
         self: GenericType, args: TypeArgs, source_location: SourceLocation | None
     ) -> TupleType:
         py_types = []
-        item_wtypes = list[_TTupleItemWType]()
+        item_wtypes = []
         for arg in args:
-            item_pytype, item_wtype = guard(arg, source_location)
-            py_types.append(item_pytype)
+            if not isinstance(arg, PyType):
+                raise CodeError(
+                    "typing.Literal cannot be used as tuple type parameter", source_location
+                )
+            item_wtype = arg.wtype
+            if item_wtype is None:
+                raise CodeError(f"Type {arg.alias} is not allowed in a tuple", source_location)
+            py_types.append(arg)
             item_wtypes.append(item_wtype)
 
         name = f"{self.name}[{', '.join(pyt.name for pyt in py_types)}]"
@@ -243,38 +245,14 @@ def _make_tuple_parameterise(
     return parameterise
 
 
-def _is_valid_native_tuple_element_type(
-    arg: TypeArg, source_location: SourceLocation | None
-) -> tuple[PyType, wtypes.WType]:
-    if not isinstance(arg, PyType):
-        raise CodeError("typing.Literal cannot be used as tuple type parameter", source_location)
-    item_wtype = arg.wtype
-    if item_wtype is None:
-        raise CodeError(f"Type {arg.alias} is not allowed in a tuple", source_location)
-    return arg, item_wtype
-
-
-def _is_valid_arc4_tuple_element_type(
-    arg: TypeArg, source_location: SourceLocation | None
-) -> tuple[PyType, wtypes.ARC4Type]:
-    py_type, item_wtype = _is_valid_native_tuple_element_type(arg, source_location)
-    if not isinstance(item_wtype, wtypes.ARC4Type):
-        raise CodeError(
-            f"Invalid type for {constants.CLS_ARC4_TUPLE}:"
-            f" {py_type.alias} is not an ARC4 encoded type",
-            source_location,
-        )
-    return py_type, item_wtype
-
-
 GenericTupleType: typing.Final = GenericType(
     name="builtins.tuple",
     alias="tuple",
-    parameterise=_make_tuple_parameterise(wtypes.WTuple, _is_valid_native_tuple_element_type),
+    parameterise=_make_tuple_parameterise(wtypes.WTuple),
 )
 
 GenericARC4TupleType: typing.Final = GenericType(
     name=constants.CLS_ARC4_TUPLE,
     alias=constants.CLS_ARC4_TUPLE,
-    parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple, _is_valid_arc4_tuple_element_type),
+    parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple),
 )

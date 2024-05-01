@@ -321,22 +321,28 @@ class ARC4UIntN(ARC4Type):
 class ARC4Tuple(ARC4Type):
     types: tuple[ARC4Type, ...] = attrs.field(validator=[attrs.validators.min_len(1)])
 
-    def __init__(self, types: Iterable[ARC4Type], source_location: SourceLocation | None):
-        # TODO: move type validation into this function again
+    def __init__(self, types: Iterable[WType], source_location: SourceLocation | None):
         types = tuple(types)
         if not types:
             raise CodeError("ARC4 Tuple cannot be empty", source_location)
         immutable = True
-        for typ in types:
+        arc4_types = []
+        for typ_idx, typ in enumerate(types):
+            if not isinstance(typ, ARC4Type):
+                raise CodeError(
+                    f"Invalid ARC4 Tuple type:"
+                    f" type at index {typ_idx} is not an ARC4 encoded type",
+                    source_location,
+                )
+            arc4_types.append(typ)
             # this seems counterintuitive, but is necessary.
             # despite the overall collection remaining stable, since ARC4 types
             # are encoded as a single value, if items within the tuple can be mutated,
             # then the overall value is also mutable
             immutable = immutable and typ.immutable
         name = f"arc4.tuple<{','.join([t.name for t in types])}>"
-        python_name = f"{constants.CLS_ARC4_TUPLE}[{', '.join(map(str, types))}]"
         self.__attrs_init__(
-            name=name, stub_name=python_name, types=tuple(types), immutable=immutable
+            name=name, stub_name=name, types=tuple(arc4_types), immutable=immutable
         )
 
 
@@ -449,7 +455,7 @@ class ARC4Struct(ARC4Type):
         for field_name, field_wtype in fields.items():
             if not isinstance(field_wtype, ARC4Type):
                 raise CodeError(
-                    f"Invalid type for ARC4 Struct: {field_wtype} is not an ARC4 encoded type",
+                    f"Invalid ARC4 Struct declaration: {field_name} is not an ARC4 encoded type",
                     source_location,
                 )
             arc4_fields[field_name] = field_wtype
