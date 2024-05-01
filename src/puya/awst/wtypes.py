@@ -322,6 +322,7 @@ class ARC4Tuple(ARC4Type):
     types: tuple[ARC4Type, ...] = attrs.field(validator=[attrs.validators.min_len(1)])
 
     def __init__(self, types: Iterable[ARC4Type], source_location: SourceLocation | None):
+        # TODO: move type validation into this function again
         types = tuple(types)
         if not types:
             raise CodeError("ARC4 Tuple cannot be empty", source_location)
