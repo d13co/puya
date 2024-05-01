@@ -3,8 +3,10 @@ from __future__ import annotations
 import abc
 import contextlib
 import typing
+from functools import cached_property
 
 import attrs
+from immutabledict import immutabledict
 
 from puya import log
 from puya.awst import wtypes
@@ -12,7 +14,7 @@ from puya.awst_build import constants
 from puya.errors import CodeError, InternalError
 
 if typing.TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Mapping, Sequence
 
     from puya.parse import SourceLocation
 
@@ -78,6 +80,52 @@ class GenericType(PyType, abc.ABC):
 class TupleType(PyType):
     items: tuple[PyType, ...] = attrs.field(validator=attrs.validators.min_len(1))
     wtype: wtypes.WTuple | wtypes.ARC4Tuple
+
+
+@attrs.frozen(init=False)
+class StructType(PyType):
+    fields: Mapping[str, PyType] = attrs.field(
+        converter=immutabledict, validator=[attrs.validators.min_len(1)]
+    )
+    wtype: wtypes.WStructType | wtypes.ARC4Struct
+    source_location: SourceLocation | None
+
+    @cached_property
+    def names(self) -> Sequence[str]:
+        return tuple(self.fields.keys())
+
+    @cached_property
+    def types(self) -> Sequence[PyType]:
+        return tuple(self.fields.values())
+
+    def __init__(
+        self,
+        kind: type[wtypes.WStructType | wtypes.ARC4Struct],
+        name: str,
+        fields: Mapping[str, PyType],
+        source_location: SourceLocation | None,
+    ):
+        field_wtypes = {}
+        for field_name, field_pytype in fields.items():
+            field_wtype = field_pytype.wtype
+            if field_wtype is None:
+                raise CodeError(
+                    f"Type {field_pytype.alias} is not allowed in a struct", source_location
+                )
+            field_wtypes[field_name] = field_wtype
+        wtype = kind.from_name_and_fields(
+            python_name=name,
+            fields=field_wtypes,
+            source_location=source_location,
+        )
+        self.__attrs_init__(
+            name=name,
+            alias=name,
+            wtype=wtype,
+            fields=fields,
+            source_location=source_location,
+        )
+        self.register()
 
 
 @attrs.frozen

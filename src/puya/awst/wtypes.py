@@ -7,7 +7,8 @@ from immutabledict import immutabledict
 
 from puya import algo_constants
 from puya.awst_build import constants
-from puya.errors import InternalError
+from puya.errors import CodeError, InternalError
+from puya.parse import SourceLocation
 from puya.utils import sha512_256_hash
 
 
@@ -226,11 +227,13 @@ class WStructType(WType):
     fields: Mapping[str, WType] = attrs.field(converter=immutabledict)
 
     @classmethod
-    def from_name_and_fields(cls, python_name: str, fields: Mapping[str, WType]) -> typing.Self:
+    def from_name_and_fields(
+        cls, python_name: str, fields: Mapping[str, WType], source_location: SourceLocation | None
+    ) -> typing.Self:
         if not fields:
-            raise ValueError("struct needs fields")
+            raise CodeError("struct needs fields", source_location)
         if void_wtype in fields.values():
-            raise ValueError("struct should not contain void types")
+            raise CodeError("struct should not contain void types", source_location)
         name = (
             "struct<"
             + ",".join(
@@ -435,18 +438,31 @@ class ARC4Struct(ARC4Type):
 
     @classmethod
     def from_name_and_fields(
-        cls, *, python_name: str, fields: Mapping[str, ARC4Type]
+        cls,
+        *,
+        python_name: str,
+        fields: Mapping[str, WType],
+        source_location: SourceLocation | None,
     ) -> typing.Self:
         if not fields:
-            raise ValueError("arc4.Struct needs at least one element")
+            raise CodeError("arc4.Struct needs at least one element", source_location)
+        arc4_fields = {}
+        for field_name, field_wtype in fields.items():
+            if not isinstance(field_wtype, ARC4Type):
+                raise CodeError(
+                    f"Invalid type for ARC4 struct: {field_wtype} is not an ARC4 enocded type",
+                    source_location,
+                )
+            arc4_fields[field_name] = field_wtype
+
         name = (
             "arc4.struct<"
             + ",".join(
-                f"{field_name}:{field_type.name}" for field_name, field_type in fields.items()
+                f"{field_name}:{field_type.name}" for field_name, field_type in arc4_fields.items()
             )
             + ">"
         )
-        return cls(name=name, stub_name=python_name, fields=fields)
+        return cls(name=name, stub_name=python_name, fields=arc4_fields)
 
 
 arc4_string_wtype: typing.Final = ARC4Type(

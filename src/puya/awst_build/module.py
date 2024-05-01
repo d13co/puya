@@ -644,12 +644,13 @@ def _process_struct(
                 has_error = True
     if has_error:
         return []
-    struct_wtype = wtypes.WStructType.from_name_and_fields(cdef.fullname, field_types)
+    cls_loc = context.node_location(cdef)
+    struct_wtype = wtypes.WStructType.from_name_and_fields(cdef.fullname, field_types, cls_loc)
     context.type_map[cdef.info.fullname] = struct_wtype
     return [
         StructureDefinition(
             name=cdef.name,
-            source_location=context.node_location(cdef),
+            source_location=cls_loc,
             fields=field_decls,
             wtype=struct_wtype,
             docstring=docstring,
@@ -701,16 +702,19 @@ def _process_arc4_struct(
     if not field_types:
         context.error("arc4.Struct requires at least one field", cdef)
         return []
-    tuple_wtype = wtypes.ARC4Struct.from_name_and_fields(
-        python_name=cdef.fullname, fields=field_types
+    cls_loc = context.node_location(cdef)
+    struct_wtype = wtypes.ARC4Struct.from_name_and_fields(
+        python_name=cdef.fullname,
+        fields=field_types,
+        source_location=cls_loc,
     )
-    context.type_map[cdef.info.fullname] = tuple_wtype
+    context.type_map[cdef.info.fullname] = struct_wtype
     return [
         StructureDefinition(
             name=cdef.name,
-            source_location=context.node_location(cdef),
+            source_location=cls_loc,
             fields=field_decls,
-            wtype=tuple_wtype,
+            wtype=struct_wtype,
             docstring=docstring,
         )
     ]
