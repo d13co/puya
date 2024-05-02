@@ -104,6 +104,7 @@ class TupleType(PyType):
 class ArrayType(PyType):
     generic: GenericType
     items: PyType
+    size: int | None
     wtype: wtypes.WType
 
 
@@ -429,15 +430,51 @@ GenericARC4TupleType: typing.Final = GenericType(
     parameterise=_make_tuple_parameterise(wtypes.ARC4Tuple),
 )
 
+
+def _make_array_parameterise(
+    typ: Callable[[wtypes.WType, SourceLocation | None], wtypes.WType]
+) -> Parameterise:
+    def parameterise(
+        self: GenericType, args: TypeArgs, source_location: SourceLocation | None
+    ) -> ArrayType:
+        try:
+            (arg,) = args
+        except ValueError:
+            raise CodeError(
+                f"Expected a single type parameter, got {len(args)} parameters", source_location
+            ) from None
+        if not isinstance(arg, PyType):
+            raise CodeError(
+                f"typing.Literal cannot be used to parameterise {self.alias}", source_location
+            )
+        if arg.wtype is None:
+            raise CodeError(
+                f"Not suitable as an {self.alias} element type: {arg}", source_location
+            )
+
+        name = f"{self.name}[{arg.name}]"
+        alias = f"{self.alias}[{arg.alias}]"
+        return ArrayType(
+            generic=self,
+            name=name,
+            alias=alias,
+            size=None,
+            items=arg,
+            wtype=typ(arg.wtype, source_location),
+        )
+
+    return parameterise
+
+
 GenericArrayType: typing.Final = GenericType(
     name=constants.CLS_ARRAY,
     alias=constants.CLS_ARRAY_ALIAS,
-    parameterise=NotImplemented,
+    parameterise=_make_array_parameterise(wtypes.WArray),
 )
 
 GenericARC4DynamicArrayType: typing.Final = GenericType(
     name=constants.CLS_ARC4_DYNAMIC_ARRAY,
-    parameterise=NotImplemented,
+    parameterise=_make_array_parameterise(wtypes.ARC4DynamicArray),
 )
 GenericARC4StaticArrayType: typing.Final = GenericType(
     name=constants.CLS_ARC4_STATIC_ARRAY,

@@ -254,16 +254,15 @@ class WStructType(WType):
 
 
 @typing.final
-@attrs.frozen(str=False, kw_only=True)
+@attrs.frozen(str=False, kw_only=True, init=False)
 class WArray(WType):
     element_type: WType
 
-    @classmethod
-    def from_element_type(cls, element_type: WType) -> typing.Self:
+    def __init__(self, element_type: WType, source_location: SourceLocation | None):
         if element_type == void_wtype:
-            raise ValueError("array element type cannot be void")
+            raise CodeError("array element type cannot be void", source_location)
         name = f"array<{element_type.name}>"
-        return cls(
+        self.__attrs_init__(
             name=name,
             stub_name=f"{constants.CLS_ARRAY_ALIAS}[{element_type}]",
             immutable=False,
@@ -399,15 +398,29 @@ class ARC4Array(ARC4Type):
 
 
 @typing.final
-@attrs.frozen(str=False, kw_only=True)
+@attrs.frozen(str=False, kw_only=True, init=False)
 class ARC4DynamicArray(ARC4Array):
-    @classmethod
-    def from_element_type(cls, element_type: ARC4Type) -> typing.Self:
-        name = f"arc4.dynamic_array<{element_type.name}>"
-        return cls(
+
+    def __init__(
+        self,
+        element_type: WType,
+        source_location: SourceLocation | None,
+        *,
+        name: str | None = None,
+        alias: str | None = None,
+        is_valid_literal: LiteralValidator | None = None,
+        stub_name: str | None = None,
+    ):
+        if not isinstance(element_type, ARC4Type):
+            raise CodeError("ARC4 arrays must have ARC4 encoded element type", source_location)
+        name = name or f"arc4.dynamic_array<{element_type.name}>"
+        is_valid_literal = is_valid_literal or typing.cast(LiteralValidator, attrs.NOTHING)
+        self.__attrs_init__(
             name=name,
             element_type=element_type,
-            stub_name=f"{constants.CLS_ARC4_DYNAMIC_ARRAY}[{element_type}]",
+            stub_name=stub_name or f"{constants.CLS_ARC4_DYNAMIC_ARRAY}[{element_type}]",
+            alias=alias,
+            is_valid_literal=is_valid_literal,
         )
 
 
@@ -510,6 +523,7 @@ arc4_dynamic_bytes: typing.Final = ARC4DynamicArray(
     element_type=arc4_byte_type,
     is_valid_literal=is_valid_bytes_literal,
     stub_name=constants.CLS_ARC4_DYNAMIC_BYTES,
+    source_location=None,
 )
 arc4_address_type: typing.Final = ARC4StaticArray(
     array_size=32,

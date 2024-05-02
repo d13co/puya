@@ -69,7 +69,7 @@ def make_dynamic_array_wtype(
 ) -> wtypes.ARC4DynamicArray:
     if not wtypes.is_arc4_encoded_type(element_type):
         raise CodeError(f"Invalid element type for arc4.DynamicArray: {element_type}", location)
-    return wtypes.ARC4DynamicArray.from_element_type(element_type)
+    return wtypes.ARC4DynamicArray(element_type, location)
 
 
 def make_static_array_wtype(
