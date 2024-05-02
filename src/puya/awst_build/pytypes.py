@@ -220,68 +220,68 @@ class _SimpleType(PyType):
         self.register()
 
 
-NoneType: typing.Final = _SimpleType(
+NoneType: typing.Final[PyType] = _SimpleType(
     name="builtins.None",
     alias="None",
     wtype=wtypes.void_wtype,
 )
-BoolType: typing.Final = _SimpleType(
+BoolType: typing.Final[PyType] = _SimpleType(
     name="builtins.bool",
     alias="bool",
     wtype=wtypes.bool_wtype,
 )
-UInt64Type: typing.Final = _SimpleType(
+UInt64Type: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_UINT64,
     alias=constants.CLS_UINT64_ALIAS,
     wtype=wtypes.uint64_wtype,
 )
-BigUIntType: typing.Final = _SimpleType(
+BigUIntType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_BIGUINT,
     alias=constants.CLS_BIGUINT_ALIAS,
     wtype=wtypes.biguint_wtype,
 )
-BytesType: typing.Final = _SimpleType(
+BytesType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_BYTES,
     alias=constants.CLS_BYTES_ALIAS,
     wtype=wtypes.bytes_wtype,
 )
-StringType: typing.Final = _SimpleType(
+StringType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_STRING,
     alias=constants.CLS_STRING_ALIAS,
     wtype=wtypes.string_wtype,
 )
-AccountType: typing.Final = _SimpleType(
+AccountType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ACCOUNT,
     alias=constants.CLS_ACCOUNT_ALIAS,
     wtype=wtypes.account_wtype,
 )
-AssetType: typing.Final = _SimpleType(
+AssetType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ASSET,
     alias=constants.CLS_ASSET_ALIAS,
     wtype=wtypes.asset_wtype,
 )
-ApplicationType: typing.Final = _SimpleType(
+ApplicationType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_APPLICATION,
     alias=constants.CLS_APPLICATION_ALIAS,
     wtype=wtypes.application_wtype,
 )
-ARC4StringType: typing.Final = _SimpleType(
+ARC4StringType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ARC4_STRING,
     wtype=wtypes.arc4_string_wtype,
 )
-ARC4BoolType: typing.Final = _SimpleType(
+ARC4BoolType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ARC4_BOOL,
     wtype=wtypes.arc4_bool_wtype,
 )
-ARC4ByteType: typing.Final = _SimpleType(
+ARC4ByteType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ARC4_BYTE,
     wtype=wtypes.arc4_byte_type,
 )
-ARC4DynamicBytesType: typing.Final = _SimpleType(
+ARC4DynamicBytesType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ARC4_DYNAMIC_BYTES,
     wtype=wtypes.arc4_dynamic_bytes,
 )
-ARC4AddressType: typing.Final = _SimpleType(
+ARC4AddressType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ARC4_ADDRESS,
     wtype=wtypes.arc4_address_type,
 )
@@ -447,10 +447,6 @@ def _make_array_parameterise(
             raise CodeError(
                 f"typing.Literal cannot be used to parameterise {self.alias}", source_location
             )
-        if arg.wtype is None:
-            raise CodeError(
-                f"Not suitable as an {self.alias} element type: {arg}", source_location
-            )
 
         name = f"{self.name}[{arg.name}]"
         alias = f"{self.alias}[{arg.alias}]"
@@ -499,10 +495,6 @@ def _make_fixed_array_parameterise(
             )
         if size < 0:
             raise CodeError("Array size should be non-negative", source_location)
-        if items.wtype is None:
-            raise CodeError(
-                f"Not suitable as an {self.alias} element type: {items}", source_location
-            )
 
         name = f"{self.name}[{items.name}, typing.Literal[{size}]]"
         alias = f"{self.alias}[{items.alias}, typing.Literal[{size}]]"
@@ -611,7 +603,7 @@ GenericBoxMapType: typing.Final = GenericType(
 )
 
 
-GroupTransactionBaseType: typing.Final = _SimpleType(
+GroupTransactionBaseType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_TRANSACTION_BASE,
     wtype=wtypes.WGroupTransaction(
         transaction_type=None,

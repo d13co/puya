@@ -350,11 +350,11 @@ def get_func_types(
         )
     return {
         **{
-            arg.variable.name: context.type_to_wtype(
+            arg.variable.name: context.type_to_pytype(
                 t, source_location=context.node_location(arg, module_src=func_def.info)
-            )
+            ).wtype
             for t, arg in zip(func_type.arg_types, func_def.arguments, strict=True)
             if not arg.variable.is_self
         },
-        "output": context.type_to_wtype(func_type.ret_type, source_location=location),
+        "output": context.type_to_pytype(func_type.ret_type, source_location=location).wtype,
     }

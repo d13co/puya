@@ -145,7 +145,7 @@ class FunctionASTConverter(
             func_loc,
         )
         # convert the return type
-        self._return_type = self.context.type_to_wtype(
+        self._return_type = self.context.type_to_pytype(
             type_info.ret_type, source_location=func_loc
         )
         # check & convert the arguments
@@ -178,13 +178,8 @@ class FunctionASTConverter(
                     "default function argument values are not supported yet", arg.initializer
                 )
             pytyp = self.context.type_to_pytype(arg_type, source_location=arg_loc)
-            wtype = pytyp.wtype
-            if wtype is None:
-                raise CodeError(
-                    f"Type is not able to be passed as an argument: {pytyp.alias}", arg_loc
-                )
             arg_name = arg.variable.name
-            args.append(SubroutineArgument(arg_loc, arg_name, wtype))
+            args.append(SubroutineArgument(arg_loc, arg_name, pytyp.wtype))
             self._symtable[arg_name] = pytyp
         # translate body
         translated_body = self.visit_block(func_def.body)
@@ -196,7 +191,7 @@ class FunctionASTConverter(
                 name=func_def.name,
                 source_location=source_location,
                 args=args,
-                return_type=self._return_type,
+                return_type=self._return_type.wtype,
                 body=translated_body,
                 docstring=func_def.docstring,
             )
@@ -207,7 +202,7 @@ class FunctionASTConverter(
                 name=func_def.name,
                 source_location=source_location,
                 args=args,
-                return_type=self._return_type,
+                return_type=self._return_type.wtype,
                 body=translated_body,
                 docstring=func_def.docstring,
                 abimethod_config=self.contract_method_info.arc4_method_config,
@@ -565,14 +560,15 @@ class FunctionASTConverter(
         loc = self._location(stmt)
         return_expr = stmt.expr
         if return_expr is None:
-            if self._return_type != wtypes.void_wtype:
+            if self._return_type is pytypes.NoneType:
                 self._error(
                     "function is typed as returning a value, so a value must be returned", loc
                 )
             return ReturnStatement(source_location=loc, value=None)
 
         returning = require_expression_builder(return_expr.accept(self)).rvalue()
-        if returning.wtype != self._return_type:
+        # TODO: compare pytypes instead
+        if returning.wtype != self._return_type.wtype:
             self._error(
                 f"invalid return type of {returning.wtype}, expected {self._return_type}", loc
             )
@@ -786,11 +782,9 @@ class FunctionASTConverter(
                 local_type = lazy_setdefault(
                     self._symtable,
                     key=var_name,
-                    # TODO: map to PyType instead
                     default=lambda _: self.context.mypy_expr_node_type(name_expr),
                 )
-                if local_type.wtype is None:
-                    raise NotImplementedError("need to map to type builder directly")
+                # TODO: map via PyType instead
                 var_expr = VarExpression(
                     name=var_name, wtype=local_type.wtype, source_location=expr_loc
                 )
@@ -1056,17 +1050,17 @@ class FunctionASTConverter(
                     " which isn't supported unless evaluating a boolean condition",
                     location,
                 )
-            target_wtype = wtypes.bool_wtype
-            # TODO: PyType is bool
+            target_pytyp = pytypes.BoolType
             lhs_expr = bool_eval(lhs, location).rvalue()
             rhs_expr = bool_eval(rhs, location).rvalue()
         else:
-            # TODO: map to PyType instead
-            target_wtype = self.context.type_to_wtype(result_mypy_type, source_location=location)
+            target_pytyp = self.context.type_to_pytype(result_mypy_type, source_location=location)
+            # TODO: use to PyType instead
+            target_wtype = target_pytyp.wtype
             lhs_expr = expect_operand_wtype(lhs, target_wtype)
             rhs_expr = expect_operand_wtype(rhs, target_wtype)
 
-        if target_wtype == wtypes.bool_wtype:
+        if target_pytyp is pytypes.BoolType:
             return BooleanBinaryOperation(
                 source_location=location, left=lhs_expr, op=op, right=rhs_expr
             )
@@ -1082,7 +1076,7 @@ class FunctionASTConverter(
             condition=condition,
             true_expr=lhs_builder.rvalue(),
             false_expr=rhs_expr,
-            wtype=target_wtype,
+            wtype=target_pytyp.wtype,
         )
 
     def visit_index_expr(self, expr: mypy.nodes.IndexExpr) -> ExpressionBuilder | Literal:
