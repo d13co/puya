@@ -13,7 +13,7 @@ from puya.awst import wtypes
 from puya.awst_build import constants
 from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
-from puya.utils import lazy_setdefault
+from puya.utils import coalesce, lazy_setdefault
 
 logger = log.get_logger(__name__)
 
@@ -22,12 +22,12 @@ logger = log.get_logger(__name__)
 class PyType(abc.ABC):
     name: str
     """The canonical fully qualified type name"""
-    alias: str = attrs.field()
+    _alias: str | None = None
     """The public fully qualified type name. If not specified, defaults to name."""
 
-    @alias.default
-    def _alias_default(self) -> str:
-        return self.name
+    @property
+    def alias(self) -> str:
+        return coalesce(self._alias, self.name)
 
     @property
     @abc.abstractmethod
@@ -313,10 +313,9 @@ def _make_arc4_unsigned_int_parameterise(*, max_bits: int | None = None) -> Para
             )
 
         name = f"{self.name}[typing.Literal[{bits}]]"
+        alias = None
         if bits.bit_count() == 1:  # quick way to check for power of 2
             alias = f"{constants.ARC4_PREFIX}UInt{bits}"
-        else:
-            alias = typing.cast(str, attrs.NOTHING)
         return ARC4UIntNType(
             generic=self,
             name=name,
