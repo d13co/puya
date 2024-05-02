@@ -118,11 +118,8 @@ class ASTConversionModuleContext(ASTConversionContext):
     def type_to_wtype(
         self, typ: mypy.types.Type, *, source_location: SourceLocation | mypy.nodes.Context
     ) -> wtypes.WType:
-        pytype = self.type_to_pytype(typ, source_location=source_location)
-        if pytype.wtype is None:
-            raise InternalError(
-                "fixme, need to use pytype instead", self._maybe_convert_location(source_location)
-            )
+        loc = self._maybe_convert_location(source_location)
+        pytype = self.type_to_pytype(typ, source_location=loc)
         return pytype.wtype
 
     def type_to_pytype(
