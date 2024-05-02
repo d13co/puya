@@ -611,6 +611,8 @@ BoxRefType: typing.Final = StorageProxyType(
     wtype=wtypes.box_key,
     generic=None,
 )
+_register(BoxRefType)
+
 GenericBoxMapType: typing.Final = GenericType(
     name=constants.CLS_BOX_MAP_PROXY,
     alias=constants.CLS_BOX_MAP_PROXY_ALIAS,
