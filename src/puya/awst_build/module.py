@@ -658,7 +658,6 @@ def _process_struct(
         frozen=frozen,
         source_location=cls_loc,
     )
-    context.type_map[cdef.info.fullname] = struct_typ
     return [
         StructureDefinition(
             name=cdef.name,
@@ -724,7 +723,6 @@ def _process_arc4_struct(
         frozen=frozen,
         source_location=cls_loc,
     )
-    context.type_map[cdef.info.fullname] = struct_typ
     return [
         StructureDefinition(
             name=cdef.name,

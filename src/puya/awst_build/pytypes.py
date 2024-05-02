@@ -45,6 +45,7 @@ class PyType(abc.ABC):
 
     @classmethod
     def lookup(cls, name: str) -> PyType | None:
+        """Lookup type by the canonical fully qualified name"""
         return _type_registry.get(name)
 
 

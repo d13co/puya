@@ -21,7 +21,6 @@ logger = log.get_logger(__name__)
 @attrs.frozen(kw_only=True)
 class ASTConversionContext(CompileContext):
     constants: dict[str, ConstantValue] = attrs.field(factory=dict)
-    type_map: dict[str, pytypes.StructType] = attrs.field(factory=dict)
     state_defs: dict[ContractReference, dict[str, AppStorageDeclaration]] = attrs.field(
         factory=dict
     )
@@ -165,9 +164,6 @@ class ASTConversionModuleContext(ASTConversionContext):
     def _resolve_type_from_name_and_args(
         self, type_fullname: str, inst_args: Sequence[mypy.types.Type] | None, loc: SourceLocation
     ) -> pytypes.PyType:
-        if type_fullname in self.type_map:
-            return self.type_map[type_fullname]
-
         result = pytypes.PyType.lookup(type_fullname)
         if result is None:
             raise CodeError(f"Unknown type: {type_fullname}", loc)
