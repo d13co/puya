@@ -583,7 +583,9 @@ def _parameterise_storage_map(
         alias=alias,
         key=key,
         content=content,
-        wtype=wtypes.box_key,  # TODO: maybe bytes since it will just be the prefix?
+        # TODO: maybe bytes since it will just be the prefix?
+        #       would have to change strategy in _gather_global_direct_storages if so
+        wtype=wtypes.box_key,
     )
 
 

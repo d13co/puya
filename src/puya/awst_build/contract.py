@@ -466,27 +466,26 @@ def _gather_global_direct_storages(
                     var_loc,
                 )
             pytyp = context.type_to_pytype(sym.type, source_location=sym.node)
-            if isinstance(pytyp, pytypes.StorageProxyType | pytypes.StorageMapProxyType):
+            storage_wtype = pytyp.wtype
+            if storage_wtype in (wtypes.box_key, wtypes.state_key):
                 pass  # these are handled on declaration, need to collect constructor arguments too
+            elif not storage_wtype.lvalue:
+                context.error(
+                    f"Invalid type for Local storage - must be assignable,"
+                    f" which type {storage_wtype} is not",
+                    var_loc,
+                )
             else:
-                storage_wtype = pytyp.wtype
-                if not storage_wtype.lvalue:
-                    context.error(
-                        f"Invalid type for Local storage - must be assignable,"
-                        f" which type {storage_wtype} is not",
-                        var_loc,
-                    )
-                else:
-                    yield AppStateDeclaration(
-                        member_name=name,
-                        kind=AppStateKind.app_global,
-                        storage_wtype=storage_wtype,
-                        decl_type=AppStateDeclType.global_direct,
-                        source_location=var_loc,
-                        defined_in=cref,
-                        key_override=None,
-                        description=None,
-                    )
+                yield AppStateDeclaration(
+                    member_name=name,
+                    kind=AppStateKind.app_global,
+                    storage_wtype=storage_wtype,
+                    decl_type=AppStateDeclType.global_direct,
+                    source_location=var_loc,
+                    defined_in=cref,
+                    key_override=None,
+                    description=None,
+                )
 
 
 def _check_class_abstractness(
