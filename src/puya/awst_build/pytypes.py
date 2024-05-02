@@ -47,26 +47,25 @@ class PyType(abc.ABC):
             raise CodeError(f"Type already has parameters: {self.alias}", source_location)
         raise CodeError(f"Not a generic type: {self.alias}", source_location)
 
-    def register(self) -> None:
-        existing_entry = _type_registry.get(self.name)
-        if existing_entry is None:
-            _type_registry[self.name] = self
-        elif existing_entry is self:
-            logger.debug(f"Duplicate registration of {self}")
-        else:
-            raise InternalError(f"Duplicate mapping of {self.name}")
-
-    @classmethod
-    def lookup(cls, name: str) -> PyType | None:
-        """Lookup type by the canonical fully qualified name"""
-        return _type_registry.get(name)
-
 
 # Registry used for lookups from mypy types.
-# Would be nice to make it a PyType class-var, but needs to be Final
-# for mypy, and Final with an initialiser isn't picked up as a ClassVar by attrs yet,
-# and ClassVar[Final[...]] is forbidden by the typing spec
 _type_registry: typing.Final = dict[str, PyType]()
+
+
+def _register(typ: PyType) -> None:
+    existing_entry = _type_registry.get(typ.name)
+    if existing_entry is None:
+        _type_registry[typ.name] = typ
+    elif existing_entry is typ:
+        logger.debug(f"Duplicate registration of {typ}")
+    else:
+        raise InternalError(f"Duplicate mapping of {typ.name}")
+
+
+def lookup(name: str) -> PyType | None:
+    """Lookup type by the canonical fully qualified name"""
+    return _type_registry.get(name)
+
 
 # https://typing.readthedocs.io/en/latest/spec/literal.html#legal-and-illegal-parameterizations
 # We don't support enums as typing.Literal parameters. MyPy encodes these as str values with
@@ -91,7 +90,7 @@ class GenericType(PyType, abc.ABC):
     _parameterise: Parameterise
 
     def __attrs_post_init__(self) -> None:
-        self.register()
+        _register(self)
 
     @typing.override
     @property
@@ -186,7 +185,7 @@ class StructType(PyType):
             frozen=frozen,
             source_location=source_location,
         )
-        self.register()
+        _register(self)
 
     @classmethod
     def native(
@@ -231,7 +230,7 @@ class _SimpleType(PyType):
     wtype: wtypes.WType
 
     def __attrs_post_init__(self) -> None:
-        self.register()
+        _register(self)
 
 
 NoneType: typing.Final[PyType] = _SimpleType(

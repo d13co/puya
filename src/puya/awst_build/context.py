@@ -126,7 +126,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                 return self.type_to_pytype(fallback, source_location=loc)
             case mypy.types.TupleType(items=items, partial_fallback=true_type):
                 types = [self.type_to_pytype(it, source_location=loc) for it in items]
-                generic = pytypes.PyType.lookup(true_type.type.fullname)
+                generic = pytypes.lookup(true_type.type.fullname)
                 if generic is None:
                     raise CodeError(f"Unknown tuple base type: {true_type.type.fullname}", loc)
                 return generic.parameterise(types, loc)
@@ -153,7 +153,7 @@ class ASTConversionModuleContext(ASTConversionContext):
     def _resolve_type_from_name_and_args(
         self, type_fullname: str, inst_args: Sequence[mypy.types.Type] | None, loc: SourceLocation
     ) -> pytypes.PyType:
-        result = pytypes.PyType.lookup(type_fullname)
+        result = pytypes.lookup(type_fullname)
         if result is None:
             raise CodeError(f"Unknown type: {type_fullname}", loc)
         if inst_args:

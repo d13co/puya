@@ -687,12 +687,9 @@ class FunctionASTConverter(
                 if typ.has_base(constants.CLS_ARC4_CLIENT):  # provides type info only
                     return ARC4ClientClassExpressionBuilder(self.context, expr_loc, typ.defn.info)
                 if typ.has_base(constants.STRUCT_BASE) or typ.has_base(constants.CLS_ARC4_STRUCT):
-                    pytyp = pytypes.PyType.lookup(fullname)
+                    pytyp = pytypes.lookup(fullname)
                     if pytyp is None:
-                        raise CodeError(
-                            f"Unknown struct subclass {fullname}",
-                            expr_loc,
-                        ) from None
+                        raise CodeError(f"Unknown struct subclass {fullname}", expr_loc)
                     # TODO: use PyType directly
                     wtype = pytyp.wtype
                     if isinstance(wtype, wtypes.WStructType):
