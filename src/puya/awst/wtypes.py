@@ -425,20 +425,31 @@ class ARC4DynamicArray(ARC4Array):
 
 
 @typing.final
-@attrs.frozen(str=False, kw_only=True)
+@attrs.frozen(str=False, kw_only=True, init=False)
 class ARC4StaticArray(ARC4Array):
     array_size: int
 
-    @classmethod
-    def from_element_type_and_size(
-        cls, element_type: ARC4Type, array_size: int, alias: str | None = None
-    ) -> typing.Self:
-        name = f"arc4.static_array<{element_type.name}, {array_size}>"
-        return cls(
+    def __init__(
+        self,
+        element_type: WType,
+        array_size: int,
+        source_location: SourceLocation | None,
+        *,
+        alias: str | None = None,
+        name: str | None = None,
+        stub_name: str | None = None,
+    ):
+        if not isinstance(element_type, ARC4Type):
+            raise CodeError("ARC4 arrays must have ARC4 encoded element type", source_location)
+        if array_size < 1:
+            raise CodeError("ARC4 static array size must be positive", source_location)
+        name = name or f"arc4.static_array<{element_type.name}, {array_size}>"
+        self.__attrs_init__(
             array_size=array_size,
             name=name,
             element_type=element_type,
-            stub_name=(
+            stub_name=stub_name
+            or (
                 f"{constants.CLS_ARC4_STATIC_ARRAY}["
                 f"{element_type}, typing.Literal[{array_size}]"
                 f"]"
@@ -531,6 +542,7 @@ arc4_address_type: typing.Final = ARC4StaticArray(
     element_type=arc4_byte_type,
     stub_name=constants.CLS_ARC4_ADDRESS,
     alias="address",
+    source_location=None,
 )
 
 

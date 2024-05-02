@@ -476,9 +476,49 @@ GenericARC4DynamicArrayType: typing.Final = GenericType(
     name=constants.CLS_ARC4_DYNAMIC_ARRAY,
     parameterise=_make_array_parameterise(wtypes.ARC4DynamicArray),
 )
+
+
+def _make_fixed_array_parameterise(
+    typ: Callable[[wtypes.WType, int, SourceLocation | None], wtypes.WType]
+) -> Parameterise:
+    def parameterise(
+        self: GenericType, args: TypeArgs, source_location: SourceLocation | None
+    ) -> ArrayType:
+        try:
+            items, size = args
+        except ValueError:
+            raise CodeError(
+                f"Expected a single type parameter, got {len(args)} parameters", source_location
+            ) from None
+        if not isinstance(items, PyType):
+            raise CodeError(f"{self.alias} expects first parameter to be a type", source_location)
+        if not isinstance(size, int):
+            raise CodeError(
+                f"{self.alias} expects second parameter to be a typing.Literal[int]",
+                source_location,
+            )
+        if items.wtype is None:
+            raise CodeError(
+                f"Not suitable as an {self.alias} element type: {items}", source_location
+            )
+
+        name = f"{self.name}[{items.name}, typing.Literal[{size}]]"
+        alias = f"{self.alias}[{items.alias}, typing.Literal[{size}]]"
+        return ArrayType(
+            generic=self,
+            name=name,
+            alias=alias,
+            size=size,
+            items=items,
+            wtype=typ(items.wtype, size, source_location),
+        )
+
+    return parameterise
+
+
 GenericARC4StaticArrayType: typing.Final = GenericType(
     name=constants.CLS_ARC4_STATIC_ARRAY,
-    parameterise=NotImplemented,
+    parameterise=_make_fixed_array_parameterise(wtypes.ARC4StaticArray),
 )
 
 

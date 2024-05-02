@@ -77,7 +77,7 @@ def make_static_array_wtype(
 ) -> wtypes.ARC4StaticArray:
     if not wtypes.is_arc4_encoded_type(element_type):
         raise CodeError(f"Invalid element type for arc4.StaticArray: {element_type}", location)
-    return wtypes.ARC4StaticArray.from_element_type_and_size(element_type, int(size))
+    return wtypes.ARC4StaticArray(element_type, int(size), location)
 
 
 def make_tuple_wtype(
