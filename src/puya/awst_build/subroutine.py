@@ -47,8 +47,7 @@ from puya.awst.nodes import (
     VarExpression,
     WhileLoop,
 )
-from puya.awst.wtypes import WType
-from puya.awst_build import constants
+from puya.awst_build import constants, pytypes
 from puya.awst_build.base_mypy_visitor import BaseMyPyVisitor
 from puya.awst_build.context import ASTConversionModuleContext
 from puya.awst_build.contract_data import AppStateDeclType, AppStorageDeclaration
@@ -168,19 +167,25 @@ class FunctionASTConverter(
                 func_loc,
             )
         # TODO: this should be more than just type?
-        self._symtable = dict[str, WType]()
+        self._symtable = dict[str, pytypes.PyType]()
         args = list[SubroutineArgument]()
         for arg, arg_type in zip(mypy_args, mypy_arg_types, strict=True):
+            arg_loc = self._location(arg)
             if arg.kind.is_star():
-                raise CodeError("variadic functions are not supported", self._location(arg))
+                raise CodeError("variadic functions are not supported", arg_loc)
             if arg.initializer is not None:
                 self._error(
                     "default function argument values are not supported yet", arg.initializer
                 )
-            wtype = self.context.type_to_wtype(arg_type, source_location=arg)
+            pytyp = self.context.type_to_pytype(arg_type, source_location=arg_loc)
+            wtype = pytyp.wtype
+            if wtype is None:
+                raise CodeError(
+                    f"Type is not able to be passed as an argument: {pytyp.alias}", arg_loc
+                )
             arg_name = arg.variable.name
-            args.append(SubroutineArgument(self._location(arg), arg_name, wtype))
-            self._symtable[arg_name] = wtype
+            args.append(SubroutineArgument(arg_loc, arg_name, wtype))
+            self._symtable[arg_name] = pytyp
         # translate body
         translated_body = self.visit_block(func_def.body)
         # build result
@@ -780,7 +785,11 @@ class FunctionASTConverter(
                     # TODO: map to PyType instead
                     default=lambda _: self.context.mypy_expr_node_type(name_expr),
                 )
-                var_expr = VarExpression(name=var_name, wtype=local_type, source_location=expr_loc)
+                if local_type.wtype is None:
+                    raise NotImplementedError("need to map to type builder directly")
+                var_expr = VarExpression(
+                    name=var_name, wtype=local_type.wtype, source_location=expr_loc
+                )
                 return var_expression(var_expr)
         scope = {
             mypy.nodes.LDEF: "local",
@@ -1109,7 +1118,7 @@ class FunctionASTConverter(
         true_expr = require_expression_builder(expr.if_expr.accept(self)).rvalue()
         false_expr = require_expression_builder(expr.else_expr.accept(self)).rvalue()
         # TODO: use PyType, and that type can be used to get result EB
-        expr_wtype = self.context.mypy_expr_node_type(expr)
+        expr_wtype = self.context.mypy_expr_node_type(expr).wtype
         if expr_wtype != true_expr.wtype:
             self._error(
                 "Incompatible result type for 'true' expression", true_expr.source_location
@@ -1124,7 +1133,7 @@ class FunctionASTConverter(
             condition=condition,
             true_expr=true_expr,
             false_expr=false_expr,
-            wtype=expr_wtype,
+            wtype=true_expr.wtype,
         )
         return var_expression(cond_expr)
 

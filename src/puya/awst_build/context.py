@@ -102,9 +102,10 @@ class ASTConversionModuleContext(ASTConversionContext):
         with log_exceptions(self._maybe_convert_location(fallback_location)):
             yield
 
-    def mypy_expr_node_type(self, expr: mypy.nodes.Expression) -> wtypes.WType:
+    def mypy_expr_node_type(self, expr: mypy.nodes.Expression) -> pytypes.PyType:
         mypy_type = self.get_mypy_expr_type(expr)
-        return self.type_to_wtype(mypy_type, source_location=self.node_location(expr))
+        expr_loc = self.node_location(expr)
+        return self.type_to_pytype(mypy_type, source_location=expr_loc)
 
     def get_mypy_expr_type(self, expr: mypy.nodes.Expression) -> mypy.types.Type:
         try:
