@@ -293,28 +293,29 @@ class ARC4Type(WType):
 
 
 @typing.final
-@attrs.frozen(str=False, kw_only=True)
+@attrs.frozen(str=False, kw_only=True, init=False)
 class ARC4UIntN(ARC4Type):
     n: int
-
     is_valid_literal: LiteralValidator = attrs.field(init=False, eq=False)
 
     @is_valid_literal.default
     def _literal_validator(self) -> LiteralValidator:
         return _uint_literal_validator(max_bits=self.n)
 
-    @classmethod
-    def from_scale(cls, n: int) -> typing.Self:
-        assert n % 8 == 0, "bit size must be multiple of 8"
-        assert 8 <= n <= 512, "bit size must be between 8 and 512 inclusive"
-        name = f"arc4.uint{n}"
-        if n.bit_count() == 1:  # quick way to check for power of 2
-            stub_name = f"{constants.ARC4_PREFIX}UInt{n}"
-        else:
-            base_cls = constants.CLS_ARC4_UINTN if n <= 64 else constants.CLS_ARC4_BIG_UINTN
-            stub_name = f"{base_cls}[typing.Literal[{n}]]"
-
-        return cls(n=n, name=name, stub_name=stub_name)
+    def __init__(
+        self,
+        n: int,
+        source_location: SourceLocation | None,
+        *,
+        name: str | None = None,
+        alias: str | None = None,
+    ):
+        if not (n % 8 == 0):
+            raise CodeError("Bit size must be multiple of 8", source_location)
+        if not (8 <= n <= 512):
+            raise CodeError("Bit size must be between 8 and 512 inclusive", source_location)
+        name = name or f"arc4.uint{n}"
+        self.__attrs_init__(n=n, name=name, stub_name=name, alias=alias)
 
 
 @typing.final
@@ -348,16 +349,20 @@ class ARC4Tuple(ARC4Type):
 
 
 @typing.final
-@attrs.frozen(str=False, kw_only=True)
+@attrs.frozen(str=False, kw_only=True, init=False)
 class ARC4UFixedNxM(ARC4Type):
     n: int
     m: int
 
-    @classmethod
-    def from_scale_and_precision(cls, n: int, m: int) -> typing.Self:
-        assert n % 8 == 0, "bit size must be multiple of 8"
-        assert 8 <= n <= 512, "bit size must be between 8 and 512 inclusive"
-        assert 1 <= m <= 160, "precision must be between 1 and 160 inclusive"
+    def __init__(self, bits: int, precision: int, source_location: SourceLocation | None):
+        n = bits
+        m = precision
+        if not (n % 8 == 0):
+            raise CodeError("Bit size must be multiple of 8", source_location)
+        if not (8 <= n <= 512):
+            raise CodeError("Bit size must be between 8 and 512 inclusive", source_location)
+        if not (1 <= m <= 160):
+            raise CodeError("Precision must be between 1 and 160 inclusive", source_location)
 
         name = f"arc4.ufixed{n}x{m}"
         base_cls = constants.CLS_ARC4_UFIXEDNXM if n <= 64 else constants.CLS_ARC4_BIG_UFIXEDNXM
@@ -378,7 +383,7 @@ class ARC4UFixedNxM(ARC4Type):
             adjusted_int = int("".join(map(str, digits)))
             return adjusted_int.bit_length() <= n
 
-        return cls(
+        self.__attrs_init__(
             n=n,
             m=m,
             name=name,
@@ -497,8 +502,8 @@ arc4_bool_wtype: typing.Final = ARC4Type(
 arc4_byte_type: typing.Final = ARC4UIntN(
     n=8,
     name="arc4.byte",
-    stub_name=constants.CLS_ARC4_BYTE,
     alias="byte",
+    source_location=None,
 )
 arc4_dynamic_bytes: typing.Final = ARC4DynamicArray(
     name="arc4.dynamic_bytes",
@@ -589,7 +594,7 @@ def is_reference_type(wtype: WType) -> bool:
     return wtype in (asset_wtype, account_wtype, application_wtype)
 
 
-def is_arc4_encoded_type(wtype: WType) -> typing.TypeGuard[ARC4Type]:
+def is_arc4_encoded_type(wtype: WType | None) -> typing.TypeGuard[ARC4Type]:
     return isinstance(wtype, ARC4Type)
 
 
@@ -618,9 +623,9 @@ def avm_to_arc4_equivalent_type(wtype: WType) -> ARC4Type:
     if wtype is bool_wtype:
         return arc4_bool_wtype
     if wtype is uint64_wtype:
-        return ARC4UIntN.from_scale(64)
+        return ARC4UIntN(64, source_location=None)
     if wtype is biguint_wtype:
-        return ARC4UIntN.from_scale(512)
+        return ARC4UIntN(512, source_location=None)
     if wtype is bytes_wtype:
         return arc4_dynamic_bytes
     if wtype is string_wtype:

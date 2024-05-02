@@ -284,21 +284,105 @@ ARC4AddressType: typing.Final = _SimpleType(
     wtype=wtypes.arc4_address_type,
 )
 
+
+@attrs.frozen
+class ARC4UIntNType(PyType):
+    generic: GenericType
+    bits: int
+    wtype: wtypes.WType
+
+
+def _make_arc4_unsigned_int_parameterise(*, max_bits: int | None = None) -> Parameterise:
+    def parameterise(
+        self: GenericType, args: TypeArgs, source_location: SourceLocation | None
+    ) -> ARC4UIntNType:
+        try:
+            (bits,) = args
+        except ValueError:
+            raise CodeError(
+                f"Expected a single type parameter, got {len(args)} parameters", source_location
+            ) from None
+        if not isinstance(bits, int):
+            raise CodeError(
+                f"{self.alias} expects a typing.Literal[int] parameter", source_location
+            )
+        if (max_bits is not None) and bits > max_bits:
+            raise CodeError(
+                f"Max bit size of {self.alias} is {max_bits}, got {bits}", source_location
+            )
+
+        name = f"{self.name}[typing.Literal[{bits}]]"
+        if bits.bit_count() == 1:  # quick way to check for power of 2
+            alias = f"{constants.ARC4_PREFIX}UInt{bits}"
+        else:
+            alias = typing.cast(str, attrs.NOTHING)
+        return ARC4UIntNType(
+            generic=self,
+            name=name,
+            alias=alias,
+            bits=bits,
+            wtype=wtypes.ARC4UIntN(bits, source_location),
+        )
+
+    return parameterise
+
+
 GenericARC4UIntNType: typing.Final = GenericType(
     name=constants.CLS_ARC4_UINTN,
-    parameterise=NotImplemented,
+    parameterise=_make_arc4_unsigned_int_parameterise(max_bits=64),
 )
 GenericARC4BigUIntNType: typing.Final = GenericType(
     name=constants.CLS_ARC4_BIG_UINTN,
-    parameterise=NotImplemented,
+    parameterise=_make_arc4_unsigned_int_parameterise(max_bits=512),
 )
+
+
+@attrs.frozen
+class ARC4UFixedNxMType(PyType):
+    generic: GenericType
+    bits: int
+    precision: int
+    wtype: wtypes.WType
+
+
+def _make_arc4_unsigned_fixed_parameterise(*, max_bits: int | None = None) -> Parameterise:
+    def parameterise(
+        self: GenericType, args: TypeArgs, source_location: SourceLocation | None
+    ) -> ARC4UFixedNxMType:
+        try:
+            bits, precision = args
+        except ValueError:
+            raise CodeError(
+                f"Expected two type parameters, got {len(args)} parameters", source_location
+            ) from None
+        if not (isinstance(bits, int) and isinstance(precision, int)):
+            raise CodeError(
+                f"{self.alias} expects two typing.Literal[int] parameters", source_location
+            )
+        if (max_bits is not None) and bits > max_bits:
+            raise CodeError(
+                f"Max bit size of {self.alias} is {max_bits}, got {bits}", source_location
+            )
+
+        name = f"{self.name}[typing.Literal[{bits}], typing.Literal[{precision}]]"
+        return ARC4UFixedNxMType(
+            generic=self,
+            name=name,
+            bits=bits,
+            precision=precision,
+            wtype=wtypes.ARC4UFixedNxM(bits, precision, source_location),
+        )
+
+    return parameterise
+
+
 GenericARC4UFixedNxMType: typing.Final = GenericType(
     name=constants.CLS_ARC4_UFIXEDNXM,
-    parameterise=NotImplemented,
+    parameterise=_make_arc4_unsigned_fixed_parameterise(max_bits=64),
 )
 GenericARC4BigUFixedNxMType: typing.Final = GenericType(
     name=constants.CLS_ARC4_BIG_UFIXEDNXM,
-    parameterise=NotImplemented,
+    parameterise=_make_arc4_unsigned_fixed_parameterise(),
 )
 
 
@@ -396,7 +480,7 @@ def _parameterise_storage_map(
         key, content = args
     except ValueError:
         raise CodeError(
-            f"Expected two type parameter, got {len(args)} parameters", source_location
+            f"Expected two type parameters, got {len(args)} parameters", source_location
         ) from None
     if not isinstance(key, PyType):
         raise CodeError(

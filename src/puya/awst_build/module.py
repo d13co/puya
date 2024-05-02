@@ -626,15 +626,20 @@ def _process_struct(
                 rvalue=mypy.nodes.TempNode(),
                 type=mypy.types.Type() as mypy_type,
             ):
-                pytype = context.type_to_wtype(mypy_type, source_location=stmt)
-                fields[field_name] = pytype
-                field_decls.append(
-                    StructureField(
-                        source_location=context.node_location(stmt),
-                        name=field_name,
-                        wtype=pytype,
+                stmt_loc = context.node_location(stmt)
+                pytype = context.type_to_pytype(mypy_type, source_location=stmt_loc)
+                if pytype.wtype is None:
+                    context.error(f"Invalid field type for Struct: {pytype}", stmt_loc)
+                    has_error = True
+                else:
+                    fields[field_name] = pytype
+                    field_decls.append(
+                        StructureField(
+                            source_location=stmt_loc,
+                            name=field_name,
+                            wtype=pytype.wtype,
+                        )
                     )
-                )
             case mypy.nodes.SymbolNode(name=symbol_name) if (
                 cdef.info.names[symbol_name].plugin_generated
             ):
@@ -684,17 +689,18 @@ def _process_arc4_struct(
                 rvalue=mypy.nodes.TempNode(),
                 type=mypy.types.Type() as mypy_type,
             ):
-                wtype = context.type_to_wtype(mypy_type, source_location=stmt)
-                if not wtypes.is_arc4_encoded_type(wtype):
-                    context.error(f"Invalid field type for arc4.Struct: {wtype}", stmt)
+                stmt_loc = context.node_location(stmt)
+                pytype = context.type_to_pytype(mypy_type, source_location=stmt_loc)
+                if not wtypes.is_arc4_encoded_type(pytype.wtype):
+                    context.error(f"Invalid field type for arc4.Struct: {pytype}", stmt_loc)
                     has_error = True
                 else:
-                    fields[field_name] = wtype
+                    fields[field_name] = pytype
                     field_decls.append(
                         StructureField(
-                            source_location=context.node_location(stmt),
+                            source_location=stmt_loc,
                             name=field_name,
-                            wtype=wtype,
+                            wtype=pytype.wtype,
                         )
                     )
             case mypy.nodes.SymbolNode(name=symbol_name) if (

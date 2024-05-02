@@ -99,10 +99,10 @@ def arc4_to_wtype(typ: str, location: SourceLocation | None = None) -> wtypes.WT
         pass
     if uint := _UINT_REGEX.match(typ):
         n = uint.group("n")
-        return wtypes.ARC4UIntN.from_scale(int(n))
+        return wtypes.ARC4UIntN(int(n), location)
     if ufixed := _UFIXED_REGEX.match(typ):
         n, m = ufixed.group("n", "m")
-        return wtypes.ARC4UFixedNxM.from_scale_and_precision(int(n), int(m))
+        return wtypes.ARC4UFixedNxM(int(n), int(m), location)
     if fixed_array := _FIXED_ARRAY_REGEX.match(typ):
         arr_type, size = fixed_array.group("type", "size")
         element_type = arc4_to_wtype(arr_type, location)
