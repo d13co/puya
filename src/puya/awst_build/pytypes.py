@@ -278,7 +278,7 @@ ARC4ByteType: typing.Final = _SimpleType(
 )
 ARC4DynamicBytesType: typing.Final = _SimpleType(
     name=constants.CLS_ARC4_DYNAMIC_BYTES,
-    wtype=wtypes.arc4_byte_type,
+    wtype=wtypes.arc4_dynamic_bytes,
 )
 ARC4AddressType: typing.Final = _SimpleType(
     name=constants.CLS_ARC4_ADDRESS,
