@@ -308,13 +308,20 @@ class ARC4UIntN(ARC4Type):
         *,
         name: str | None = None,
         alias: str | None = None,
+        stub_name: str | None = None,
     ):
         if not (n % 8 == 0):
             raise CodeError("Bit size must be multiple of 8", source_location)
         if not (8 <= n <= 512):
             raise CodeError("Bit size must be between 8 and 512 inclusive", source_location)
         name = name or f"arc4.uint{n}"
-        self.__attrs_init__(n=n, name=name, stub_name=name, alias=alias)
+        if stub_name is None:
+            if n.bit_count() == 1:  # quick way to check for power of 2
+                stub_name = f"{constants.ARC4_PREFIX}UInt{n}"
+            else:
+                base_cls = constants.CLS_ARC4_UINTN if n <= 64 else constants.CLS_ARC4_BIG_UINTN
+                stub_name = f"{base_cls}[typing.Literal[{n}]]"
+        self.__attrs_init__(n=n, name=name, stub_name=stub_name, alias=alias)
 
 
 @typing.final
@@ -528,6 +535,7 @@ arc4_byte_type: typing.Final = ARC4UIntN(
     name="arc4.byte",
     alias="byte",
     source_location=None,
+    stub_name=constants.CLS_ARC4_BYTE,
 )
 arc4_dynamic_bytes: typing.Final = ARC4DynamicArray(
     name="arc4.dynamic_bytes",
