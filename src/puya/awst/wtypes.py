@@ -349,8 +349,9 @@ class ARC4Tuple(ARC4Type):
             # then the overall value is also mutable
             immutable = immutable and typ.immutable
         name = f"arc4.tuple<{','.join([t.name for t in types])}>"
+        python_name = f"{constants.CLS_ARC4_TUPLE}[{', '.join(map(str, types))}]"
         self.__attrs_init__(
-            name=name, stub_name=name, types=tuple(arc4_types), immutable=immutable
+            name=name, stub_name=python_name, types=tuple(arc4_types), immutable=immutable
         )
 
 
