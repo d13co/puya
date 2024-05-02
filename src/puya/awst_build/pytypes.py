@@ -24,6 +24,8 @@ class PyType(abc.ABC):
     """The canonical fully qualified type name"""
     _alias: str | None = None
     """The public fully qualified type name. If not specified, defaults to name."""
+    generic: GenericType | None = None
+    """The generic type that this type was parameterised from, if any."""
 
     @property
     def alias(self) -> str:
@@ -33,6 +35,17 @@ class PyType(abc.ABC):
     @abc.abstractmethod
     def wtype(self) -> wtypes.WType:
         """The WType that this type represents, if any."""
+
+    def parameterise(
+        self,
+        args: Sequence[PyType | TypingLiteralValue],  # noqa: ARG002
+        source_location: SourceLocation | None,
+    ) -> PyType:
+        """Produce parameterised type.
+        Throws if not a generic type of if a parameterised generic type."""
+        if self.generic:
+            raise CodeError(f"Type already has parameters: {self.alias}", source_location)
+        raise CodeError(f"Not a generic type: {self.alias}", source_location)
 
     def register(self) -> None:
         existing_entry = _type_registry.get(self.name)
@@ -80,10 +93,12 @@ class GenericType(PyType, abc.ABC):
     def __attrs_post_init__(self) -> None:
         self.register()
 
+    @typing.override
     @property
     def wtype(self) -> typing.Never:
         raise CodeError("Generic type usage requires parameters")
 
+    @typing.override
     def parameterise(
         self, args: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
     ) -> PyType:
@@ -111,7 +126,6 @@ class ArrayType(PyType):
 
 @attrs.frozen
 class StorageProxyType(PyType):
-    generic: GenericType | None
     content: PyType
     wtype: wtypes.WType
 

@@ -468,10 +468,6 @@ def _gather_global_direct_storages(
             pytyp = context.type_to_pytype(sym.type, source_location=sym.node)
             if isinstance(pytyp, pytypes.StorageProxyType | pytypes.StorageMapProxyType):
                 pass  # these are handled on declaration, need to collect constructor arguments too
-            elif isinstance(pytyp, pytypes.GenericType):
-                context.error(
-                    "Generic types must have parameters to be used as contract state", var_loc
-                )
             else:
                 storage_wtype = pytyp.wtype
                 if not storage_wtype.lvalue:

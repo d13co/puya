@@ -6,7 +6,6 @@ import mypy.nodes
 import mypy.types
 
 from puya import log
-from puya.awst import wtypes
 from puya.awst.nodes import ConstantValue, ContractReference
 from puya.awst_build import pytypes
 from puya.awst_build.contract_data import AppStorageDeclaration
@@ -128,7 +127,7 @@ class ASTConversionModuleContext(ASTConversionContext):
             case mypy.types.TupleType(items=items, partial_fallback=true_type):
                 types = [self.type_to_pytype(it, source_location=loc) for it in items]
                 generic = pytypes.PyType.lookup(true_type.type.fullname)
-                if not isinstance(generic, pytypes.GenericType):
+                if generic is None:
                     raise CodeError(f"Unknown tuple base type: {true_type.type.fullname}", loc)
                 return generic.parameterise(types, loc)
             case mypy.types.Instance() as inst:
@@ -158,8 +157,6 @@ class ASTConversionModuleContext(ASTConversionContext):
         if result is None:
             raise CodeError(f"Unknown type: {type_fullname}", loc)
         if inst_args:
-            if not isinstance(result, pytypes.GenericType):
-                raise CodeError(f"{result.alias} does not take generic parameters", loc)
             type_args_resolved = list[pytypes.TypeArg]()
             for idx, ta in enumerate(inst_args):
                 if isinstance(ta, mypy.types.AnyType):
