@@ -31,7 +31,7 @@ class PyType(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def wtype(self) -> wtypes.WType | None:
+    def wtype(self) -> wtypes.WType:
         """The WType that this type represents, if any."""
 
     def register(self) -> None:
@@ -44,7 +44,7 @@ class PyType(abc.ABC):
             raise InternalError(f"Duplicate mapping of {self.name}")
 
     @classmethod
-    def from_name(cls, name: str) -> PyType | None:
+    def lookup(cls, name: str) -> PyType | None:
         return _type_registry.get(name)
 
 

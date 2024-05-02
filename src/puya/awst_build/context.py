@@ -138,7 +138,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                 return self.type_to_pytype(fallback, source_location=loc)
             case mypy.types.TupleType(items=items, partial_fallback=true_type):
                 types = [self.type_to_pytype(it, source_location=loc) for it in items]
-                generic = pytypes.PyType.from_name(true_type.type.fullname)
+                generic = pytypes.PyType.lookup(true_type.type.fullname)
                 if not isinstance(generic, pytypes.GenericType):
                     raise CodeError(f"Unknown tuple base type: {true_type.type.fullname}", loc)
                 return generic.parameterise(types, loc)
@@ -168,7 +168,7 @@ class ASTConversionModuleContext(ASTConversionContext):
         if type_fullname in self.type_map:
             return self.type_map[type_fullname]
 
-        result = pytypes.PyType.from_name(type_fullname)
+        result = pytypes.PyType.lookup(type_fullname)
         if result is None:
             raise CodeError(f"Unknown type: {type_fullname}", loc)
         if inst_args:
