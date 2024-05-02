@@ -449,8 +449,8 @@ class ARC4StaticArray(ARC4Array):
     ):
         if not isinstance(element_type, ARC4Type):
             raise CodeError("ARC4 arrays must have ARC4 encoded element type", source_location)
-        if array_size < 1:
-            raise CodeError("ARC4 static array size must be positive", source_location)
+        if array_size < 0:
+            raise CodeError("ARC4 static array size must be non-negative", source_location)
         name = name or f"arc4.static_array<{element_type.name}, {array_size}>"
         self.__attrs_init__(
             array_size=array_size,

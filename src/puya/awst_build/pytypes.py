@@ -497,6 +497,8 @@ def _make_fixed_array_parameterise(
                 f"{self.alias} expects second parameter to be a typing.Literal[int]",
                 source_location,
             )
+        if size < 0:
+            raise CodeError("Array size should be non-negative", source_location)
         if items.wtype is None:
             raise CodeError(
                 f"Not suitable as an {self.alias} element type: {items}", source_location
