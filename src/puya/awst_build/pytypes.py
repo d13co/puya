@@ -72,7 +72,7 @@ def lookup(name: str) -> PyType | None:
 
 
 # https://typing.readthedocs.io/en/latest/spec/literal.html#legal-and-illegal-parameterizations
-# We don't support enums as typing.Literal parameters. MyPy encodes these as str values with
+# We don't support enums as typing.Literal parameters. mypy encodes these as str values with
 # an additional "fallback" data member, but we don't need that complication.
 # mypy.types.LiteralValue also includes float, noting its invalid as a parameterization, but
 # we exclude this here.
