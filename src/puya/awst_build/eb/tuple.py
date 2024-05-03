@@ -113,7 +113,7 @@ class TupleExpressionBuilder(ValueExpressionBuilder):
             raise CodeError("Empty slices are not supported", location)
 
         updated_wtype = wtypes.WTuple(slice_types, location)
-        return var_expression(
+        return TupleExpressionBuilder(
             SliceExpression(
                 source_location=location,
                 base=self.expr,
@@ -152,7 +152,7 @@ class TupleExpressionBuilder(ValueExpressionBuilder):
             )
         item_expr = item.rvalue()
         contains_expr = Contains(source_location=location, item=item_expr, sequence=self.expr)
-        return var_expression(contains_expr)
+        return BoolExpressionBuilder(contains_expr)
 
     def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
         return bool_eval_to_constant(value=True, location=location, negate=negate)
