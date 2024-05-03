@@ -13,12 +13,12 @@ from puya.awst import wtypes
 from puya.awst_build import constants
 from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
-from puya.utils import coalesce, lazy_setdefault
+from puya.utils import lazy_setdefault
 
 logger = log.get_logger(__name__)
 
 
-@attrs.frozen(kw_only=True)
+@attrs.frozen(kw_only=True, str=False)
 class PyType(abc.ABC):
     name: str
     """The canonical fully qualified type name"""
@@ -28,7 +28,7 @@ class PyType(abc.ABC):
     """The metaclass for this type, if different from builtins.type"""
 
     @cached_property
-    def alias(self) -> str:
+    def _friendly_name(self) -> str:
         """User-friendly fully-qualified name.
 
         Basically just strips "builtins." from types, and removes the private part
@@ -39,6 +39,9 @@ class PyType(abc.ABC):
         result, _ = re.subn(r"\bbuiltins\.", "", self.name)
         result, _ = re.subn(r"algopy\._[^.]+", "algopy", result)
         return result
+
+    def __str__(self) -> str:
+        return self._friendly_name
 
     @property
     @abc.abstractmethod
@@ -53,8 +56,8 @@ class PyType(abc.ABC):
         """Produce parameterised type.
         Throws if not a generic type of if a parameterised generic type."""
         if self.generic:
-            raise CodeError(f"Type already has parameters: {self.alias}", source_location)
-        raise CodeError(f"Not a generic type: {self.alias}", source_location)
+            raise CodeError(f"Type already has parameters: {self}", source_location)
+        raise CodeError(f"Not a generic type: {self}", source_location)
 
     def register(self) -> typing.Self:
         _register(self)
@@ -343,13 +346,9 @@ def _make_arc4_unsigned_int_parameterise(*, max_bits: int | None = None) -> Para
                 f"Expected a single type parameter, got {len(args)} parameters", source_location
             ) from None
         if not isinstance(bits, int):
-            raise CodeError(
-                f"{self.alias} expects a typing.Literal[int] parameter", source_location
-            )
+            raise CodeError(f"{self} expects a typing.Literal[int] parameter", source_location)
         if (max_bits is not None) and bits > max_bits:
-            raise CodeError(
-                f"Max bit size of {self.alias} is {max_bits}, got {bits}", source_location
-            )
+            raise CodeError(f"Max bit size of {self} is {max_bits}, got {bits}", source_location)
 
         name = f"{self.name}[typing.Literal[{bits}]]"
         return ARC4UIntNType(
@@ -411,13 +410,9 @@ def _make_arc4_unsigned_fixed_parameterise(*, max_bits: int | None = None) -> Pa
                 f"Expected two type parameters, got {len(args)} parameters", source_location
             ) from None
         if not (isinstance(bits, int) and isinstance(precision, int)):
-            raise CodeError(
-                f"{self.alias} expects two typing.Literal[int] parameters", source_location
-            )
+            raise CodeError(f"{self} expects two typing.Literal[int] parameters", source_location)
         if (max_bits is not None) and bits > max_bits:
-            raise CodeError(
-                f"Max bit size of {self.alias} is {max_bits}, got {bits}", source_location
-            )
+            raise CodeError(f"Max bit size of {self} is {max_bits}, got {bits}", source_location)
 
         name = f"{self.name}[typing.Literal[{bits}], typing.Literal[{precision}]]"
         return ARC4UFixedNxMType(
@@ -456,7 +451,7 @@ def _make_tuple_parameterise(
                 )
             item_wtype = arg.wtype
             if item_wtype is None:
-                raise CodeError(f"Type {arg.alias} is not allowed in a tuple", source_location)
+                raise CodeError(f"Type {arg} is not allowed in a tuple", source_location)
             py_types.append(arg)
             item_wtypes.append(item_wtype)
 
@@ -496,7 +491,7 @@ def _make_array_parameterise(
             ) from None
         if not isinstance(arg, PyType):
             raise CodeError(
-                f"typing.Literal cannot be used to parameterise {self.alias}", source_location
+                f"typing.Literal cannot be used to parameterise {self}", source_location
             )
 
         name = f"{self.name}[{arg.name}]"
@@ -535,10 +530,10 @@ def _make_fixed_array_parameterise(
                 f"Expected a single type parameter, got {len(args)} parameters", source_location
             ) from None
         if not isinstance(items, PyType):
-            raise CodeError(f"{self.alias} expects first parameter to be a type", source_location)
+            raise CodeError(f"{self} expects first parameter to be a type", source_location)
         if not isinstance(size, int):
             raise CodeError(
-                f"{self.alias} expects second parameter to be a typing.Literal[int]",
+                f"{self} expects second parameter to be a typing.Literal[int]",
                 source_location,
             )
         if size < 0:
@@ -574,7 +569,7 @@ def _make_storage_parameterise(key_type: wtypes.WType) -> Parameterise:
             ) from None
         if not isinstance(arg, PyType):
             raise CodeError(
-                f"typing.Literal cannot be used to parameterise {self.alias}", source_location
+                f"typing.Literal cannot be used to parameterise {self}", source_location
             )
 
         name = f"{self.name}[{arg.name}]"
@@ -602,7 +597,7 @@ def _make_storage_parameterise_todo_remove_me(
             ) from None
         if not isinstance(arg, PyType):
             raise CodeError(
-                f"typing.Literal cannot be used to parameterise {self.alias}", source_location
+                f"typing.Literal cannot be used to parameterise {self}", source_location
             )
 
         name = f"{self.name}[{arg.name}]"
@@ -626,13 +621,9 @@ def _parameterise_storage_map(
             f"Expected two type parameters, got {len(args)} parameters", source_location
         ) from None
     if not isinstance(key, PyType):
-        raise CodeError(
-            f"typing.Literal cannot be used to parameterise {self.alias}", source_location
-        )
+        raise CodeError(f"typing.Literal cannot be used to parameterise {self}", source_location)
     if not isinstance(content, PyType):
-        raise CodeError(
-            f"typing.Literal cannot be used to parameterise {self.alias}", source_location
-        )
+        raise CodeError(f"typing.Literal cannot be used to parameterise {self}", source_location)
 
     name = f"{self.name}[{key.name}, {content.name}]"
     return StorageMapProxyType(
