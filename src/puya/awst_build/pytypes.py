@@ -22,14 +22,23 @@ logger = log.get_logger(__name__)
 class PyType(abc.ABC):
     name: str
     """The canonical fully qualified type name"""
-    _alias: str | None = None
-    """The public fully qualified type name. If not specified, defaults to name."""
     generic: GenericType | None = None
     """The generic type that this type was parameterised from, if any."""
+    metaclass: MetaclassType | None = None
+    """The metaclass for this type, if different from builtins.type"""
 
-    @property
+    @cached_property
     def alias(self) -> str:
-        return coalesce(self._alias, self.name)
+        """User-friendly fully-qualified name.
+
+        Basically just strips "builtins." from types, and removes the private part
+        of algopy names.
+        """
+        import re
+
+        result, _ = re.subn(r"\bbuiltins\.", "", self.name)
+        result, _ = re.subn(r"algopy\._[^.]+", "algopy", result)
+        return result
 
     @property
     @abc.abstractmethod
@@ -110,6 +119,31 @@ class GenericType(PyType, abc.ABC):
         )
 
 
+@typing.final
+@attrs.frozen
+class MetaclassType(PyType):
+    generic: None = None
+
+    @typing.override
+    @property
+    def wtype(self) -> typing.Never:
+        raise CodeError("Metaclass types are not valid as values")
+
+    def __attrs_post_init__(self) -> None:
+        self.register()
+
+    @typing.override
+    def parameterise(
+        self, args: Sequence[PyType | TypingLiteralValue], source_location: SourceLocation | None
+    ) -> typing.Never:
+        raise CodeError("Generic metaclass types are not supported", source_location)
+
+
+ABCMeta: typing.Final = MetaclassType(name="abc.ABCMeta")
+StructMeta: typing.Final = MetaclassType(name=constants.STRUCT_META)
+ARC4StructMeta: typing.Final = MetaclassType(name=constants.CLS_ARC4_STRUCT_META)
+
+
 @attrs.frozen
 class TupleType(PyType):
     generic: GenericType
@@ -142,7 +176,6 @@ class StorageMapProxyType(PyType):
 @typing.final
 @attrs.frozen(init=False)
 class StructType(PyType):
-    metaclass: str
     fields: Mapping[str, PyType] = attrs.field(
         converter=immutabledict, validator=[attrs.validators.min_len(1)]
     )
@@ -160,7 +193,7 @@ class StructType(PyType):
 
     def __init__(
         self,
-        metaclass: str,
+        metaclass: MetaclassType,
         typ: Callable[
             [str, Mapping[str, wtypes.WType], bool, SourceLocation | None], wtypes.WType
         ],
@@ -170,14 +203,7 @@ class StructType(PyType):
         frozen: bool,
         source_location: SourceLocation | None,
     ):
-        field_wtypes = {}
-        for field_name, field_pytype in fields.items():
-            field_wtype = field_pytype.wtype
-            if field_wtype is None:
-                raise CodeError(
-                    f"Type {field_pytype.alias} is not allowed in a struct", source_location
-                )
-            field_wtypes[field_name] = field_wtype
+        field_wtypes = {name: field_typ.wtype for name, field_typ in fields.items()}
         wtype = typ(name, field_wtypes, frozen, source_location)
         self.__attrs_init__(
             metaclass=metaclass,
@@ -199,7 +225,7 @@ class StructType(PyType):
         source_location: SourceLocation | None,
     ) -> typing.Self:
         return cls(
-            metaclass=constants.STRUCT_BASE,
+            metaclass=StructMeta,
             typ=wtypes.WStructType,
             name=name,
             fields=fields,
@@ -217,7 +243,7 @@ class StructType(PyType):
         source_location: SourceLocation | None,
     ) -> typing.Self:
         return cls(
-            metaclass=constants.CLS_ARC4_STRUCT_META,
+            metaclass=ARC4StructMeta,
             typ=wtypes.ARC4Struct,
             name=name,
             fields=fields,
@@ -237,58 +263,47 @@ class _SimpleType(PyType):
 
 NoneType: typing.Final[PyType] = _SimpleType(
     name="builtins.None",
-    alias="None",
     wtype=wtypes.void_wtype,
 )
 BoolType: typing.Final[PyType] = _SimpleType(
     name="builtins.bool",
-    alias="bool",
     wtype=wtypes.bool_wtype,
 )
 UInt64Type: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_UINT64,
-    alias=constants.CLS_UINT64_ALIAS,
     wtype=wtypes.uint64_wtype,
 )
 BigUIntType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_BIGUINT,
-    alias=constants.CLS_BIGUINT_ALIAS,
     wtype=wtypes.biguint_wtype,
 )
 BytesType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_BYTES,
-    alias=constants.CLS_BYTES_ALIAS,
     wtype=wtypes.bytes_wtype,
 )
 StringType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_STRING,
-    alias=constants.CLS_STRING_ALIAS,
     wtype=wtypes.string_wtype,
 )
 AccountType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ACCOUNT,
-    alias=constants.CLS_ACCOUNT_ALIAS,
     wtype=wtypes.account_wtype,
 )
 AssetType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_ASSET,
-    alias=constants.CLS_ASSET_ALIAS,
     wtype=wtypes.asset_wtype,
 )
 ApplicationType: typing.Final[PyType] = _SimpleType(
     name=constants.CLS_APPLICATION,
-    alias=constants.CLS_APPLICATION_ALIAS,
     wtype=wtypes.application_wtype,
 )
 
 OnCompleteActionType: typing.Final[PyType] = _SimpleType(
     name=constants.ENUM_CLS_ON_COMPLETE_ACTION,
-    alias=constants.ENUM_CLS_ON_COMPLETE_ACTION.replace("_constants.", ""),  # TODO: fixme
     wtype=wtypes.uint64_wtype,
 )
 TransactionType: typing.Final[PyType] = _SimpleType(
     name=constants.ENUM_CLS_TRANSACTION_TYPE,
-    alias=constants.ENUM_CLS_TRANSACTION_TYPE.replace("_constants.", ""),  # TODO: fixme
     wtype=wtypes.uint64_wtype,
 )
 
@@ -337,13 +352,9 @@ def _make_arc4_unsigned_int_parameterise(*, max_bits: int | None = None) -> Para
             )
 
         name = f"{self.name}[typing.Literal[{bits}]]"
-        alias = None
-        if bits.bit_count() == 1:  # quick way to check for power of 2
-            alias = f"{constants.ARC4_PREFIX}UInt{bits}"
         return ARC4UIntNType(
             generic=self,
             name=name,
-            alias=alias,
             bits=bits,
             wtype=wtypes.ARC4UIntN(bits, source_location),
         )
@@ -367,27 +378,18 @@ ARC4ByteType: typing.Final[PyType] = ARC4UIntNType(
     wtype=wtypes.arc4_byte_type,
     bits=8,
 ).register()
-ARC4UInt8Type: typing.Final[PyType] = GenericARC4UIntNType.parameterise(
-    [8], source_location=None
-).register()
-ARC4UInt16Type: typing.Final[PyType] = GenericARC4UIntNType.parameterise(
-    [16], source_location=None
-).register()
-ARC4UInt32Type: typing.Final[PyType] = GenericARC4UIntNType.parameterise(
-    [32], source_location=None
-).register()
-ARC4UInt64Type: typing.Final[PyType] = GenericARC4UIntNType.parameterise(
-    [64], source_location=None
-).register()
-ARC4UInt128Type: typing.Final[PyType] = GenericARC4BigUIntNType.parameterise(
-    [128], source_location=None
-).register()
-ARC4UInt256Type: typing.Final[PyType] = GenericARC4BigUIntNType.parameterise(
-    [256], source_location=None
-).register()
-ARC4UInt512Type: typing.Final[PyType] = GenericARC4BigUIntNType.parameterise(
-    [512], source_location=None
-).register()
+
+ARC4UIntN_Aliases: typing.Final = immutabledict[int, ARC4UIntNType](
+    {
+        (_bits := 2**_exp): ARC4UIntNType(
+            generic=GenericARC4UIntNType if _bits <= 64 else GenericARC4BigUIntNType,
+            name=f"{constants.ARC4_PREFIX}UInt{_bits}",
+            wtype=wtypes.ARC4UIntN(_bits, source_location=None),
+            bits=_bits,
+        ).register()
+        for _exp in range(3, 10)
+    }
+)
 
 
 @attrs.frozen
@@ -459,11 +461,9 @@ def _make_tuple_parameterise(
             item_wtypes.append(item_wtype)
 
         name = f"{self.name}[{', '.join(pyt.name for pyt in py_types)}]"
-        alias = f"{self.alias}[{', '.join(pyt.alias for pyt in py_types)}]"
         return TupleType(
             generic=self,
             name=name,
-            alias=alias,
             items=tuple(py_types),
             wtype=typ(item_wtypes, source_location),
         )
@@ -473,7 +473,6 @@ def _make_tuple_parameterise(
 
 GenericTupleType: typing.Final = GenericType(
     name="builtins.tuple",
-    alias="tuple",
     parameterise=_make_tuple_parameterise(wtypes.WTuple),
 )
 
@@ -501,11 +500,9 @@ def _make_array_parameterise(
             )
 
         name = f"{self.name}[{arg.name}]"
-        alias = f"{self.alias}[{arg.alias}]"
         return ArrayType(
             generic=self,
             name=name,
-            alias=alias,
             size=None,
             items=arg,
             wtype=typ(arg.wtype, source_location),
@@ -516,7 +513,6 @@ def _make_array_parameterise(
 
 GenericArrayType: typing.Final = GenericType(
     name=constants.CLS_ARRAY,
-    alias=constants.CLS_ARRAY_ALIAS,
     parameterise=_make_array_parameterise(wtypes.WArray),
 )
 
@@ -549,11 +545,9 @@ def _make_fixed_array_parameterise(
             raise CodeError("Array size should be non-negative", source_location)
 
         name = f"{self.name}[{items.name}, typing.Literal[{size}]]"
-        alias = f"{self.alias}[{items.alias}, typing.Literal[{size}]]"
         return ArrayType(
             generic=self,
             name=name,
-            alias=alias,
             size=size,
             items=items,
             wtype=typ(items.wtype, size, source_location),
@@ -584,11 +578,9 @@ def _make_storage_parameterise(key_type: wtypes.WType) -> Parameterise:
             )
 
         name = f"{self.name}[{arg.name}]"
-        alias = f"{self.alias}[{arg.alias}]"
         return StorageProxyType(
             generic=self,
             name=name,
-            alias=alias,
             content=arg,
             wtype=key_type,
         )
@@ -614,11 +606,9 @@ def _make_storage_parameterise_todo_remove_me(
             )
 
         name = f"{self.name}[{arg.name}]"
-        alias = f"{self.alias}[{arg.alias}]"
         return StorageProxyType(
             generic=self,
             name=name,
-            alias=alias,
             content=arg,
             wtype=key_type(arg.wtype),
         )
@@ -645,11 +635,9 @@ def _parameterise_storage_map(
         )
 
     name = f"{self.name}[{key.name}, {content.name}]"
-    alias = f"{self.alias}[{key.alias}, {content.alias}]"
     return StorageMapProxyType(
         generic=self,
         name=name,
-        alias=alias,
         key=key,
         content=content,
         # TODO: maybe bytes since it will just be the prefix?
@@ -662,24 +650,20 @@ def _parameterise_storage_map(
 
 GenericGlobalStateType: typing.Final = GenericType(
     name=constants.CLS_GLOBAL_STATE,
-    alias=constants.CLS_GLOBAL_STATE_ALIAS,
     parameterise=_make_storage_parameterise(wtypes.state_key),
 )
 GenericLocalStateType: typing.Final = GenericType(
     name=constants.CLS_LOCAL_STATE,
-    alias=constants.CLS_LOCAL_STATE_ALIAS,
     parameterise=_make_storage_parameterise(wtypes.state_key),
 )
 GenericBoxType: typing.Final = GenericType(
     name=constants.CLS_BOX_PROXY,
-    alias=constants.CLS_BOX_PROXY_ALIAS,
     # TODO: FIXME
     # parameterise=_make_storage_parameterise(wtypes.box_key),
     parameterise=_make_storage_parameterise_todo_remove_me(wtypes.WBoxProxy.from_content_type),
 )
 BoxRefType: typing.Final = StorageProxyType(
     name=constants.CLS_BOX_REF_PROXY,
-    alias=constants.CLS_BOX_REF_PROXY_ALIAS,
     content=BytesType,
     # wtype=wtypes.box_key,
     wtype=wtypes.box_ref_proxy_type,  # TODO: fixme
@@ -688,7 +672,6 @@ BoxRefType: typing.Final = StorageProxyType(
 
 GenericBoxMapType: typing.Final = GenericType(
     name=constants.CLS_BOX_MAP_PROXY,
-    alias=constants.CLS_BOX_MAP_PROXY_ALIAS,
     parameterise=_parameterise_storage_map,
 )
 
