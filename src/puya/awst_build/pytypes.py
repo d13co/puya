@@ -63,19 +63,24 @@ class PyType(abc.ABC):
         _register(self)
         return self
 
+    def register_alias(self, name: str) -> typing.Self:
+        _register(self, alias=name)
+        return self
+
 
 # Registry used for lookups from mypy types.
 _type_registry: typing.Final = dict[str, PyType]()
 
 
-def _register(typ: PyType) -> None:
-    existing_entry = _type_registry.get(typ.name)
+def _register(typ: PyType, *, alias: str | None = None) -> None:
+    name = alias or typ.name
+    existing_entry = _type_registry.get(name)
     if existing_entry is None:
-        _type_registry[typ.name] = typ
+        _type_registry[name] = typ
     elif existing_entry is typ:
         logger.debug(f"Duplicate registration of {typ}")
     else:
-        raise InternalError(f"Duplicate mapping of {typ.name}")
+        raise InternalError(f"Duplicate mapping of {name}")
 
 
 def lookup(name: str) -> PyType | None:
@@ -380,12 +385,9 @@ ARC4ByteType: typing.Final[PyType] = ARC4UIntNType(
 
 ARC4UIntN_Aliases: typing.Final = immutabledict[int, ARC4UIntNType](
     {
-        (_bits := 2**_exp): ARC4UIntNType(
-            generic=GenericARC4UIntNType if _bits <= 64 else GenericARC4BigUIntNType,
-            name=f"{constants.ARC4_PREFIX}UInt{_bits}",
-            wtype=wtypes.ARC4UIntN(_bits, source_location=None),
-            bits=_bits,
-        ).register()
+        (_bits := 2**_exp): (GenericARC4UIntNType if _bits <= 64 else GenericARC4BigUIntNType)
+        .parameterise([_bits], source_location=None)
+        .register_alias(f"{constants.ARC4_PREFIX}UInt{_bits}")
         for _exp in range(3, 10)
     }
 )
