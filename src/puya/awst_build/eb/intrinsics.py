@@ -13,13 +13,13 @@ from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBui
 from puya.awst_build.eb.bytes import BytesExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.intrinsic_data import ENUM_CLASSES, STUB_TO_AST_MAPPER
-from puya.awst_build.intrinsic_models import FunctionOpMapping, ImmediateArgMapping
 from puya.awst_build.utils import convert_literal, get_arg_mapping
 from puya.errors import InternalError
 
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from puya.awst_build.intrinsic_models import FunctionOpMapping
     from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
@@ -183,26 +183,25 @@ def _map_call(
     args = args.copy()  # make a copy since we're going to mutate
 
     immediates = list[str | int]()
-    for immediate in op_mapping.immediates:
-        if not isinstance(immediate, ImmediateArgMapping):
-            immediates.append(immediate)
-        else:
-            arg_in = args.pop(immediate.arg_name, None)
-            if arg_in is None:
-                logger.error(
-                    f"Missing expected argument {immediate.arg_name}", location=node_location
-                )
-            elif not (
-                isinstance(arg_in, Literal)
-                and isinstance(arg_value := arg_in.value, immediate.literal_type)
-            ):
-                logger.error(
-                    f"Argument must be a literal {immediate.literal_type.__name__} value",
-                    location=arg_in.source_location,
-                )
-            else:
-                assert isinstance(arg_value, int | str)
-                immediates.append(arg_value)
+    for immediate in op_mapping.immediates.items():
+        match immediate:
+            case value, None:
+                immediates.append(value)
+            case arg_name, literal_type:
+                arg_in = args.pop(arg_name, None)
+                if arg_in is None:
+                    logger.error(f"Missing expected argument {arg_name}", location=node_location)
+                elif not (
+                    isinstance(arg_in, Literal)
+                    and isinstance(arg_value := arg_in.value, literal_type)
+                ):
+                    logger.error(
+                        f"Argument must be a literal {literal_type.__name__} value",
+                        location=arg_in.source_location,
+                    )
+                else:
+                    assert isinstance(arg_value, int | str)
+                    immediates.append(arg_value)
 
     stack_args = list[Expression]()
     for arg_name, allowed_types in op_mapping.stack_inputs.items():

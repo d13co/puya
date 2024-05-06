@@ -12,7 +12,7 @@ from pathlib import Path
 import attrs
 from puya import log
 from puya.awst import wtypes
-from puya.awst_build.intrinsic_models import FunctionOpMapping, ImmediateArgMapping
+from puya.awst_build.intrinsic_models import FunctionOpMapping
 from puya.awst_build.utils import snake_case
 
 from scripts.transform_lang_spec import (
@@ -742,17 +742,18 @@ def build_function_op_mapping(
 
     return FunctionOpMapping(
         op_code=op.name,
-        immediates=[
+        immediates={
             (
                 const_immediate_value[1].name
-                if const_immediate_value and const_immediate_value[0] == arg
-                else ImmediateArgMapping(
-                    arg_name=arg_name_map[arg.name],
-                    literal_type=immediate_kind_to_type(arg.immediate_type),
-                )
+                if (const_immediate_value and const_immediate_value[0] == arg)
+                else arg_name_map[arg.name]
+            ): (
+                None
+                if (const_immediate_value and const_immediate_value[0] == arg)
+                else immediate_kind_to_type(arg.immediate_type)
             )
             for arg in op.immediate_args
-        ],
+        },
         stack_inputs={
             arg_name_map[arg.name]: tuple(
                 sub_types(
@@ -945,21 +946,19 @@ def build_op_specification_body(name_suffix: str, function: FunctionDef) -> Iter
         if op_mapping.is_property:
             yield f" is_property={op_mapping.is_property},"
         if op_mapping.immediates:
-            yield " immediates=("
-            immediate_parts = []
-            for immediate in op_mapping.immediates:
-                if isinstance(immediate, str):
-                    immediate_parts.append(repr(immediate))
+            yield " immediates=dict("
+            for idx, (name_or_value, literal_type_or_none) in enumerate(
+                op_mapping.immediates.items()
+            ):
+                if idx:
+                    yield ", "
+                if literal_type_or_none is None:
+                    val_repr = repr(literal_type_or_none)
                 else:
-                    immediate_parts.append(
-                        "ImmediateArgMapping("
-                        f"{immediate.arg_name!r},"
-                        f" {immediate.literal_type.__name__}"
-                        ")"
-                    )
-            if len(immediate_parts) == 1:
-                immediate_parts.append("")
-            yield ", ".join(immediate_parts) + "),"
+                    val_repr = literal_type_or_none.__name__
+
+                yield f"{name_or_value}={val_repr}"
+            yield "),"
         if op_mapping.stack_inputs:
             yield " stack_inputs=dict("
             for idx, (arg_name, allowed_types) in enumerate(op_mapping.stack_inputs.items()):
@@ -994,12 +993,9 @@ def build_awst_data(
 ) -> Iterable[str]:
     yield "import typing"
     yield "from collections.abc import Mapping, Sequence"
-    yield "from immutabledict import immutabledict"
     yield "from puya.awst import wtypes"
-    yield (
-        "from puya.awst_build.intrinsic_models import" " FunctionOpMapping, ImmediateArgMapping"
-    )
-    yield ""
+    yield "from puya.awst_build.intrinsic_models import FunctionOpMapping, ImmediateArgMapping"
+    yield "from immutabledict import immutabledict"
     yield "ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]]({"
     for enum_name in enums:
         yield f'    "algopy.{STUB_NAMESPACE}.{get_python_enum_class(enum_name)}": {{'

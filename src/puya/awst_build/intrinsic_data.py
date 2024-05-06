@@ -4,7 +4,7 @@ from collections.abc import Mapping, Sequence
 from immutabledict import immutabledict
 
 from puya.awst import wtypes
-from puya.awst_build.intrinsic_models import FunctionOpMapping, ImmediateArgMapping
+from puya.awst_build.intrinsic_models import FunctionOpMapping
 
 ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]](
     {
@@ -58,7 +58,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             ),
             FunctionOpMapping(
                 "arg",
-                immediates=(ImmediateArgMapping("a", int),),
+                immediates=dict(a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -72,7 +72,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.base64_decode": (
             FunctionOpMapping(
                 "base64_decode",
-                immediates=(ImmediateArgMapping("e", str),),
+                immediates=dict(e=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -141,7 +141,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.ecdsa_pk_decompress": (
             FunctionOpMapping(
                 "ecdsa_pk_decompress",
-                immediates=(ImmediateArgMapping("v", str),),
+                immediates=dict(v=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(
                     wtypes.bytes_wtype,
@@ -152,7 +152,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.ecdsa_pk_recover": (
             FunctionOpMapping(
                 "ecdsa_pk_recover",
-                immediates=(ImmediateArgMapping("v", str),),
+                immediates=dict(v=str),
                 stack_inputs=dict(
                     a=(wtypes.bytes_wtype,),
                     b=(wtypes.uint64_wtype,),
@@ -168,7 +168,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.ecdsa_verify": (
             FunctionOpMapping(
                 "ecdsa_verify",
-                immediates=(ImmediateArgMapping("v", str),),
+                immediates=dict(v=str),
                 stack_inputs=dict(
                     a=(wtypes.bytes_wtype,),
                     b=(wtypes.bytes_wtype,),
@@ -235,7 +235,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             ),
             FunctionOpMapping(
                 "extract",
-                immediates=(ImmediateArgMapping("b", int), ImmediateArgMapping("c", int)),
+                immediates=dict(b=int, c=int),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -269,7 +269,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             ),
             FunctionOpMapping(
                 "gaid",
-                immediates=(ImmediateArgMapping("a", int),),
+                immediates=dict(a=int),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
@@ -297,12 +297,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             ),
             FunctionOpMapping(
                 "gload",
-                immediates=(ImmediateArgMapping("a", int), ImmediateArgMapping("b", int)),
+                immediates=dict(a=int, b=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gloads",
-                immediates=(ImmediateArgMapping("b", int),),
+                immediates=dict(b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -315,12 +315,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             ),
             FunctionOpMapping(
                 "gload",
-                immediates=(ImmediateArgMapping("a", int), ImmediateArgMapping("b", int)),
+                immediates=dict(a=int, b=int),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gloads",
-                immediates=(ImmediateArgMapping("b", int),),
+                immediates=dict(b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
@@ -366,7 +366,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             ),
             FunctionOpMapping(
                 "replace2",
-                immediates=(ImmediateArgMapping("b", int),),
+                immediates=dict(b=int),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), c=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -472,7 +472,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             ),
             FunctionOpMapping(
                 "substring",
-                immediates=(ImmediateArgMapping("b", int), ImmediateArgMapping("c", int)),
+                immediates=dict(b=int, c=int),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -480,7 +480,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.vrf_verify": (
             FunctionOpMapping(
                 "vrf_verify",
-                immediates=(ImmediateArgMapping("s", str),),
+                immediates=dict(s=str),
                 stack_inputs=dict(
                     a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,), c=(wtypes.bytes_wtype,)
                 ),
@@ -493,7 +493,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_balance": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctBalance",),
+                immediates=dict(AcctBalance=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -504,7 +504,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_min_balance": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctMinBalance",),
+                immediates=dict(AcctMinBalance=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -515,7 +515,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_auth_addr": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctAuthAddr",),
+                immediates=dict(AcctAuthAddr=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -526,7 +526,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_num_uint": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalNumUint",),
+                immediates=dict(AcctTotalNumUint=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -537,7 +537,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_num_byte_slice": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalNumByteSlice",),
+                immediates=dict(AcctTotalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -548,7 +548,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_extra_app_pages": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalExtraAppPages",),
+                immediates=dict(AcctTotalExtraAppPages=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -559,7 +559,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_apps_created": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalAppsCreated",),
+                immediates=dict(AcctTotalAppsCreated=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -570,7 +570,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_apps_opted_in": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalAppsOptedIn",),
+                immediates=dict(AcctTotalAppsOptedIn=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -581,7 +581,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_assets_created": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalAssetsCreated",),
+                immediates=dict(AcctTotalAssetsCreated=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -592,7 +592,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_assets": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalAssets",),
+                immediates=dict(AcctTotalAssets=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -603,7 +603,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_boxes": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalBoxes",),
+                immediates=dict(AcctTotalBoxes=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -614,7 +614,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AcctParamsGet.acct_total_box_bytes": (
             FunctionOpMapping(
                 "acct_params_get",
-                immediates=("AcctTotalBoxBytes",),
+                immediates=dict(AcctTotalBoxBytes=None),
                 stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -741,7 +741,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_approval_program": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppApprovalProgram",),
+                immediates=dict(AppApprovalProgram=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.bytes_wtype,
@@ -752,7 +752,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_clear_state_program": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppClearStateProgram",),
+                immediates=dict(AppClearStateProgram=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.bytes_wtype,
@@ -763,7 +763,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_global_num_uint": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppGlobalNumUint",),
+                immediates=dict(AppGlobalNumUint=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -774,7 +774,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_global_num_byte_slice": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppGlobalNumByteSlice",),
+                immediates=dict(AppGlobalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -785,7 +785,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_local_num_uint": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppLocalNumUint",),
+                immediates=dict(AppLocalNumUint=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -796,7 +796,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_local_num_byte_slice": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppLocalNumByteSlice",),
+                immediates=dict(AppLocalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -807,7 +807,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_extra_program_pages": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppExtraProgramPages",),
+                immediates=dict(AppExtraProgramPages=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -818,7 +818,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_creator": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppCreator",),
+                immediates=dict(AppCreator=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -829,7 +829,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AppParamsGet.app_address": (
             FunctionOpMapping(
                 "app_params_get",
-                immediates=("AppAddress",),
+                immediates=dict(AppAddress=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -840,7 +840,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetHoldingGet.asset_balance": (
             FunctionOpMapping(
                 "asset_holding_get",
-                immediates=("AssetBalance",),
+                immediates=dict(AssetBalance=None),
                 stack_inputs=dict(
                     a=(wtypes.account_wtype, wtypes.uint64_wtype),
                     b=(wtypes.asset_wtype, wtypes.uint64_wtype),
@@ -854,7 +854,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetHoldingGet.asset_frozen": (
             FunctionOpMapping(
                 "asset_holding_get",
-                immediates=("AssetFrozen",),
+                immediates=dict(AssetFrozen=None),
                 stack_inputs=dict(
                     a=(wtypes.account_wtype, wtypes.uint64_wtype),
                     b=(wtypes.asset_wtype, wtypes.uint64_wtype),
@@ -868,7 +868,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_total": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetTotal",),
+                immediates=dict(AssetTotal=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -879,7 +879,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_decimals": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetDecimals",),
+                immediates=dict(AssetDecimals=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.uint64_wtype,
@@ -890,7 +890,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_default_frozen": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetDefaultFrozen",),
+                immediates=dict(AssetDefaultFrozen=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.bool_wtype,
@@ -901,7 +901,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_unit_name": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetUnitName",),
+                immediates=dict(AssetUnitName=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.bytes_wtype,
@@ -912,7 +912,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_name": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetName",),
+                immediates=dict(AssetName=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.bytes_wtype,
@@ -923,7 +923,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_url": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetURL",),
+                immediates=dict(AssetURL=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.bytes_wtype,
@@ -934,7 +934,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_metadata_hash": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetMetadataHash",),
+                immediates=dict(AssetMetadataHash=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.bytes_wtype,
@@ -945,7 +945,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_manager": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetManager",),
+                immediates=dict(AssetManager=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -956,7 +956,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_reserve": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetReserve",),
+                immediates=dict(AssetReserve=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -967,7 +967,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_freeze": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetFreeze",),
+                immediates=dict(AssetFreeze=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -978,7 +978,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_clawback": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetClawback",),
+                immediates=dict(AssetClawback=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -989,7 +989,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.AssetParamsGet.asset_creator": (
             FunctionOpMapping(
                 "asset_params_get",
-                immediates=("AssetCreator",),
+                immediates=dict(AssetCreator=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
                 stack_outputs=(
                     wtypes.account_wtype,
@@ -1000,7 +1000,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.Block.blk_seed": (
             FunctionOpMapping(
                 "block",
-                immediates=("BlkSeed",),
+                immediates=dict(BlkSeed=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1008,7 +1008,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.Block.blk_timestamp": (
             FunctionOpMapping(
                 "block",
-                immediates=("BlkTimestamp",),
+                immediates=dict(BlkTimestamp=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
@@ -1090,7 +1090,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.EllipticCurve.add": (
             FunctionOpMapping(
                 "ec_add",
-                immediates=(ImmediateArgMapping("g", str),),
+                immediates=dict(g=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1098,7 +1098,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.EllipticCurve.map_to": (
             FunctionOpMapping(
                 "ec_map_to",
-                immediates=(ImmediateArgMapping("g", str),),
+                immediates=dict(g=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1106,7 +1106,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.EllipticCurve.scalar_mul_multi": (
             FunctionOpMapping(
                 "ec_multi_scalar_mul",
-                immediates=(ImmediateArgMapping("g", str),),
+                immediates=dict(g=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1114,7 +1114,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.EllipticCurve.pairing_check": (
             FunctionOpMapping(
                 "ec_pairing_check",
-                immediates=(ImmediateArgMapping("g", str),),
+                immediates=dict(g=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
@@ -1122,7 +1122,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.EllipticCurve.scalar_mul": (
             FunctionOpMapping(
                 "ec_scalar_mul",
-                immediates=(ImmediateArgMapping("g", str),),
+                immediates=dict(g=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1130,7 +1130,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.EllipticCurve.subgroup_check": (
             FunctionOpMapping(
                 "ec_subgroup_check",
-                immediates=(ImmediateArgMapping("g", str),),
+                immediates=dict(g=str),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
@@ -1138,908 +1138,880 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GITxn.sender": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Sender"),
+                immediates=dict(t=int, Sender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.fee": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Fee"),
+                immediates=dict(t=int, Fee=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.first_valid": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "FirstValid"),
+                immediates=dict(t=int, FirstValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.first_valid_time": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "FirstValidTime"),
+                immediates=dict(t=int, FirstValidTime=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.last_valid": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "LastValid"),
+                immediates=dict(t=int, LastValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.note": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Note"),
+                immediates=dict(t=int, Note=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.lease": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Lease"),
+                immediates=dict(t=int, Lease=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.receiver": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Receiver"),
+                immediates=dict(t=int, Receiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.amount": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Amount"),
+                immediates=dict(t=int, Amount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.close_remainder_to": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "CloseRemainderTo"),
+                immediates=dict(t=int, CloseRemainderTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_pk": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "VotePK"),
+                immediates=dict(t=int, VotePK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.selection_pk": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "SelectionPK"),
+                immediates=dict(t=int, SelectionPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_first": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "VoteFirst"),
+                immediates=dict(t=int, VoteFirst=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_last": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "VoteLast"),
+                immediates=dict(t=int, VoteLast=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_key_dilution": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "VoteKeyDilution"),
+                immediates=dict(t=int, VoteKeyDilution=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.type": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Type"),
+                immediates=dict(t=int, Type=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.type_enum": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "TypeEnum"),
+                immediates=dict(t=int, TypeEnum=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.xfer_asset": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "XferAsset"),
+                immediates=dict(t=int, XferAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_amount": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "AssetAmount"),
+                immediates=dict(t=int, AssetAmount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_sender": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "AssetSender"),
+                immediates=dict(t=int, AssetSender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_receiver": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "AssetReceiver"),
+                immediates=dict(t=int, AssetReceiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_close_to": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "AssetCloseTo"),
+                immediates=dict(t=int, AssetCloseTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.group_index": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "GroupIndex"),
+                immediates=dict(t=int, GroupIndex=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.tx_id": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "TxID"),
+                immediates=dict(t=int, TxID=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.application_id": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ApplicationID"),
+                immediates=dict(t=int, ApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.GITxn.on_completion": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "OnCompletion"),
+                immediates=dict(t=int, OnCompletion=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.application_args": (
             FunctionOpMapping(
                 "gitxnas",
-                immediates=(ImmediateArgMapping("t", int), "ApplicationArgs"),
+                immediates=dict(t=int, ApplicationArgs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gitxna",
-                immediates=(
-                    ImmediateArgMapping("t", int),
-                    "ApplicationArgs",
-                    ImmediateArgMapping("a", int),
-                ),
+                immediates=dict(t=int, ApplicationArgs=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_app_args": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "NumAppArgs"),
+                immediates=dict(t=int, NumAppArgs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.accounts": (
             FunctionOpMapping(
                 "gitxnas",
-                immediates=(ImmediateArgMapping("t", int), "Accounts"),
+                immediates=dict(t=int, Accounts=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gitxna",
-                immediates=(
-                    ImmediateArgMapping("t", int),
-                    "Accounts",
-                    ImmediateArgMapping("a", int),
-                ),
+                immediates=dict(t=int, Accounts=None, a=int),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_accounts": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "NumAccounts"),
+                immediates=dict(t=int, NumAccounts=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.approval_program": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ApprovalProgram"),
+                immediates=dict(t=int, ApprovalProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.clear_state_program": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ClearStateProgram"),
+                immediates=dict(t=int, ClearStateProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.rekey_to": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "RekeyTo"),
+                immediates=dict(t=int, RekeyTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAsset"),
+                immediates=dict(t=int, ConfigAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_total": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetTotal"),
+                immediates=dict(t=int, ConfigAssetTotal=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_decimals": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetDecimals"),
+                immediates=dict(t=int, ConfigAssetDecimals=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_default_frozen": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetDefaultFrozen"),
+                immediates=dict(t=int, ConfigAssetDefaultFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_unit_name": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetUnitName"),
+                immediates=dict(t=int, ConfigAssetUnitName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_name": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetName"),
+                immediates=dict(t=int, ConfigAssetName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_url": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetURL"),
+                immediates=dict(t=int, ConfigAssetURL=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_metadata_hash": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetMetadataHash"),
+                immediates=dict(t=int, ConfigAssetMetadataHash=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_manager": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetManager"),
+                immediates=dict(t=int, ConfigAssetManager=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_reserve": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetReserve"),
+                immediates=dict(t=int, ConfigAssetReserve=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_freeze": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetFreeze"),
+                immediates=dict(t=int, ConfigAssetFreeze=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_clawback": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ConfigAssetClawback"),
+                immediates=dict(t=int, ConfigAssetClawback=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.freeze_asset": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "FreezeAsset"),
+                immediates=dict(t=int, FreezeAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.freeze_asset_account": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "FreezeAssetAccount"),
+                immediates=dict(t=int, FreezeAssetAccount=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.freeze_asset_frozen": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "FreezeAssetFrozen"),
+                immediates=dict(t=int, FreezeAssetFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GITxn.assets": (
             FunctionOpMapping(
                 "gitxnas",
-                immediates=(ImmediateArgMapping("t", int), "Assets"),
+                immediates=dict(t=int, Assets=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gitxna",
-                immediates=(
-                    ImmediateArgMapping("t", int),
-                    "Assets",
-                    ImmediateArgMapping("a", int),
-                ),
+                immediates=dict(t=int, Assets=None, a=int),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_assets": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "NumAssets"),
+                immediates=dict(t=int, NumAssets=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.applications": (
             FunctionOpMapping(
                 "gitxnas",
-                immediates=(ImmediateArgMapping("t", int), "Applications"),
+                immediates=dict(t=int, Applications=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "gitxna",
-                immediates=(
-                    ImmediateArgMapping("t", int),
-                    "Applications",
-                    ImmediateArgMapping("a", int),
-                ),
+                immediates=dict(t=int, Applications=None, a=int),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_applications": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "NumApplications"),
+                immediates=dict(t=int, NumApplications=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.global_num_uint": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "GlobalNumUint"),
+                immediates=dict(t=int, GlobalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.global_num_byte_slice": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "GlobalNumByteSlice"),
+                immediates=dict(t=int, GlobalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.local_num_uint": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "LocalNumUint"),
+                immediates=dict(t=int, LocalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.local_num_byte_slice": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "LocalNumByteSlice"),
+                immediates=dict(t=int, LocalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.extra_program_pages": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "ExtraProgramPages"),
+                immediates=dict(t=int, ExtraProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.nonparticipation": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "Nonparticipation"),
+                immediates=dict(t=int, Nonparticipation=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GITxn.logs": (
             FunctionOpMapping(
                 "gitxnas",
-                immediates=(ImmediateArgMapping("t", int), "Logs"),
+                immediates=dict(t=int, Logs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gitxna",
-                immediates=(ImmediateArgMapping("t", int), "Logs", ImmediateArgMapping("a", int)),
+                immediates=dict(t=int, Logs=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_logs": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "NumLogs"),
+                immediates=dict(t=int, NumLogs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.created_asset_id": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "CreatedAssetID"),
+                immediates=dict(t=int, CreatedAssetID=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.created_application_id": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "CreatedApplicationID"),
+                immediates=dict(t=int, CreatedApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.GITxn.last_log": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "LastLog"),
+                immediates=dict(t=int, LastLog=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.state_proof_pk": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "StateProofPK"),
+                immediates=dict(t=int, StateProofPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.approval_program_pages": (
             FunctionOpMapping(
                 "gitxnas",
-                immediates=(ImmediateArgMapping("t", int), "ApprovalProgramPages"),
+                immediates=dict(t=int, ApprovalProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gitxna",
-                immediates=(
-                    ImmediateArgMapping("t", int),
-                    "ApprovalProgramPages",
-                    ImmediateArgMapping("a", int),
-                ),
+                immediates=dict(t=int, ApprovalProgramPages=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_approval_program_pages": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "NumApprovalProgramPages"),
+                immediates=dict(t=int, NumApprovalProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.clear_state_program_pages": (
             FunctionOpMapping(
                 "gitxnas",
-                immediates=(ImmediateArgMapping("t", int), "ClearStateProgramPages"),
+                immediates=dict(t=int, ClearStateProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gitxna",
-                immediates=(
-                    ImmediateArgMapping("t", int),
-                    "ClearStateProgramPages",
-                    ImmediateArgMapping("a", int),
-                ),
+                immediates=dict(t=int, ClearStateProgramPages=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_clear_state_program_pages": (
             FunctionOpMapping(
                 "gitxn",
-                immediates=(ImmediateArgMapping("t", int), "NumClearStateProgramPages"),
+                immediates=dict(t=int, NumClearStateProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.sender": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Sender",),
+                immediates=dict(Sender=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Sender"),
+                immediates=dict(a=int, Sender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.fee": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Fee",),
+                immediates=dict(Fee=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Fee"),
+                immediates=dict(a=int, Fee=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.first_valid": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("FirstValid",),
+                immediates=dict(FirstValid=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "FirstValid"),
+                immediates=dict(a=int, FirstValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.first_valid_time": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("FirstValidTime",),
+                immediates=dict(FirstValidTime=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "FirstValidTime"),
+                immediates=dict(a=int, FirstValidTime=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.last_valid": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("LastValid",),
+                immediates=dict(LastValid=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "LastValid"),
+                immediates=dict(a=int, LastValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.note": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Note",),
+                immediates=dict(Note=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Note"),
+                immediates=dict(a=int, Note=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.lease": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Lease",),
+                immediates=dict(Lease=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Lease"),
+                immediates=dict(a=int, Lease=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.receiver": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Receiver",),
+                immediates=dict(Receiver=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Receiver"),
+                immediates=dict(a=int, Receiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.amount": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Amount",),
+                immediates=dict(Amount=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Amount"),
+                immediates=dict(a=int, Amount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.close_remainder_to": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("CloseRemainderTo",),
+                immediates=dict(CloseRemainderTo=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "CloseRemainderTo"),
+                immediates=dict(a=int, CloseRemainderTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.vote_pk": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("VotePK",),
+                immediates=dict(VotePK=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "VotePK"),
+                immediates=dict(a=int, VotePK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.selection_pk": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("SelectionPK",),
+                immediates=dict(SelectionPK=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "SelectionPK"),
+                immediates=dict(a=int, SelectionPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.vote_first": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("VoteFirst",),
+                immediates=dict(VoteFirst=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "VoteFirst"),
+                immediates=dict(a=int, VoteFirst=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.vote_last": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("VoteLast",),
+                immediates=dict(VoteLast=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "VoteLast"),
+                immediates=dict(a=int, VoteLast=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.vote_key_dilution": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("VoteKeyDilution",),
+                immediates=dict(VoteKeyDilution=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "VoteKeyDilution"),
+                immediates=dict(a=int, VoteKeyDilution=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.type": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Type",),
+                immediates=dict(Type=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Type"),
+                immediates=dict(a=int, Type=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.type_enum": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("TypeEnum",),
+                immediates=dict(TypeEnum=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "TypeEnum"),
+                immediates=dict(a=int, TypeEnum=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.xfer_asset": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("XferAsset",),
+                immediates=dict(XferAsset=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "XferAsset"),
+                immediates=dict(a=int, XferAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GTxn.asset_amount": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("AssetAmount",),
+                immediates=dict(AssetAmount=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "AssetAmount"),
+                immediates=dict(a=int, AssetAmount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.asset_sender": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("AssetSender",),
+                immediates=dict(AssetSender=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "AssetSender"),
+                immediates=dict(a=int, AssetSender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.asset_receiver": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("AssetReceiver",),
+                immediates=dict(AssetReceiver=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "AssetReceiver"),
+                immediates=dict(a=int, AssetReceiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.asset_close_to": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("AssetCloseTo",),
+                immediates=dict(AssetCloseTo=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "AssetCloseTo"),
+                immediates=dict(a=int, AssetCloseTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.group_index": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("GroupIndex",),
+                immediates=dict(GroupIndex=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "GroupIndex"),
+                immediates=dict(a=int, GroupIndex=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.tx_id": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("TxID",),
+                immediates=dict(TxID=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "TxID"),
+                immediates=dict(a=int, TxID=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.application_id": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ApplicationID",),
+                immediates=dict(ApplicationID=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ApplicationID"),
+                immediates=dict(a=int, ApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.GTxn.on_completion": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("OnCompletion",),
+                immediates=dict(OnCompletion=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "OnCompletion"),
+                immediates=dict(a=int, OnCompletion=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.application_args": (
             FunctionOpMapping(
                 "gtxnsas",
-                immediates=("ApplicationArgs",),
+                immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnsa",
-                immediates=("ApplicationArgs", ImmediateArgMapping("b", int)),
+                immediates=dict(ApplicationArgs=None, b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxna",
-                immediates=(
-                    ImmediateArgMapping("a", int),
-                    "ApplicationArgs",
-                    ImmediateArgMapping("b", int),
-                ),
+                immediates=dict(a=int, ApplicationArgs=None, b=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnas",
-                immediates=(ImmediateArgMapping("a", int), "ApplicationArgs"),
+                immediates=dict(a=int, ApplicationArgs=None),
                 stack_inputs=dict(b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -2047,41 +2019,37 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GTxn.num_app_args": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("NumAppArgs",),
+                immediates=dict(NumAppArgs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "NumAppArgs"),
+                immediates=dict(a=int, NumAppArgs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.accounts": (
             FunctionOpMapping(
                 "gtxnsas",
-                immediates=("Accounts",),
+                immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnsa",
-                immediates=("Accounts", ImmediateArgMapping("b", int)),
+                immediates=dict(Accounts=None, b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxna",
-                immediates=(
-                    ImmediateArgMapping("a", int),
-                    "Accounts",
-                    ImmediateArgMapping("b", int),
-                ),
+                immediates=dict(a=int, Accounts=None, b=int),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnas",
-                immediates=(ImmediateArgMapping("a", int), "Accounts"),
+                immediates=dict(a=int, Accounts=None),
                 stack_inputs=dict(b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
@@ -2089,275 +2057,271 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GTxn.num_accounts": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("NumAccounts",),
+                immediates=dict(NumAccounts=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "NumAccounts"),
+                immediates=dict(a=int, NumAccounts=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.approval_program": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ApprovalProgram",),
+                immediates=dict(ApprovalProgram=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ApprovalProgram"),
+                immediates=dict(a=int, ApprovalProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.clear_state_program": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ClearStateProgram",),
+                immediates=dict(ClearStateProgram=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ClearStateProgram"),
+                immediates=dict(a=int, ClearStateProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.rekey_to": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("RekeyTo",),
+                immediates=dict(RekeyTo=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "RekeyTo"),
+                immediates=dict(a=int, RekeyTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAsset",),
+                immediates=dict(ConfigAsset=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAsset"),
+                immediates=dict(a=int, ConfigAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_total": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetTotal",),
+                immediates=dict(ConfigAssetTotal=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetTotal"),
+                immediates=dict(a=int, ConfigAssetTotal=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_decimals": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetDecimals",),
+                immediates=dict(ConfigAssetDecimals=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetDecimals"),
+                immediates=dict(a=int, ConfigAssetDecimals=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_default_frozen": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetDefaultFrozen",),
+                immediates=dict(ConfigAssetDefaultFrozen=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetDefaultFrozen"),
+                immediates=dict(a=int, ConfigAssetDefaultFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_unit_name": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetUnitName",),
+                immediates=dict(ConfigAssetUnitName=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetUnitName"),
+                immediates=dict(a=int, ConfigAssetUnitName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_name": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetName",),
+                immediates=dict(ConfigAssetName=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetName"),
+                immediates=dict(a=int, ConfigAssetName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_url": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetURL",),
+                immediates=dict(ConfigAssetURL=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetURL"),
+                immediates=dict(a=int, ConfigAssetURL=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_metadata_hash": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetMetadataHash",),
+                immediates=dict(ConfigAssetMetadataHash=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetMetadataHash"),
+                immediates=dict(a=int, ConfigAssetMetadataHash=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_manager": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetManager",),
+                immediates=dict(ConfigAssetManager=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetManager"),
+                immediates=dict(a=int, ConfigAssetManager=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_reserve": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetReserve",),
+                immediates=dict(ConfigAssetReserve=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetReserve"),
+                immediates=dict(a=int, ConfigAssetReserve=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_freeze": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetFreeze",),
+                immediates=dict(ConfigAssetFreeze=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetFreeze"),
+                immediates=dict(a=int, ConfigAssetFreeze=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.config_asset_clawback": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ConfigAssetClawback",),
+                immediates=dict(ConfigAssetClawback=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ConfigAssetClawback"),
+                immediates=dict(a=int, ConfigAssetClawback=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.freeze_asset": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("FreezeAsset",),
+                immediates=dict(FreezeAsset=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "FreezeAsset"),
+                immediates=dict(a=int, FreezeAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GTxn.freeze_asset_account": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("FreezeAssetAccount",),
+                immediates=dict(FreezeAssetAccount=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "FreezeAssetAccount"),
+                immediates=dict(a=int, FreezeAssetAccount=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GTxn.freeze_asset_frozen": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("FreezeAssetFrozen",),
+                immediates=dict(FreezeAssetFrozen=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "FreezeAssetFrozen"),
+                immediates=dict(a=int, FreezeAssetFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GTxn.assets": (
             FunctionOpMapping(
                 "gtxnsas",
-                immediates=("Assets",),
+                immediates=dict(Assets=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnsa",
-                immediates=("Assets", ImmediateArgMapping("b", int)),
+                immediates=dict(Assets=None, b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gtxna",
-                immediates=(
-                    ImmediateArgMapping("a", int),
-                    "Assets",
-                    ImmediateArgMapping("b", int),
-                ),
+                immediates=dict(a=int, Assets=None, b=int),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnas",
-                immediates=(ImmediateArgMapping("a", int), "Assets"),
+                immediates=dict(a=int, Assets=None),
                 stack_inputs=dict(b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
@@ -2365,41 +2329,37 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GTxn.num_assets": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("NumAssets",),
+                immediates=dict(NumAssets=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "NumAssets"),
+                immediates=dict(a=int, NumAssets=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.applications": (
             FunctionOpMapping(
                 "gtxnsas",
-                immediates=("Applications",),
+                immediates=dict(Applications=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnsa",
-                immediates=("Applications", ImmediateArgMapping("b", int)),
+                immediates=dict(Applications=None, b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "gtxna",
-                immediates=(
-                    ImmediateArgMapping("a", int),
-                    "Applications",
-                    ImmediateArgMapping("b", int),
-                ),
+                immediates=dict(a=int, Applications=None, b=int),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnas",
-                immediates=(ImmediateArgMapping("a", int), "Applications"),
+                immediates=dict(a=int, Applications=None),
                 stack_inputs=dict(b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
@@ -2407,115 +2367,115 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GTxn.num_applications": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("NumApplications",),
+                immediates=dict(NumApplications=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "NumApplications"),
+                immediates=dict(a=int, NumApplications=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.global_num_uint": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("GlobalNumUint",),
+                immediates=dict(GlobalNumUint=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "GlobalNumUint"),
+                immediates=dict(a=int, GlobalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.global_num_byte_slice": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("GlobalNumByteSlice",),
+                immediates=dict(GlobalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "GlobalNumByteSlice"),
+                immediates=dict(a=int, GlobalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.local_num_uint": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("LocalNumUint",),
+                immediates=dict(LocalNumUint=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "LocalNumUint"),
+                immediates=dict(a=int, LocalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.local_num_byte_slice": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("LocalNumByteSlice",),
+                immediates=dict(LocalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "LocalNumByteSlice"),
+                immediates=dict(a=int, LocalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.extra_program_pages": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("ExtraProgramPages",),
+                immediates=dict(ExtraProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "ExtraProgramPages"),
+                immediates=dict(a=int, ExtraProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.nonparticipation": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("Nonparticipation",),
+                immediates=dict(Nonparticipation=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "Nonparticipation"),
+                immediates=dict(a=int, Nonparticipation=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GTxn.logs": (
             FunctionOpMapping(
                 "gtxnsas",
-                immediates=("Logs",),
+                immediates=dict(Logs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnsa",
-                immediates=("Logs", ImmediateArgMapping("b", int)),
+                immediates=dict(Logs=None, b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxna",
-                immediates=(ImmediateArgMapping("a", int), "Logs", ImmediateArgMapping("b", int)),
+                immediates=dict(a=int, Logs=None, b=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnas",
-                immediates=(ImmediateArgMapping("a", int), "Logs"),
+                immediates=dict(a=int, Logs=None),
                 stack_inputs=dict(b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -2523,93 +2483,89 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GTxn.num_logs": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("NumLogs",),
+                immediates=dict(NumLogs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "NumLogs"),
+                immediates=dict(a=int, NumLogs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.created_asset_id": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("CreatedAssetID",),
+                immediates=dict(CreatedAssetID=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "CreatedAssetID"),
+                immediates=dict(a=int, CreatedAssetID=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GTxn.created_application_id": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("CreatedApplicationID",),
+                immediates=dict(CreatedApplicationID=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "CreatedApplicationID"),
+                immediates=dict(a=int, CreatedApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.GTxn.last_log": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("LastLog",),
+                immediates=dict(LastLog=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "LastLog"),
+                immediates=dict(a=int, LastLog=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.state_proof_pk": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("StateProofPK",),
+                immediates=dict(StateProofPK=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "StateProofPK"),
+                immediates=dict(a=int, StateProofPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GTxn.approval_program_pages": (
             FunctionOpMapping(
                 "gtxnsas",
-                immediates=("ApprovalProgramPages",),
+                immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnsa",
-                immediates=("ApprovalProgramPages", ImmediateArgMapping("b", int)),
+                immediates=dict(ApprovalProgramPages=None, b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxna",
-                immediates=(
-                    ImmediateArgMapping("a", int),
-                    "ApprovalProgramPages",
-                    ImmediateArgMapping("b", int),
-                ),
+                immediates=dict(a=int, ApprovalProgramPages=None, b=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnas",
-                immediates=(ImmediateArgMapping("a", int), "ApprovalProgramPages"),
+                immediates=dict(a=int, ApprovalProgramPages=None),
                 stack_inputs=dict(b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -2617,41 +2573,37 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GTxn.num_approval_program_pages": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("NumApprovalProgramPages",),
+                immediates=dict(NumApprovalProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "NumApprovalProgramPages"),
+                immediates=dict(a=int, NumApprovalProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GTxn.clear_state_program_pages": (
             FunctionOpMapping(
                 "gtxnsas",
-                immediates=("ClearStateProgramPages",),
+                immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnsa",
-                immediates=("ClearStateProgramPages", ImmediateArgMapping("b", int)),
+                immediates=dict(ClearStateProgramPages=None, b=int),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxna",
-                immediates=(
-                    ImmediateArgMapping("a", int),
-                    "ClearStateProgramPages",
-                    ImmediateArgMapping("b", int),
-                ),
+                immediates=dict(a=int, ClearStateProgramPages=None, b=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "gtxnas",
-                immediates=(ImmediateArgMapping("a", int), "ClearStateProgramPages"),
+                immediates=dict(a=int, ClearStateProgramPages=None),
                 stack_inputs=dict(b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -2659,657 +2611,657 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GTxn.num_clear_state_program_pages": (
             FunctionOpMapping(
                 "gtxns",
-                immediates=("NumClearStateProgramPages",),
+                immediates=dict(NumClearStateProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 "gtxn",
-                immediates=(ImmediateArgMapping("a", int), "NumClearStateProgramPages"),
+                immediates=dict(a=int, NumClearStateProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.min_txn_fee": (
             FunctionOpMapping(
                 "global",
-                immediates=("MinTxnFee",),
+                immediates=dict(MinTxnFee=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.min_balance": (
             FunctionOpMapping(
                 "global",
-                immediates=("MinBalance",),
+                immediates=dict(MinBalance=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.max_txn_life": (
             FunctionOpMapping(
                 "global",
-                immediates=("MaxTxnLife",),
+                immediates=dict(MaxTxnLife=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.zero_address": (
             FunctionOpMapping(
                 "global",
-                immediates=("ZeroAddress",),
+                immediates=dict(ZeroAddress=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Global.group_size": (
             FunctionOpMapping(
                 "global",
-                immediates=("GroupSize",),
+                immediates=dict(GroupSize=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.logic_sig_version": (
             FunctionOpMapping(
                 "global",
-                immediates=("LogicSigVersion",),
+                immediates=dict(LogicSigVersion=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.round": (
             FunctionOpMapping(
                 "global",
-                immediates=("Round",),
+                immediates=dict(Round=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.latest_timestamp": (
             FunctionOpMapping(
                 "global",
-                immediates=("LatestTimestamp",),
+                immediates=dict(LatestTimestamp=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.current_application_id": (
             FunctionOpMapping(
                 "global",
-                immediates=("CurrentApplicationID",),
+                immediates=dict(CurrentApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.Global.creator_address": (
             FunctionOpMapping(
                 "global",
-                immediates=("CreatorAddress",),
+                immediates=dict(CreatorAddress=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Global.current_application_address": (
             FunctionOpMapping(
                 "global",
-                immediates=("CurrentApplicationAddress",),
+                immediates=dict(CurrentApplicationAddress=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Global.group_id": (
             FunctionOpMapping(
                 "global",
-                immediates=("GroupID",),
+                immediates=dict(GroupID=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Global.opcode_budget": (
             FunctionOpMapping(
                 "global",
-                immediates=("OpcodeBudget",),
+                immediates=dict(OpcodeBudget=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.caller_application_id": (
             FunctionOpMapping(
                 "global",
-                immediates=("CallerApplicationID",),
+                immediates=dict(CallerApplicationID=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.caller_application_address": (
             FunctionOpMapping(
                 "global",
-                immediates=("CallerApplicationAddress",),
+                immediates=dict(CallerApplicationAddress=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Global.asset_create_min_balance": (
             FunctionOpMapping(
                 "global",
-                immediates=("AssetCreateMinBalance",),
+                immediates=dict(AssetCreateMinBalance=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.asset_opt_in_min_balance": (
             FunctionOpMapping(
                 "global",
-                immediates=("AssetOptInMinBalance",),
+                immediates=dict(AssetOptInMinBalance=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Global.genesis_hash": (
             FunctionOpMapping(
                 "global",
-                immediates=("GenesisHash",),
+                immediates=dict(GenesisHash=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.sender": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Sender",),
+                immediates=dict(Sender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.fee": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Fee",),
+                immediates=dict(Fee=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.first_valid": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("FirstValid",),
+                immediates=dict(FirstValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.first_valid_time": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("FirstValidTime",),
+                immediates=dict(FirstValidTime=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.last_valid": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("LastValid",),
+                immediates=dict(LastValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.note": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Note",),
+                immediates=dict(Note=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.lease": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Lease",),
+                immediates=dict(Lease=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.receiver": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Receiver",),
+                immediates=dict(Receiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.amount": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Amount",),
+                immediates=dict(Amount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.close_remainder_to": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("CloseRemainderTo",),
+                immediates=dict(CloseRemainderTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.vote_pk": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("VotePK",),
+                immediates=dict(VotePK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.selection_pk": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("SelectionPK",),
+                immediates=dict(SelectionPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.vote_first": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("VoteFirst",),
+                immediates=dict(VoteFirst=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.vote_last": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("VoteLast",),
+                immediates=dict(VoteLast=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.vote_key_dilution": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("VoteKeyDilution",),
+                immediates=dict(VoteKeyDilution=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.type": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Type",),
+                immediates=dict(Type=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.type_enum": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("TypeEnum",),
+                immediates=dict(TypeEnum=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.xfer_asset": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("XferAsset",),
+                immediates=dict(XferAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.ITxn.asset_amount": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("AssetAmount",),
+                immediates=dict(AssetAmount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.asset_sender": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("AssetSender",),
+                immediates=dict(AssetSender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.asset_receiver": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("AssetReceiver",),
+                immediates=dict(AssetReceiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.asset_close_to": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("AssetCloseTo",),
+                immediates=dict(AssetCloseTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.group_index": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("GroupIndex",),
+                immediates=dict(GroupIndex=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.tx_id": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("TxID",),
+                immediates=dict(TxID=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.application_id": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ApplicationID",),
+                immediates=dict(ApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.ITxn.on_completion": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("OnCompletion",),
+                immediates=dict(OnCompletion=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.application_args": (
             FunctionOpMapping(
                 "itxnas",
-                immediates=("ApplicationArgs",),
+                immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "itxna",
-                immediates=("ApplicationArgs", ImmediateArgMapping("a", int)),
+                immediates=dict(ApplicationArgs=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.num_app_args": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("NumAppArgs",),
+                immediates=dict(NumAppArgs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.accounts": (
             FunctionOpMapping(
                 "itxnas",
-                immediates=("Accounts",),
+                immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "itxna",
-                immediates=("Accounts", ImmediateArgMapping("a", int)),
+                immediates=dict(Accounts=None, a=int),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.num_accounts": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("NumAccounts",),
+                immediates=dict(NumAccounts=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.approval_program": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ApprovalProgram",),
+                immediates=dict(ApprovalProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.clear_state_program": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ClearStateProgram",),
+                immediates=dict(ClearStateProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.rekey_to": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("RekeyTo",),
+                immediates=dict(RekeyTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAsset",),
+                immediates=dict(ConfigAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_total": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetTotal",),
+                immediates=dict(ConfigAssetTotal=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_decimals": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetDecimals",),
+                immediates=dict(ConfigAssetDecimals=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_default_frozen": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetDefaultFrozen",),
+                immediates=dict(ConfigAssetDefaultFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_unit_name": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetUnitName",),
+                immediates=dict(ConfigAssetUnitName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_name": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetName",),
+                immediates=dict(ConfigAssetName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_url": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetURL",),
+                immediates=dict(ConfigAssetURL=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_metadata_hash": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetMetadataHash",),
+                immediates=dict(ConfigAssetMetadataHash=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_manager": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetManager",),
+                immediates=dict(ConfigAssetManager=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_reserve": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetReserve",),
+                immediates=dict(ConfigAssetReserve=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_freeze": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetFreeze",),
+                immediates=dict(ConfigAssetFreeze=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.config_asset_clawback": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ConfigAssetClawback",),
+                immediates=dict(ConfigAssetClawback=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.freeze_asset": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("FreezeAsset",),
+                immediates=dict(FreezeAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.ITxn.freeze_asset_account": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("FreezeAssetAccount",),
+                immediates=dict(FreezeAssetAccount=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.ITxn.freeze_asset_frozen": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("FreezeAssetFrozen",),
+                immediates=dict(FreezeAssetFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.ITxn.assets": (
             FunctionOpMapping(
                 "itxnas",
-                immediates=("Assets",),
+                immediates=dict(Assets=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "itxna",
-                immediates=("Assets", ImmediateArgMapping("a", int)),
+                immediates=dict(Assets=None, a=int),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.ITxn.num_assets": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("NumAssets",),
+                immediates=dict(NumAssets=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.applications": (
             FunctionOpMapping(
                 "itxnas",
-                immediates=("Applications",),
+                immediates=dict(Applications=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "itxna",
-                immediates=("Applications", ImmediateArgMapping("a", int)),
+                immediates=dict(Applications=None, a=int),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.ITxn.num_applications": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("NumApplications",),
+                immediates=dict(NumApplications=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.global_num_uint": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("GlobalNumUint",),
+                immediates=dict(GlobalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.global_num_byte_slice": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("GlobalNumByteSlice",),
+                immediates=dict(GlobalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.local_num_uint": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("LocalNumUint",),
+                immediates=dict(LocalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.local_num_byte_slice": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("LocalNumByteSlice",),
+                immediates=dict(LocalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.extra_program_pages": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("ExtraProgramPages",),
+                immediates=dict(ExtraProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.nonparticipation": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("Nonparticipation",),
+                immediates=dict(Nonparticipation=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.ITxn.logs": (
             FunctionOpMapping(
                 "itxnas",
-                immediates=("Logs",),
+                immediates=dict(Logs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "itxna",
-                immediates=("Logs", ImmediateArgMapping("a", int)),
+                immediates=dict(Logs=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.num_logs": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("NumLogs",),
+                immediates=dict(NumLogs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.created_asset_id": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("CreatedAssetID",),
+                immediates=dict(CreatedAssetID=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.ITxn.created_application_id": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("CreatedApplicationID",),
+                immediates=dict(CreatedApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.ITxn.last_log": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("LastLog",),
+                immediates=dict(LastLog=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.state_proof_pk": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("StateProofPK",),
+                immediates=dict(StateProofPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.approval_program_pages": (
             FunctionOpMapping(
                 "itxnas",
-                immediates=("ApprovalProgramPages",),
+                immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "itxna",
-                immediates=("ApprovalProgramPages", ImmediateArgMapping("a", int)),
+                immediates=dict(ApprovalProgramPages=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.num_approval_program_pages": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("NumApprovalProgramPages",),
+                immediates=dict(NumApprovalProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ITxn.clear_state_program_pages": (
             FunctionOpMapping(
                 "itxnas",
-                immediates=("ClearStateProgramPages",),
+                immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "itxna",
-                immediates=("ClearStateProgramPages", ImmediateArgMapping("a", int)),
+                immediates=dict(ClearStateProgramPages=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.ITxn.num_clear_state_program_pages": (
             FunctionOpMapping(
                 "itxn",
-                immediates=("NumClearStateProgramPages",),
+                immediates=dict(NumClearStateProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -3331,364 +3283,364 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.ITxnCreate.set_sender": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Sender",),
+                immediates=dict(Sender=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_fee": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Fee",),
+                immediates=dict(Fee=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_note": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Note",),
+                immediates=dict(Note=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_receiver": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Receiver",),
+                immediates=dict(Receiver=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_amount": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Amount",),
+                immediates=dict(Amount=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_close_remainder_to": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("CloseRemainderTo",),
+                immediates=dict(CloseRemainderTo=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_pk": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("VotePK",),
+                immediates=dict(VotePK=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_selection_pk": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("SelectionPK",),
+                immediates=dict(SelectionPK=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_first": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("VoteFirst",),
+                immediates=dict(VoteFirst=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_last": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("VoteLast",),
+                immediates=dict(VoteLast=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_key_dilution": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("VoteKeyDilution",),
+                immediates=dict(VoteKeyDilution=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_type": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Type",),
+                immediates=dict(Type=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_type_enum": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("TypeEnum",),
+                immediates=dict(TypeEnum=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_xfer_asset": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("XferAsset",),
+                immediates=dict(XferAsset=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_amount": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("AssetAmount",),
+                immediates=dict(AssetAmount=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_sender": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("AssetSender",),
+                immediates=dict(AssetSender=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_receiver": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("AssetReceiver",),
+                immediates=dict(AssetReceiver=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_close_to": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("AssetCloseTo",),
+                immediates=dict(AssetCloseTo=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_application_id": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ApplicationID",),
+                immediates=dict(ApplicationID=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
             ),
         ),
         "algopy.op.ITxnCreate.set_on_completion": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("OnCompletion",),
+                immediates=dict(OnCompletion=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_application_args": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ApplicationArgs",),
+                immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_accounts": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Accounts",),
+                immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_approval_program": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ApprovalProgram",),
+                immediates=dict(ApprovalProgram=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_clear_state_program": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ClearStateProgram",),
+                immediates=dict(ClearStateProgram=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_rekey_to": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("RekeyTo",),
+                immediates=dict(RekeyTo=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAsset",),
+                immediates=dict(ConfigAsset=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_total": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetTotal",),
+                immediates=dict(ConfigAssetTotal=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_decimals": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetDecimals",),
+                immediates=dict(ConfigAssetDecimals=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_default_frozen": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetDefaultFrozen",),
+                immediates=dict(ConfigAssetDefaultFrozen=None),
                 stack_inputs=dict(a=(wtypes.bool_wtype, wtypes.uint64_wtype)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_unit_name": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetUnitName",),
+                immediates=dict(ConfigAssetUnitName=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_name": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetName",),
+                immediates=dict(ConfigAssetName=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_url": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetURL",),
+                immediates=dict(ConfigAssetURL=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_metadata_hash": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetMetadataHash",),
+                immediates=dict(ConfigAssetMetadataHash=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_manager": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetManager",),
+                immediates=dict(ConfigAssetManager=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_reserve": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetReserve",),
+                immediates=dict(ConfigAssetReserve=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_freeze": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetFreeze",),
+                immediates=dict(ConfigAssetFreeze=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_clawback": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ConfigAssetClawback",),
+                immediates=dict(ConfigAssetClawback=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_freeze_asset": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("FreezeAsset",),
+                immediates=dict(FreezeAsset=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
             ),
         ),
         "algopy.op.ITxnCreate.set_freeze_asset_account": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("FreezeAssetAccount",),
+                immediates=dict(FreezeAssetAccount=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_freeze_asset_frozen": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("FreezeAssetFrozen",),
+                immediates=dict(FreezeAssetFrozen=None),
                 stack_inputs=dict(a=(wtypes.bool_wtype, wtypes.uint64_wtype)),
             ),
         ),
         "algopy.op.ITxnCreate.set_assets": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Assets",),
+                immediates=dict(Assets=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_applications": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Applications",),
+                immediates=dict(Applications=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_global_num_uint": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("GlobalNumUint",),
+                immediates=dict(GlobalNumUint=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_global_num_byte_slice": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("GlobalNumByteSlice",),
+                immediates=dict(GlobalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_local_num_uint": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("LocalNumUint",),
+                immediates=dict(LocalNumUint=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_local_num_byte_slice": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("LocalNumByteSlice",),
+                immediates=dict(LocalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_extra_program_pages": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ExtraProgramPages",),
+                immediates=dict(ExtraProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_nonparticipation": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("Nonparticipation",),
+                immediates=dict(Nonparticipation=None),
                 stack_inputs=dict(a=(wtypes.bool_wtype, wtypes.uint64_wtype)),
             ),
         ),
         "algopy.op.ITxnCreate.set_state_proof_pk": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("StateProofPK",),
+                immediates=dict(StateProofPK=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_approval_program_pages": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ApprovalProgramPages",),
+                immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.ITxnCreate.set_clear_state_program_pages": (
             FunctionOpMapping(
                 "itxn_field",
-                immediates=("ClearStateProgramPages",),
+                immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
         "algopy.op.JsonRef.json_string": (
             FunctionOpMapping(
                 "json_ref",
-                immediates=("JSONString",),
+                immediates=dict(JSONString=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -3696,7 +3648,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.JsonRef.json_uint64": (
             FunctionOpMapping(
                 "json_ref",
-                immediates=("JSONUint64",),
+                immediates=dict(JSONUint64=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
@@ -3704,7 +3656,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.JsonRef.json_object": (
             FunctionOpMapping(
                 "json_ref",
-                immediates=("JSONObject",),
+                immediates=dict(JSONObject=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -3734,518 +3686,518 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.Txn.sender": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Sender",),
+                immediates=dict(Sender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.fee": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Fee",),
+                immediates=dict(Fee=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.first_valid": (
             FunctionOpMapping(
                 "txn",
-                immediates=("FirstValid",),
+                immediates=dict(FirstValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.first_valid_time": (
             FunctionOpMapping(
                 "txn",
-                immediates=("FirstValidTime",),
+                immediates=dict(FirstValidTime=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.last_valid": (
             FunctionOpMapping(
                 "txn",
-                immediates=("LastValid",),
+                immediates=dict(LastValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.note": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Note",),
+                immediates=dict(Note=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.lease": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Lease",),
+                immediates=dict(Lease=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.receiver": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Receiver",),
+                immediates=dict(Receiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.amount": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Amount",),
+                immediates=dict(Amount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.close_remainder_to": (
             FunctionOpMapping(
                 "txn",
-                immediates=("CloseRemainderTo",),
+                immediates=dict(CloseRemainderTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.vote_pk": (
             FunctionOpMapping(
                 "txn",
-                immediates=("VotePK",),
+                immediates=dict(VotePK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.selection_pk": (
             FunctionOpMapping(
                 "txn",
-                immediates=("SelectionPK",),
+                immediates=dict(SelectionPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.vote_first": (
             FunctionOpMapping(
                 "txn",
-                immediates=("VoteFirst",),
+                immediates=dict(VoteFirst=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.vote_last": (
             FunctionOpMapping(
                 "txn",
-                immediates=("VoteLast",),
+                immediates=dict(VoteLast=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.vote_key_dilution": (
             FunctionOpMapping(
                 "txn",
-                immediates=("VoteKeyDilution",),
+                immediates=dict(VoteKeyDilution=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.type": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Type",),
+                immediates=dict(Type=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.type_enum": (
             FunctionOpMapping(
                 "txn",
-                immediates=("TypeEnum",),
+                immediates=dict(TypeEnum=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.xfer_asset": (
             FunctionOpMapping(
                 "txn",
-                immediates=("XferAsset",),
+                immediates=dict(XferAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.Txn.asset_amount": (
             FunctionOpMapping(
                 "txn",
-                immediates=("AssetAmount",),
+                immediates=dict(AssetAmount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.asset_sender": (
             FunctionOpMapping(
                 "txn",
-                immediates=("AssetSender",),
+                immediates=dict(AssetSender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.asset_receiver": (
             FunctionOpMapping(
                 "txn",
-                immediates=("AssetReceiver",),
+                immediates=dict(AssetReceiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.asset_close_to": (
             FunctionOpMapping(
                 "txn",
-                immediates=("AssetCloseTo",),
+                immediates=dict(AssetCloseTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.group_index": (
             FunctionOpMapping(
                 "txn",
-                immediates=("GroupIndex",),
+                immediates=dict(GroupIndex=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.tx_id": (
             FunctionOpMapping(
                 "txn",
-                immediates=("TxID",),
+                immediates=dict(TxID=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.application_id": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ApplicationID",),
+                immediates=dict(ApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.Txn.on_completion": (
             FunctionOpMapping(
                 "txn",
-                immediates=("OnCompletion",),
+                immediates=dict(OnCompletion=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.application_args": (
             FunctionOpMapping(
                 "txnas",
-                immediates=("ApplicationArgs",),
+                immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "txna",
-                immediates=("ApplicationArgs", ImmediateArgMapping("a", int)),
+                immediates=dict(ApplicationArgs=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.num_app_args": (
             FunctionOpMapping(
                 "txn",
-                immediates=("NumAppArgs",),
+                immediates=dict(NumAppArgs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.accounts": (
             FunctionOpMapping(
                 "txnas",
-                immediates=("Accounts",),
+                immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 "txna",
-                immediates=("Accounts", ImmediateArgMapping("a", int)),
+                immediates=dict(Accounts=None, a=int),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.num_accounts": (
             FunctionOpMapping(
                 "txn",
-                immediates=("NumAccounts",),
+                immediates=dict(NumAccounts=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.approval_program": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ApprovalProgram",),
+                immediates=dict(ApprovalProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.clear_state_program": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ClearStateProgram",),
+                immediates=dict(ClearStateProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.rekey_to": (
             FunctionOpMapping(
                 "txn",
-                immediates=("RekeyTo",),
+                immediates=dict(RekeyTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAsset",),
+                immediates=dict(ConfigAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_total": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetTotal",),
+                immediates=dict(ConfigAssetTotal=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_decimals": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetDecimals",),
+                immediates=dict(ConfigAssetDecimals=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_default_frozen": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetDefaultFrozen",),
+                immediates=dict(ConfigAssetDefaultFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_unit_name": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetUnitName",),
+                immediates=dict(ConfigAssetUnitName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_name": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetName",),
+                immediates=dict(ConfigAssetName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_url": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetURL",),
+                immediates=dict(ConfigAssetURL=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_metadata_hash": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetMetadataHash",),
+                immediates=dict(ConfigAssetMetadataHash=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_manager": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetManager",),
+                immediates=dict(ConfigAssetManager=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_reserve": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetReserve",),
+                immediates=dict(ConfigAssetReserve=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_freeze": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetFreeze",),
+                immediates=dict(ConfigAssetFreeze=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.config_asset_clawback": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ConfigAssetClawback",),
+                immediates=dict(ConfigAssetClawback=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.freeze_asset": (
             FunctionOpMapping(
                 "txn",
-                immediates=("FreezeAsset",),
+                immediates=dict(FreezeAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.Txn.freeze_asset_account": (
             FunctionOpMapping(
                 "txn",
-                immediates=("FreezeAssetAccount",),
+                immediates=dict(FreezeAssetAccount=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.Txn.freeze_asset_frozen": (
             FunctionOpMapping(
                 "txn",
-                immediates=("FreezeAssetFrozen",),
+                immediates=dict(FreezeAssetFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.Txn.assets": (
             FunctionOpMapping(
                 "txnas",
-                immediates=("Assets",),
+                immediates=dict(Assets=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 "txna",
-                immediates=("Assets", ImmediateArgMapping("a", int)),
+                immediates=dict(Assets=None, a=int),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.Txn.num_assets": (
             FunctionOpMapping(
                 "txn",
-                immediates=("NumAssets",),
+                immediates=dict(NumAssets=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.applications": (
             FunctionOpMapping(
                 "txnas",
-                immediates=("Applications",),
+                immediates=dict(Applications=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 "txna",
-                immediates=("Applications", ImmediateArgMapping("a", int)),
+                immediates=dict(Applications=None, a=int),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.Txn.num_applications": (
             FunctionOpMapping(
                 "txn",
-                immediates=("NumApplications",),
+                immediates=dict(NumApplications=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.global_num_uint": (
             FunctionOpMapping(
                 "txn",
-                immediates=("GlobalNumUint",),
+                immediates=dict(GlobalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.global_num_byte_slice": (
             FunctionOpMapping(
                 "txn",
-                immediates=("GlobalNumByteSlice",),
+                immediates=dict(GlobalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.local_num_uint": (
             FunctionOpMapping(
                 "txn",
-                immediates=("LocalNumUint",),
+                immediates=dict(LocalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.local_num_byte_slice": (
             FunctionOpMapping(
                 "txn",
-                immediates=("LocalNumByteSlice",),
+                immediates=dict(LocalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.extra_program_pages": (
             FunctionOpMapping(
                 "txn",
-                immediates=("ExtraProgramPages",),
+                immediates=dict(ExtraProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.nonparticipation": (
             FunctionOpMapping(
                 "txn",
-                immediates=("Nonparticipation",),
+                immediates=dict(Nonparticipation=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.Txn.logs": (
             FunctionOpMapping(
                 "txnas",
-                immediates=("Logs",),
+                immediates=dict(Logs=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "txna",
-                immediates=("Logs", ImmediateArgMapping("a", int)),
+                immediates=dict(Logs=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.num_logs": (
             FunctionOpMapping(
                 "txn",
-                immediates=("NumLogs",),
+                immediates=dict(NumLogs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.created_asset_id": (
             FunctionOpMapping(
                 "txn",
-                immediates=("CreatedAssetID",),
+                immediates=dict(CreatedAssetID=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.Txn.created_application_id": (
             FunctionOpMapping(
                 "txn",
-                immediates=("CreatedApplicationID",),
+                immediates=dict(CreatedApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.Txn.last_log": (
             FunctionOpMapping(
                 "txn",
-                immediates=("LastLog",),
+                immediates=dict(LastLog=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.state_proof_pk": (
             FunctionOpMapping(
                 "txn",
-                immediates=("StateProofPK",),
+                immediates=dict(StateProofPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.approval_program_pages": (
             FunctionOpMapping(
                 "txnas",
-                immediates=("ApprovalProgramPages",),
+                immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "txna",
-                immediates=("ApprovalProgramPages", ImmediateArgMapping("a", int)),
+                immediates=dict(ApprovalProgramPages=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.num_approval_program_pages": (
             FunctionOpMapping(
                 "txn",
-                immediates=("NumApprovalProgramPages",),
+                immediates=dict(NumApprovalProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Txn.clear_state_program_pages": (
             FunctionOpMapping(
                 "txnas",
-                immediates=("ClearStateProgramPages",),
+                immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 "txna",
-                immediates=("ClearStateProgramPages", ImmediateArgMapping("a", int)),
+                immediates=dict(ClearStateProgramPages=None, a=int),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Txn.num_clear_state_program_pages": (
             FunctionOpMapping(
                 "txn",
-                immediates=("NumClearStateProgramPages",),
+                immediates=dict(NumClearStateProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),

@@ -7,7 +7,6 @@ from collections.abc import Mapping, Sequence, Set
 from functools import cached_property
 
 import attrs
-from immutabledict import immutabledict
 
 from puya.awst import wtypes
 from puya.errors import InternalError
@@ -25,11 +24,9 @@ class ImmediateArgMapping:
 class FunctionOpMapping:
     op_code: str
     """TEAL op code for this mapping"""
-    immediates: Sequence[str | ImmediateArgMapping] = attrs.field(factory=tuple)
-    """A list of constant values or references to an algopy argument to include in immediate"""
-    stack_inputs: Mapping[str, Sequence[wtypes.WType]] = attrs.field(
-        factory=immutabledict, converter=immutabledict
-    )
+    immediates: Mapping[str, type[str | int] | None] = attrs.field(default={})
+    """A sequence of constant values or references to an algopy argument to include in immediate"""
+    stack_inputs: Mapping[str, Sequence[wtypes.WType]] = attrs.field(default={})
     """Mapping of stack argument names to valid types for the argument,
      in descending priority for literal conversions"""
     stack_outputs: Sequence[wtypes.WType] = attrs.field(factory=tuple)
@@ -40,13 +37,13 @@ class FunctionOpMapping:
     @cached_property
     def literal_arg_names(self) -> Set[str]:
         result = set[str]()
-        for im in self.immediates:
-            if not isinstance(im, str):
-                if im.arg_name in result:
+        for name, maybe_lit_type in self.immediates.items():
+            if maybe_lit_type is not None:
+                if name in result:
                     raise InternalError(
-                        f"Duplicated immediate input name: {im.arg_name!r} for {self.op_code!r}"
+                        f"Duplicated immediate input name: {name!r} for {self.op_code!r}"
                     )
-                result.add(im.arg_name)
+                result.add(name)
         return result
 
     @stack_inputs.validator
