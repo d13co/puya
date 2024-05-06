@@ -7,28 +7,28 @@ from puya.awst_build.intrinsic_models import (
     PropertyOpMapping,
 )
 
-ENUM_CLASSES: typing.Final[Mapping[str, Mapping[str, str]]] = {
-    "Base64": {
-        "URLEncoding": "URLEncoding",
-        "StdEncoding": "StdEncoding",
-    },
-    "ECDSA": {
-        "Secp256k1": "Secp256k1",
-        "Secp256r1": "Secp256r1",
-    },
-    "VrfVerify": {
-        "VrfAlgorand": "VrfAlgorand",
-    },
-    "EC": {
-        "BN254g1": "BN254g1",
-        "BN254g2": "BN254g2",
-        "BLS12_381g1": "BLS12_381g1",
-        "BLS12_381g2": "BLS12_381g2",
-    },
-}
+ENUM_CLASSES: typing.Final[Mapping[str, Mapping[str, str]]] = dict(
+    Base64=dict(
+        URLEncoding="URLEncoding",
+        StdEncoding="StdEncoding",
+    ),
+    ECDSA=dict(
+        Secp256k1="Secp256k1",
+        Secp256r1="Secp256r1",
+    ),
+    VrfVerify=dict(
+        VrfAlgorand="VrfAlgorand",
+    ),
+    EC=dict(
+        BN254g1="BN254g1",
+        BN254g2="BN254g2",
+        BLS12_381g1="BLS12_381g1",
+        BLS12_381g2="BLS12_381g2",
+    ),
+)
 
-FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
-    "addw": (
+FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = dict(
+    addw=(
         FunctionOpMapping(
             "addw",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
@@ -38,7 +38,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             ),
         ),
     ),
-    "app_opted_in": (
+    app_opted_in=(
         FunctionOpMapping(
             "app_opted_in",
             stack_inputs=dict(
@@ -48,7 +48,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bool_wtype,),
         ),
     ),
-    "arg": (
+    arg=(
         FunctionOpMapping(
             "args",
             stack_inputs=dict(a=(wtypes.uint64_wtype,)),
@@ -60,14 +60,14 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "balance": (
+    balance=(
         FunctionOpMapping(
             "balance",
             stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "base64_decode": (
+    base64_decode=(
         FunctionOpMapping(
             "base64_decode",
             immediates=dict(e=str),
@@ -75,42 +75,42 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "bitlen": (
+    bitlen=(
         FunctionOpMapping(
             "bitlen",
             stack_inputs=dict(a=(wtypes.bytes_wtype, wtypes.uint64_wtype)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "bsqrt": (
+    bsqrt=(
         FunctionOpMapping(
             "bsqrt",
             stack_inputs=dict(a=(wtypes.biguint_wtype,)),
             stack_outputs=(wtypes.biguint_wtype,),
         ),
     ),
-    "btoi": (
+    btoi=(
         FunctionOpMapping(
             "btoi",
             stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "bzero": (
+    bzero=(
         FunctionOpMapping(
             "bzero",
             stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "concat": (
+    concat=(
         FunctionOpMapping(
             "concat",
             stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "divmodw": (
+    divmodw=(
         FunctionOpMapping(
             "divmodw",
             stack_inputs=dict(
@@ -127,7 +127,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             ),
         ),
     ),
-    "divw": (
+    divw=(
         FunctionOpMapping(
             "divw",
             stack_inputs=dict(
@@ -136,7 +136,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "ecdsa_pk_decompress": (
+    ecdsa_pk_decompress=(
         FunctionOpMapping(
             "ecdsa_pk_decompress",
             immediates=dict(v=str),
@@ -147,7 +147,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             ),
         ),
     ),
-    "ecdsa_pk_recover": (
+    ecdsa_pk_recover=(
         FunctionOpMapping(
             "ecdsa_pk_recover",
             immediates=dict(v=str),
@@ -163,7 +163,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             ),
         ),
     ),
-    "ecdsa_verify": (
+    ecdsa_verify=(
         FunctionOpMapping(
             "ecdsa_verify",
             immediates=dict(v=str),
@@ -177,7 +177,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bool_wtype,),
         ),
     ),
-    "ed25519verify": (
+    ed25519verify=(
         FunctionOpMapping(
             "ed25519verify",
             stack_inputs=dict(
@@ -186,7 +186,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bool_wtype,),
         ),
     ),
-    "ed25519verify_bare": (
+    ed25519verify_bare=(
         FunctionOpMapping(
             "ed25519verify_bare",
             stack_inputs=dict(
@@ -195,25 +195,25 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bool_wtype,),
         ),
     ),
-    "err": (
+    err=(
         FunctionOpMapping(
             "err",
         ),
     ),
-    "exit": (
+    exit=(
         FunctionOpMapping(
             "return",
             stack_inputs=dict(a=(wtypes.uint64_wtype,)),
         ),
     ),
-    "exp": (
+    exp=(
         FunctionOpMapping(
             "exp",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "expw": (
+    expw=(
         FunctionOpMapping(
             "expw",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
@@ -223,7 +223,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             ),
         ),
     ),
-    "extract": (
+    extract=(
         FunctionOpMapping(
             "extract3",
             stack_inputs=dict(
@@ -238,28 +238,28 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "extract_uint16": (
+    extract_uint16=(
         FunctionOpMapping(
             "extract_uint16",
             stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "extract_uint32": (
+    extract_uint32=(
         FunctionOpMapping(
             "extract_uint32",
             stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "extract_uint64": (
+    extract_uint64=(
         FunctionOpMapping(
             "extract_uint64",
             stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "gaid": (
+    gaid=(
         FunctionOpMapping(
             "gaids",
             stack_inputs=dict(a=(wtypes.uint64_wtype,)),
@@ -271,7 +271,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.application_wtype,),
         ),
     ),
-    "getbit": (
+    getbit=(
         FunctionOpMapping(
             "getbit",
             stack_inputs=dict(
@@ -280,14 +280,14 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "getbyte": (
+    getbyte=(
         FunctionOpMapping(
             "getbyte",
             stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "gload_bytes": (
+    gload_bytes=(
         FunctionOpMapping(
             "gloadss",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
@@ -305,7 +305,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "gload_uint64": (
+    gload_uint64=(
         FunctionOpMapping(
             "gloadss",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
@@ -323,28 +323,28 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "itob": (
+    itob=(
         FunctionOpMapping(
             "itob",
             stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "keccak256": (
+    keccak256=(
         FunctionOpMapping(
             "keccak256",
             stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "min_balance": (
+    min_balance=(
         FunctionOpMapping(
             "min_balance",
             stack_inputs=dict(a=(wtypes.account_wtype, wtypes.uint64_wtype)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "mulw": (
+    mulw=(
         FunctionOpMapping(
             "mulw",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
@@ -354,7 +354,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             ),
         ),
     ),
-    "replace": (
+    replace=(
         FunctionOpMapping(
             "replace3",
             stack_inputs=dict(
@@ -369,7 +369,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "select_bytes": (
+    select_bytes=(
         FunctionOpMapping(
             "select",
             stack_inputs=dict(
@@ -380,7 +380,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "select_uint64": (
+    select_uint64=(
         FunctionOpMapping(
             "select",
             stack_inputs=dict(
@@ -391,7 +391,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "setbit_bytes": (
+    setbit_bytes=(
         FunctionOpMapping(
             "setbit",
             stack_inputs=dict(
@@ -400,7 +400,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "setbit_uint64": (
+    setbit_uint64=(
         FunctionOpMapping(
             "setbit",
             stack_inputs=dict(
@@ -409,7 +409,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "setbyte": (
+    setbyte=(
         FunctionOpMapping(
             "setbyte",
             stack_inputs=dict(
@@ -418,49 +418,49 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "sha256": (
+    sha256=(
         FunctionOpMapping(
             "sha256",
             stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "sha3_256": (
+    sha3_256=(
         FunctionOpMapping(
             "sha3_256",
             stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "sha512_256": (
+    sha512_256=(
         FunctionOpMapping(
             "sha512_256",
             stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "shl": (
+    shl=(
         FunctionOpMapping(
             "shl",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "shr": (
+    shr=(
         FunctionOpMapping(
             "shr",
             stack_inputs=dict(a=(wtypes.uint64_wtype,), b=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "sqrt": (
+    sqrt=(
         FunctionOpMapping(
             "sqrt",
             stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
     ),
-    "substring": (
+    substring=(
         FunctionOpMapping(
             "substring3",
             stack_inputs=dict(
@@ -475,7 +475,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             stack_outputs=(wtypes.bytes_wtype,),
         ),
     ),
-    "vrf_verify": (
+    vrf_verify=(
         FunctionOpMapping(
             "vrf_verify",
             immediates=dict(s=str),
@@ -488,12 +488,12 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {
             ),
         ),
     ),
-}
+)
 NAMESPACE_CLASSES: typing.Final[
     Mapping[str, Mapping[str, PropertyOpMapping | Sequence[FunctionOpMapping]]]
-] = {
-    "AcctParamsGet": {
-        "acct_balance": (
+] = dict(
+    AcctParamsGet=dict(
+        acct_balance=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctBalance=None),
@@ -504,7 +504,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_min_balance": (
+        acct_min_balance=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctMinBalance=None),
@@ -515,7 +515,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_auth_addr": (
+        acct_auth_addr=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctAuthAddr=None),
@@ -526,7 +526,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_num_uint": (
+        acct_total_num_uint=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalNumUint=None),
@@ -537,7 +537,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_num_byte_slice": (
+        acct_total_num_byte_slice=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalNumByteSlice=None),
@@ -548,7 +548,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_extra_app_pages": (
+        acct_total_extra_app_pages=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalExtraAppPages=None),
@@ -559,7 +559,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_apps_created": (
+        acct_total_apps_created=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalAppsCreated=None),
@@ -570,7 +570,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_apps_opted_in": (
+        acct_total_apps_opted_in=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalAppsOptedIn=None),
@@ -581,7 +581,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_assets_created": (
+        acct_total_assets_created=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalAssetsCreated=None),
@@ -592,7 +592,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_assets": (
+        acct_total_assets=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalAssets=None),
@@ -603,7 +603,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_boxes": (
+        acct_total_boxes=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalBoxes=None),
@@ -614,7 +614,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "acct_total_box_bytes": (
+        acct_total_box_bytes=(
             FunctionOpMapping(
                 "acct_params_get",
                 immediates=dict(AcctTotalBoxBytes=None),
@@ -625,23 +625,23 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "AppGlobal": {
-        "get_bytes": (
+    ),
+    AppGlobal=dict(
+        get_bytes=(
             FunctionOpMapping(
                 "app_global_get",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "get_uint64": (
+        get_uint64=(
             FunctionOpMapping(
                 "app_global_get",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "get_ex_bytes": (
+        get_ex_bytes=(
             FunctionOpMapping(
                 "app_global_get_ex",
                 stack_inputs=dict(
@@ -653,7 +653,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "get_ex_uint64": (
+        get_ex_uint64=(
             FunctionOpMapping(
                 "app_global_get_ex",
                 stack_inputs=dict(
@@ -665,13 +665,13 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "delete": (
+        delete=(
             FunctionOpMapping(
                 "app_global_del",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "put": (
+        put=(
             FunctionOpMapping(
                 "app_global_put",
                 stack_inputs=dict(
@@ -679,9 +679,9 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "AppLocal": {
-        "get_bytes": (
+    ),
+    AppLocal=dict(
+        get_bytes=(
             FunctionOpMapping(
                 "app_local_get",
                 stack_inputs=dict(
@@ -690,7 +690,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "get_uint64": (
+        get_uint64=(
             FunctionOpMapping(
                 "app_local_get",
                 stack_inputs=dict(
@@ -699,7 +699,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "get_ex_bytes": (
+        get_ex_bytes=(
             FunctionOpMapping(
                 "app_local_get_ex",
                 stack_inputs=dict(
@@ -713,7 +713,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "get_ex_uint64": (
+        get_ex_uint64=(
             FunctionOpMapping(
                 "app_local_get_ex",
                 stack_inputs=dict(
@@ -727,7 +727,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "delete": (
+        delete=(
             FunctionOpMapping(
                 "app_local_del",
                 stack_inputs=dict(
@@ -735,7 +735,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "put": (
+        put=(
             FunctionOpMapping(
                 "app_local_put",
                 stack_inputs=dict(
@@ -745,9 +745,9 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "AppParamsGet": {
-        "app_approval_program": (
+    ),
+    AppParamsGet=dict(
+        app_approval_program=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppApprovalProgram=None),
@@ -758,7 +758,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_clear_state_program": (
+        app_clear_state_program=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppClearStateProgram=None),
@@ -769,7 +769,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_global_num_uint": (
+        app_global_num_uint=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppGlobalNumUint=None),
@@ -780,7 +780,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_global_num_byte_slice": (
+        app_global_num_byte_slice=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppGlobalNumByteSlice=None),
@@ -791,7 +791,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_local_num_uint": (
+        app_local_num_uint=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppLocalNumUint=None),
@@ -802,7 +802,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_local_num_byte_slice": (
+        app_local_num_byte_slice=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppLocalNumByteSlice=None),
@@ -813,7 +813,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_extra_program_pages": (
+        app_extra_program_pages=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppExtraProgramPages=None),
@@ -824,7 +824,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_creator": (
+        app_creator=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppCreator=None),
@@ -835,7 +835,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "app_address": (
+        app_address=(
             FunctionOpMapping(
                 "app_params_get",
                 immediates=dict(AppAddress=None),
@@ -846,9 +846,9 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "AssetHoldingGet": {
-        "asset_balance": (
+    ),
+    AssetHoldingGet=dict(
+        asset_balance=(
             FunctionOpMapping(
                 "asset_holding_get",
                 immediates=dict(AssetBalance=None),
@@ -862,7 +862,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_frozen": (
+        asset_frozen=(
             FunctionOpMapping(
                 "asset_holding_get",
                 immediates=dict(AssetFrozen=None),
@@ -876,9 +876,9 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "AssetParamsGet": {
-        "asset_total": (
+    ),
+    AssetParamsGet=dict(
+        asset_total=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetTotal=None),
@@ -889,7 +889,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_decimals": (
+        asset_decimals=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetDecimals=None),
@@ -900,7 +900,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_default_frozen": (
+        asset_default_frozen=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetDefaultFrozen=None),
@@ -911,7 +911,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_unit_name": (
+        asset_unit_name=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetUnitName=None),
@@ -922,7 +922,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_name": (
+        asset_name=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetName=None),
@@ -933,7 +933,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_url": (
+        asset_url=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetURL=None),
@@ -944,7 +944,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_metadata_hash": (
+        asset_metadata_hash=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetMetadataHash=None),
@@ -955,7 +955,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_manager": (
+        asset_manager=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetManager=None),
@@ -966,7 +966,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_reserve": (
+        asset_reserve=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetReserve=None),
@@ -977,7 +977,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_freeze": (
+        asset_freeze=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetFreeze=None),
@@ -988,7 +988,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_clawback": (
+        asset_clawback=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetClawback=None),
@@ -999,7 +999,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "asset_creator": (
+        asset_creator=(
             FunctionOpMapping(
                 "asset_params_get",
                 immediates=dict(AssetCreator=None),
@@ -1010,9 +1010,9 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "Block": {
-        "blk_seed": (
+    ),
+    Block=dict(
+        blk_seed=(
             FunctionOpMapping(
                 "block",
                 immediates=dict(BlkSeed=None),
@@ -1020,7 +1020,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "blk_timestamp": (
+        blk_timestamp=(
             FunctionOpMapping(
                 "block",
                 immediates=dict(BlkTimestamp=None),
@@ -1028,23 +1028,23 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-    },
-    "Box": {
-        "create": (
+    ),
+    Box=dict(
+        create=(
             FunctionOpMapping(
                 "box_create",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "delete": (
+        delete=(
             FunctionOpMapping(
                 "box_del",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "extract": (
+        extract=(
             FunctionOpMapping(
                 "box_extract",
                 stack_inputs=dict(
@@ -1053,7 +1053,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "get": (
+        get=(
             FunctionOpMapping(
                 "box_get",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
@@ -1063,7 +1063,7 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "length": (
+        length=(
             FunctionOpMapping(
                 "box_len",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
@@ -1073,13 +1073,13 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "put": (
+        put=(
             FunctionOpMapping(
                 "box_put",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.bytes_wtype,)),
             ),
         ),
-        "replace": (
+        replace=(
             FunctionOpMapping(
                 "box_replace",
                 stack_inputs=dict(
@@ -1087,13 +1087,13 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-        "resize": (
+        resize=(
             FunctionOpMapping(
                 "box_resize",
                 stack_inputs=dict(a=(wtypes.bytes_wtype,), b=(wtypes.uint64_wtype,)),
             ),
         ),
-        "splice": (
+        splice=(
             FunctionOpMapping(
                 "box_splice",
                 stack_inputs=dict(
@@ -1104,9 +1104,9 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "EllipticCurve": {
-        "add": (
+    ),
+    EllipticCurve=dict(
+        add=(
             FunctionOpMapping(
                 "ec_add",
                 immediates=dict(g=str),
@@ -1114,7 +1114,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "map_to": (
+        map_to=(
             FunctionOpMapping(
                 "ec_map_to",
                 immediates=dict(g=str),
@@ -1122,7 +1122,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "scalar_mul_multi": (
+        scalar_mul_multi=(
             FunctionOpMapping(
                 "ec_multi_scalar_mul",
                 immediates=dict(g=str),
@@ -1130,7 +1130,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "pairing_check": (
+        pairing_check=(
             FunctionOpMapping(
                 "ec_pairing_check",
                 immediates=dict(g=str),
@@ -1138,7 +1138,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "scalar_mul": (
+        scalar_mul=(
             FunctionOpMapping(
                 "ec_scalar_mul",
                 immediates=dict(g=str),
@@ -1146,7 +1146,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "subgroup_check": (
+        subgroup_check=(
             FunctionOpMapping(
                 "ec_subgroup_check",
                 immediates=dict(g=str),
@@ -1154,191 +1154,191 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-    },
-    "GITxn": {
-        "sender": (
+    ),
+    GITxn=dict(
+        sender=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Sender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "fee": (
+        fee=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Fee=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "first_valid": (
+        first_valid=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FirstValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "first_valid_time": (
+        first_valid_time=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FirstValidTime=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "last_valid": (
+        last_valid=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LastValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "note": (
+        note=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Note=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "lease": (
+        lease=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Lease=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "receiver": (
+        receiver=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Receiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "amount": (
+        amount=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Amount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "close_remainder_to": (
+        close_remainder_to=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, CloseRemainderTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "vote_pk": (
+        vote_pk=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VotePK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "selection_pk": (
+        selection_pk=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, SelectionPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "vote_first": (
+        vote_first=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VoteFirst=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "vote_last": (
+        vote_last=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VoteLast=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "vote_key_dilution": (
+        vote_key_dilution=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VoteKeyDilution=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "type": (
+        type=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Type=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "type_enum": (
+        type_enum=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, TypeEnum=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "xfer_asset": (
+        xfer_asset=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, XferAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "asset_amount": (
+        asset_amount=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetAmount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "asset_sender": (
+        asset_sender=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetSender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "asset_receiver": (
+        asset_receiver=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetReceiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "asset_close_to": (
+        asset_close_to=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetCloseTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "group_index": (
+        group_index=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, GroupIndex=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "tx_id": (
+        tx_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, TxID=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "application_id": (
+        application_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "on_completion": (
+        on_completion=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, OnCompletion=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "application_args": (
+        application_args=(
             FunctionOpMapping(
                 "gitxnas",
                 immediates=dict(t=int, ApplicationArgs=None),
@@ -1351,14 +1351,14 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_app_args": (
+        num_app_args=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumAppArgs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "accounts": (
+        accounts=(
             FunctionOpMapping(
                 "gitxnas",
                 immediates=dict(t=int, Accounts=None),
@@ -1371,140 +1371,140 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "num_accounts": (
+        num_accounts=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumAccounts=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "approval_program": (
+        approval_program=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ApprovalProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "clear_state_program": (
+        clear_state_program=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ClearStateProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "rekey_to": (
+        rekey_to=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, RekeyTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset": (
+        config_asset=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "config_asset_total": (
+        config_asset_total=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetTotal=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "config_asset_decimals": (
+        config_asset_decimals=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetDecimals=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "config_asset_default_frozen": (
+        config_asset_default_frozen=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetDefaultFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "config_asset_unit_name": (
+        config_asset_unit_name=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetUnitName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_name": (
+        config_asset_name=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_url": (
+        config_asset_url=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetURL=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_metadata_hash": (
+        config_asset_metadata_hash=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetMetadataHash=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_manager": (
+        config_asset_manager=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetManager=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_reserve": (
+        config_asset_reserve=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetReserve=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_freeze": (
+        config_asset_freeze=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetFreeze=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_clawback": (
+        config_asset_clawback=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetClawback=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "freeze_asset": (
+        freeze_asset=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FreezeAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "freeze_asset_account": (
+        freeze_asset_account=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FreezeAssetAccount=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "freeze_asset_frozen": (
+        freeze_asset_frozen=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FreezeAssetFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "assets": (
+        assets=(
             FunctionOpMapping(
                 "gitxnas",
                 immediates=dict(t=int, Assets=None),
@@ -1517,14 +1517,14 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "num_assets": (
+        num_assets=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumAssets=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "applications": (
+        applications=(
             FunctionOpMapping(
                 "gitxnas",
                 immediates=dict(t=int, Applications=None),
@@ -1537,56 +1537,56 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "num_applications": (
+        num_applications=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumApplications=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "global_num_uint": (
+        global_num_uint=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, GlobalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "global_num_byte_slice": (
+        global_num_byte_slice=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, GlobalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "local_num_uint": (
+        local_num_uint=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LocalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "local_num_byte_slice": (
+        local_num_byte_slice=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LocalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "extra_program_pages": (
+        extra_program_pages=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ExtraProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "nonparticipation": (
+        nonparticipation=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Nonparticipation=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "logs": (
+        logs=(
             FunctionOpMapping(
                 "gitxnas",
                 immediates=dict(t=int, Logs=None),
@@ -1599,42 +1599,42 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_logs": (
+        num_logs=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumLogs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "created_asset_id": (
+        created_asset_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, CreatedAssetID=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "created_application_id": (
+        created_application_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, CreatedApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "last_log": (
+        last_log=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LastLog=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "state_proof_pk": (
+        state_proof_pk=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, StateProofPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "approval_program_pages": (
+        approval_program_pages=(
             FunctionOpMapping(
                 "gitxnas",
                 immediates=dict(t=int, ApprovalProgramPages=None),
@@ -1647,14 +1647,14 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_approval_program_pages": (
+        num_approval_program_pages=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumApprovalProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "clear_state_program_pages": (
+        clear_state_program_pages=(
             FunctionOpMapping(
                 "gitxnas",
                 immediates=dict(t=int, ClearStateProgramPages=None),
@@ -1667,16 +1667,16 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_clear_state_program_pages": (
+        num_clear_state_program_pages=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumClearStateProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-    },
-    "GTxn": {
-        "sender": (
+    ),
+    GTxn=dict(
+        sender=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Sender=None),
@@ -1689,7 +1689,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "fee": (
+        fee=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Fee=None),
@@ -1702,7 +1702,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "first_valid": (
+        first_valid=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(FirstValid=None),
@@ -1715,7 +1715,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "first_valid_time": (
+        first_valid_time=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(FirstValidTime=None),
@@ -1728,7 +1728,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "last_valid": (
+        last_valid=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(LastValid=None),
@@ -1741,7 +1741,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "note": (
+        note=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Note=None),
@@ -1754,7 +1754,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "lease": (
+        lease=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Lease=None),
@@ -1767,7 +1767,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "receiver": (
+        receiver=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Receiver=None),
@@ -1780,7 +1780,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "amount": (
+        amount=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Amount=None),
@@ -1793,7 +1793,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "close_remainder_to": (
+        close_remainder_to=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(CloseRemainderTo=None),
@@ -1806,7 +1806,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "vote_pk": (
+        vote_pk=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(VotePK=None),
@@ -1819,7 +1819,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "selection_pk": (
+        selection_pk=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(SelectionPK=None),
@@ -1832,7 +1832,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "vote_first": (
+        vote_first=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(VoteFirst=None),
@@ -1845,7 +1845,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "vote_last": (
+        vote_last=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(VoteLast=None),
@@ -1858,7 +1858,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "vote_key_dilution": (
+        vote_key_dilution=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(VoteKeyDilution=None),
@@ -1871,7 +1871,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "type": (
+        type=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Type=None),
@@ -1884,7 +1884,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "type_enum": (
+        type_enum=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(TypeEnum=None),
@@ -1897,7 +1897,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "xfer_asset": (
+        xfer_asset=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(XferAsset=None),
@@ -1910,7 +1910,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "asset_amount": (
+        asset_amount=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(AssetAmount=None),
@@ -1923,7 +1923,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "asset_sender": (
+        asset_sender=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(AssetSender=None),
@@ -1936,7 +1936,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "asset_receiver": (
+        asset_receiver=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(AssetReceiver=None),
@@ -1949,7 +1949,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "asset_close_to": (
+        asset_close_to=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(AssetCloseTo=None),
@@ -1962,7 +1962,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "group_index": (
+        group_index=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(GroupIndex=None),
@@ -1975,7 +1975,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "tx_id": (
+        tx_id=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(TxID=None),
@@ -1988,7 +1988,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "application_id": (
+        application_id=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ApplicationID=None),
@@ -2001,7 +2001,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "on_completion": (
+        on_completion=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(OnCompletion=None),
@@ -2014,7 +2014,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "application_args": (
+        application_args=(
             FunctionOpMapping(
                 "gtxnsas",
                 immediates=dict(ApplicationArgs=None),
@@ -2039,7 +2039,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_app_args": (
+        num_app_args=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(NumAppArgs=None),
@@ -2052,7 +2052,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "accounts": (
+        accounts=(
             FunctionOpMapping(
                 "gtxnsas",
                 immediates=dict(Accounts=None),
@@ -2077,7 +2077,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "num_accounts": (
+        num_accounts=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(NumAccounts=None),
@@ -2090,7 +2090,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "approval_program": (
+        approval_program=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ApprovalProgram=None),
@@ -2103,7 +2103,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "clear_state_program": (
+        clear_state_program=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ClearStateProgram=None),
@@ -2116,7 +2116,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "rekey_to": (
+        rekey_to=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(RekeyTo=None),
@@ -2129,7 +2129,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset": (
+        config_asset=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAsset=None),
@@ -2142,7 +2142,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "config_asset_total": (
+        config_asset_total=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetTotal=None),
@@ -2155,7 +2155,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "config_asset_decimals": (
+        config_asset_decimals=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetDecimals=None),
@@ -2168,7 +2168,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "config_asset_default_frozen": (
+        config_asset_default_frozen=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetDefaultFrozen=None),
@@ -2181,7 +2181,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "config_asset_unit_name": (
+        config_asset_unit_name=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetUnitName=None),
@@ -2194,7 +2194,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_name": (
+        config_asset_name=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetName=None),
@@ -2207,7 +2207,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_url": (
+        config_asset_url=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetURL=None),
@@ -2220,7 +2220,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_metadata_hash": (
+        config_asset_metadata_hash=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetMetadataHash=None),
@@ -2233,7 +2233,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_manager": (
+        config_asset_manager=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetManager=None),
@@ -2246,7 +2246,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_reserve": (
+        config_asset_reserve=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetReserve=None),
@@ -2259,7 +2259,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_freeze": (
+        config_asset_freeze=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetFreeze=None),
@@ -2272,7 +2272,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_clawback": (
+        config_asset_clawback=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ConfigAssetClawback=None),
@@ -2285,7 +2285,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "freeze_asset": (
+        freeze_asset=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(FreezeAsset=None),
@@ -2298,7 +2298,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "freeze_asset_account": (
+        freeze_asset_account=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(FreezeAssetAccount=None),
@@ -2311,7 +2311,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "freeze_asset_frozen": (
+        freeze_asset_frozen=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(FreezeAssetFrozen=None),
@@ -2324,7 +2324,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "assets": (
+        assets=(
             FunctionOpMapping(
                 "gtxnsas",
                 immediates=dict(Assets=None),
@@ -2349,7 +2349,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "num_assets": (
+        num_assets=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(NumAssets=None),
@@ -2362,7 +2362,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "applications": (
+        applications=(
             FunctionOpMapping(
                 "gtxnsas",
                 immediates=dict(Applications=None),
@@ -2387,7 +2387,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "num_applications": (
+        num_applications=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(NumApplications=None),
@@ -2400,7 +2400,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "global_num_uint": (
+        global_num_uint=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(GlobalNumUint=None),
@@ -2413,7 +2413,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "global_num_byte_slice": (
+        global_num_byte_slice=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(GlobalNumByteSlice=None),
@@ -2426,7 +2426,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "local_num_uint": (
+        local_num_uint=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(LocalNumUint=None),
@@ -2439,7 +2439,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "local_num_byte_slice": (
+        local_num_byte_slice=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(LocalNumByteSlice=None),
@@ -2452,7 +2452,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "extra_program_pages": (
+        extra_program_pages=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(ExtraProgramPages=None),
@@ -2465,7 +2465,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "nonparticipation": (
+        nonparticipation=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(Nonparticipation=None),
@@ -2478,7 +2478,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "logs": (
+        logs=(
             FunctionOpMapping(
                 "gtxnsas",
                 immediates=dict(Logs=None),
@@ -2503,7 +2503,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_logs": (
+        num_logs=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(NumLogs=None),
@@ -2516,7 +2516,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "created_asset_id": (
+        created_asset_id=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(CreatedAssetID=None),
@@ -2529,7 +2529,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "created_application_id": (
+        created_application_id=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(CreatedApplicationID=None),
@@ -2542,7 +2542,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "last_log": (
+        last_log=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(LastLog=None),
@@ -2555,7 +2555,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "state_proof_pk": (
+        state_proof_pk=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(StateProofPK=None),
@@ -2568,7 +2568,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "approval_program_pages": (
+        approval_program_pages=(
             FunctionOpMapping(
                 "gtxnsas",
                 immediates=dict(ApprovalProgramPages=None),
@@ -2593,7 +2593,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_approval_program_pages": (
+        num_approval_program_pages=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(NumApprovalProgramPages=None),
@@ -2606,7 +2606,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "clear_state_program_pages": (
+        clear_state_program_pages=(
             FunctionOpMapping(
                 "gtxnsas",
                 immediates=dict(ClearStateProgramPages=None),
@@ -2631,7 +2631,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_clear_state_program_pages": (
+        num_clear_state_program_pages=(
             FunctionOpMapping(
                 "gtxns",
                 immediates=dict(NumClearStateProgramPages=None),
@@ -2644,285 +2644,285 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-    },
-    "Global": {
-        "min_txn_fee": PropertyOpMapping(
+    ),
+    Global=dict(
+        min_txn_fee=PropertyOpMapping(
             "global",
             immediates=("MinTxnFee",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "min_balance": PropertyOpMapping(
+        min_balance=PropertyOpMapping(
             "global",
             immediates=("MinBalance",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "max_txn_life": PropertyOpMapping(
+        max_txn_life=PropertyOpMapping(
             "global",
             immediates=("MaxTxnLife",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "zero_address": PropertyOpMapping(
+        zero_address=PropertyOpMapping(
             "global",
             immediates=("ZeroAddress",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "group_size": PropertyOpMapping(
+        group_size=PropertyOpMapping(
             "global",
             immediates=("GroupSize",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "logic_sig_version": PropertyOpMapping(
+        logic_sig_version=PropertyOpMapping(
             "global",
             immediates=("LogicSigVersion",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "round": PropertyOpMapping(
+        round=PropertyOpMapping(
             "global",
             immediates=("Round",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "latest_timestamp": PropertyOpMapping(
+        latest_timestamp=PropertyOpMapping(
             "global",
             immediates=("LatestTimestamp",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "current_application_id": PropertyOpMapping(
+        current_application_id=PropertyOpMapping(
             "global",
             immediates=("CurrentApplicationID",),
             stack_outputs=(wtypes.application_wtype,),
         ),
-        "creator_address": PropertyOpMapping(
+        creator_address=PropertyOpMapping(
             "global",
             immediates=("CreatorAddress",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "current_application_address": PropertyOpMapping(
+        current_application_address=PropertyOpMapping(
             "global",
             immediates=("CurrentApplicationAddress",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "group_id": PropertyOpMapping(
+        group_id=PropertyOpMapping(
             "global",
             immediates=("GroupID",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "opcode_budget": (
+        opcode_budget=(
             FunctionOpMapping(
                 "global",
                 immediates=dict(OpcodeBudget=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "caller_application_id": PropertyOpMapping(
+        caller_application_id=PropertyOpMapping(
             "global",
             immediates=("CallerApplicationID",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "caller_application_address": PropertyOpMapping(
+        caller_application_address=PropertyOpMapping(
             "global",
             immediates=("CallerApplicationAddress",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "asset_create_min_balance": PropertyOpMapping(
+        asset_create_min_balance=PropertyOpMapping(
             "global",
             immediates=("AssetCreateMinBalance",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "asset_opt_in_min_balance": PropertyOpMapping(
+        asset_opt_in_min_balance=PropertyOpMapping(
             "global",
             immediates=("AssetOptInMinBalance",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "genesis_hash": PropertyOpMapping(
+        genesis_hash=PropertyOpMapping(
             "global",
             immediates=("GenesisHash",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-    },
-    "ITxn": {
-        "sender": (
+    ),
+    ITxn=dict(
+        sender=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Sender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "fee": (
+        fee=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Fee=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "first_valid": (
+        first_valid=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FirstValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "first_valid_time": (
+        first_valid_time=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FirstValidTime=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "last_valid": (
+        last_valid=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LastValid=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "note": (
+        note=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Note=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "lease": (
+        lease=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Lease=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "receiver": (
+        receiver=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Receiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "amount": (
+        amount=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Amount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "close_remainder_to": (
+        close_remainder_to=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(CloseRemainderTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "vote_pk": (
+        vote_pk=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VotePK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "selection_pk": (
+        selection_pk=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(SelectionPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "vote_first": (
+        vote_first=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VoteFirst=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "vote_last": (
+        vote_last=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VoteLast=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "vote_key_dilution": (
+        vote_key_dilution=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VoteKeyDilution=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "type": (
+        type=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Type=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "type_enum": (
+        type_enum=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(TypeEnum=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "xfer_asset": (
+        xfer_asset=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(XferAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "asset_amount": (
+        asset_amount=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetAmount=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "asset_sender": (
+        asset_sender=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetSender=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "asset_receiver": (
+        asset_receiver=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetReceiver=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "asset_close_to": (
+        asset_close_to=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetCloseTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "group_index": (
+        group_index=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(GroupIndex=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "tx_id": (
+        tx_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(TxID=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "application_id": (
+        application_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "on_completion": (
+        on_completion=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(OnCompletion=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "application_args": (
+        application_args=(
             FunctionOpMapping(
                 "itxnas",
                 immediates=dict(ApplicationArgs=None),
@@ -2935,14 +2935,14 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_app_args": (
+        num_app_args=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumAppArgs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "accounts": (
+        accounts=(
             FunctionOpMapping(
                 "itxnas",
                 immediates=dict(Accounts=None),
@@ -2955,140 +2955,140 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "num_accounts": (
+        num_accounts=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumAccounts=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "approval_program": (
+        approval_program=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ApprovalProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "clear_state_program": (
+        clear_state_program=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ClearStateProgram=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "rekey_to": (
+        rekey_to=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(RekeyTo=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset": (
+        config_asset=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "config_asset_total": (
+        config_asset_total=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetTotal=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "config_asset_decimals": (
+        config_asset_decimals=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetDecimals=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "config_asset_default_frozen": (
+        config_asset_default_frozen=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetDefaultFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "config_asset_unit_name": (
+        config_asset_unit_name=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetUnitName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_name": (
+        config_asset_name=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetName=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_url": (
+        config_asset_url=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetURL=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_metadata_hash": (
+        config_asset_metadata_hash=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetMetadataHash=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "config_asset_manager": (
+        config_asset_manager=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetManager=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_reserve": (
+        config_asset_reserve=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetReserve=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_freeze": (
+        config_asset_freeze=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetFreeze=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "config_asset_clawback": (
+        config_asset_clawback=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetClawback=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "freeze_asset": (
+        freeze_asset=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FreezeAsset=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "freeze_asset_account": (
+        freeze_asset_account=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FreezeAssetAccount=None),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "freeze_asset_frozen": (
+        freeze_asset_frozen=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FreezeAssetFrozen=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "assets": (
+        assets=(
             FunctionOpMapping(
                 "itxnas",
                 immediates=dict(Assets=None),
@@ -3101,14 +3101,14 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "num_assets": (
+        num_assets=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumAssets=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "applications": (
+        applications=(
             FunctionOpMapping(
                 "itxnas",
                 immediates=dict(Applications=None),
@@ -3121,56 +3121,56 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "num_applications": (
+        num_applications=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumApplications=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "global_num_uint": (
+        global_num_uint=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(GlobalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "global_num_byte_slice": (
+        global_num_byte_slice=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(GlobalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "local_num_uint": (
+        local_num_uint=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LocalNumUint=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "local_num_byte_slice": (
+        local_num_byte_slice=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LocalNumByteSlice=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "extra_program_pages": (
+        extra_program_pages=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ExtraProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "nonparticipation": (
+        nonparticipation=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Nonparticipation=None),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
-        "logs": (
+        logs=(
             FunctionOpMapping(
                 "itxnas",
                 immediates=dict(Logs=None),
@@ -3183,42 +3183,42 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_logs": (
+        num_logs=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumLogs=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "created_asset_id": (
+        created_asset_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(CreatedAssetID=None),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "created_application_id": (
+        created_application_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(CreatedApplicationID=None),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "last_log": (
+        last_log=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LastLog=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "state_proof_pk": (
+        state_proof_pk=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(StateProofPK=None),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "approval_program_pages": (
+        approval_program_pages=(
             FunctionOpMapping(
                 "itxnas",
                 immediates=dict(ApprovalProgramPages=None),
@@ -3231,14 +3231,14 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_approval_program_pages": (
+        num_approval_program_pages=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumApprovalProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "clear_state_program_pages": (
+        clear_state_program_pages=(
             FunctionOpMapping(
                 "itxnas",
                 immediates=dict(ClearStateProgramPages=None),
@@ -3251,390 +3251,390 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_clear_state_program_pages": (
+        num_clear_state_program_pages=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumClearStateProgramPages=None),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-    },
-    "ITxnCreate": {
-        "begin": (
+    ),
+    ITxnCreate=dict(
+        begin=(
             FunctionOpMapping(
                 "itxn_begin",
             ),
         ),
-        "next": (
+        next=(
             FunctionOpMapping(
                 "itxn_next",
             ),
         ),
-        "submit": (
+        submit=(
             FunctionOpMapping(
                 "itxn_submit",
             ),
         ),
-        "set_sender": (
+        set_sender=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Sender=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_fee": (
+        set_fee=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Fee=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_note": (
+        set_note=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Note=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_receiver": (
+        set_receiver=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Receiver=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_amount": (
+        set_amount=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Amount=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_close_remainder_to": (
+        set_close_remainder_to=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(CloseRemainderTo=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_vote_pk": (
+        set_vote_pk=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(VotePK=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_selection_pk": (
+        set_selection_pk=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(SelectionPK=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_vote_first": (
+        set_vote_first=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(VoteFirst=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_vote_last": (
+        set_vote_last=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(VoteLast=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_vote_key_dilution": (
+        set_vote_key_dilution=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(VoteKeyDilution=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_type": (
+        set_type=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Type=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_type_enum": (
+        set_type_enum=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(TypeEnum=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_xfer_asset": (
+        set_xfer_asset=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(XferAsset=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
             ),
         ),
-        "set_asset_amount": (
+        set_asset_amount=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(AssetAmount=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_asset_sender": (
+        set_asset_sender=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(AssetSender=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_asset_receiver": (
+        set_asset_receiver=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(AssetReceiver=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_asset_close_to": (
+        set_asset_close_to=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(AssetCloseTo=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_application_id": (
+        set_application_id=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ApplicationID=None),
                 stack_inputs=dict(a=(wtypes.application_wtype, wtypes.uint64_wtype)),
             ),
         ),
-        "set_on_completion": (
+        set_on_completion=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(OnCompletion=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_application_args": (
+        set_application_args=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_accounts": (
+        set_accounts=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_approval_program": (
+        set_approval_program=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ApprovalProgram=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_clear_state_program": (
+        set_clear_state_program=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ClearStateProgram=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_rekey_to": (
+        set_rekey_to=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(RekeyTo=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_config_asset": (
+        set_config_asset=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAsset=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
             ),
         ),
-        "set_config_asset_total": (
+        set_config_asset_total=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetTotal=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_config_asset_decimals": (
+        set_config_asset_decimals=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetDecimals=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_config_asset_default_frozen": (
+        set_config_asset_default_frozen=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetDefaultFrozen=None),
                 stack_inputs=dict(a=(wtypes.bool_wtype, wtypes.uint64_wtype)),
             ),
         ),
-        "set_config_asset_unit_name": (
+        set_config_asset_unit_name=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetUnitName=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_config_asset_name": (
+        set_config_asset_name=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetName=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_config_asset_url": (
+        set_config_asset_url=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetURL=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_config_asset_metadata_hash": (
+        set_config_asset_metadata_hash=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetMetadataHash=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_config_asset_manager": (
+        set_config_asset_manager=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetManager=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_config_asset_reserve": (
+        set_config_asset_reserve=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetReserve=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_config_asset_freeze": (
+        set_config_asset_freeze=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetFreeze=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_config_asset_clawback": (
+        set_config_asset_clawback=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ConfigAssetClawback=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_freeze_asset": (
+        set_freeze_asset=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(FreezeAsset=None),
                 stack_inputs=dict(a=(wtypes.asset_wtype, wtypes.uint64_wtype)),
             ),
         ),
-        "set_freeze_asset_account": (
+        set_freeze_asset_account=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(FreezeAssetAccount=None),
                 stack_inputs=dict(a=(wtypes.account_wtype,)),
             ),
         ),
-        "set_freeze_asset_frozen": (
+        set_freeze_asset_frozen=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(FreezeAssetFrozen=None),
                 stack_inputs=dict(a=(wtypes.bool_wtype, wtypes.uint64_wtype)),
             ),
         ),
-        "set_assets": (
+        set_assets=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Assets=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_applications": (
+        set_applications=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Applications=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_global_num_uint": (
+        set_global_num_uint=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(GlobalNumUint=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_global_num_byte_slice": (
+        set_global_num_byte_slice=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(GlobalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_local_num_uint": (
+        set_local_num_uint=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(LocalNumUint=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_local_num_byte_slice": (
+        set_local_num_byte_slice=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(LocalNumByteSlice=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_extra_program_pages": (
+        set_extra_program_pages=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ExtraProgramPages=None),
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
             ),
         ),
-        "set_nonparticipation": (
+        set_nonparticipation=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(Nonparticipation=None),
                 stack_inputs=dict(a=(wtypes.bool_wtype, wtypes.uint64_wtype)),
             ),
         ),
-        "set_state_proof_pk": (
+        set_state_proof_pk=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(StateProofPK=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_approval_program_pages": (
+        set_approval_program_pages=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-        "set_clear_state_program_pages": (
+        set_clear_state_program_pages=(
             FunctionOpMapping(
                 "itxn_field",
                 immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(wtypes.bytes_wtype,)),
             ),
         ),
-    },
-    "JsonRef": {
-        "json_string": (
+    ),
+    JsonRef=dict(
+        json_string=(
             FunctionOpMapping(
                 "json_ref",
                 immediates=dict(JSONString=None),
@@ -3642,7 +3642,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "json_uint64": (
+        json_uint64=(
             FunctionOpMapping(
                 "json_ref",
                 immediates=dict(JSONUint64=None),
@@ -3650,7 +3650,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "json_object": (
+        json_object=(
             FunctionOpMapping(
                 "json_ref",
                 immediates=dict(JSONObject=None),
@@ -3658,23 +3658,23 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-    },
-    "Scratch": {
-        "load_bytes": (
+    ),
+    Scratch=dict(
+        load_bytes=(
             FunctionOpMapping(
                 "loads",
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "load_uint64": (
+        load_uint64=(
             FunctionOpMapping(
                 "loads",
                 stack_inputs=dict(a=(wtypes.uint64_wtype,)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
-        "store": (
+        store=(
             FunctionOpMapping(
                 "stores",
                 stack_inputs=dict(
@@ -3682,139 +3682,139 @@ NAMESPACE_CLASSES: typing.Final[
                 ),
             ),
         ),
-    },
-    "Txn": {
-        "sender": PropertyOpMapping(
+    ),
+    Txn=dict(
+        sender=PropertyOpMapping(
             "txn",
             immediates=("Sender",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "fee": PropertyOpMapping(
+        fee=PropertyOpMapping(
             "txn",
             immediates=("Fee",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "first_valid": PropertyOpMapping(
+        first_valid=PropertyOpMapping(
             "txn",
             immediates=("FirstValid",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "first_valid_time": PropertyOpMapping(
+        first_valid_time=PropertyOpMapping(
             "txn",
             immediates=("FirstValidTime",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "last_valid": PropertyOpMapping(
+        last_valid=PropertyOpMapping(
             "txn",
             immediates=("LastValid",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "note": PropertyOpMapping(
+        note=PropertyOpMapping(
             "txn",
             immediates=("Note",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "lease": PropertyOpMapping(
+        lease=PropertyOpMapping(
             "txn",
             immediates=("Lease",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "receiver": PropertyOpMapping(
+        receiver=PropertyOpMapping(
             "txn",
             immediates=("Receiver",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "amount": PropertyOpMapping(
+        amount=PropertyOpMapping(
             "txn",
             immediates=("Amount",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "close_remainder_to": PropertyOpMapping(
+        close_remainder_to=PropertyOpMapping(
             "txn",
             immediates=("CloseRemainderTo",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "vote_pk": PropertyOpMapping(
+        vote_pk=PropertyOpMapping(
             "txn",
             immediates=("VotePK",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "selection_pk": PropertyOpMapping(
+        selection_pk=PropertyOpMapping(
             "txn",
             immediates=("SelectionPK",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "vote_first": PropertyOpMapping(
+        vote_first=PropertyOpMapping(
             "txn",
             immediates=("VoteFirst",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "vote_last": PropertyOpMapping(
+        vote_last=PropertyOpMapping(
             "txn",
             immediates=("VoteLast",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "vote_key_dilution": PropertyOpMapping(
+        vote_key_dilution=PropertyOpMapping(
             "txn",
             immediates=("VoteKeyDilution",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "type": PropertyOpMapping(
+        type=PropertyOpMapping(
             "txn",
             immediates=("Type",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "type_enum": PropertyOpMapping(
+        type_enum=PropertyOpMapping(
             "txn",
             immediates=("TypeEnum",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "xfer_asset": PropertyOpMapping(
+        xfer_asset=PropertyOpMapping(
             "txn",
             immediates=("XferAsset",),
             stack_outputs=(wtypes.asset_wtype,),
         ),
-        "asset_amount": PropertyOpMapping(
+        asset_amount=PropertyOpMapping(
             "txn",
             immediates=("AssetAmount",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "asset_sender": PropertyOpMapping(
+        asset_sender=PropertyOpMapping(
             "txn",
             immediates=("AssetSender",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "asset_receiver": PropertyOpMapping(
+        asset_receiver=PropertyOpMapping(
             "txn",
             immediates=("AssetReceiver",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "asset_close_to": PropertyOpMapping(
+        asset_close_to=PropertyOpMapping(
             "txn",
             immediates=("AssetCloseTo",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "group_index": PropertyOpMapping(
+        group_index=PropertyOpMapping(
             "txn",
             immediates=("GroupIndex",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "tx_id": PropertyOpMapping(
+        tx_id=PropertyOpMapping(
             "txn",
             immediates=("TxID",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "application_id": PropertyOpMapping(
+        application_id=PropertyOpMapping(
             "txn",
             immediates=("ApplicationID",),
             stack_outputs=(wtypes.application_wtype,),
         ),
-        "on_completion": PropertyOpMapping(
+        on_completion=PropertyOpMapping(
             "txn",
             immediates=("OnCompletion",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "application_args": (
+        application_args=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(ApplicationArgs=None),
@@ -3827,12 +3827,12 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_app_args": PropertyOpMapping(
+        num_app_args=PropertyOpMapping(
             "txn",
             immediates=("NumAppArgs",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "accounts": (
+        accounts=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Accounts=None),
@@ -3845,102 +3845,102 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
-        "num_accounts": PropertyOpMapping(
+        num_accounts=PropertyOpMapping(
             "txn",
             immediates=("NumAccounts",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "approval_program": PropertyOpMapping(
+        approval_program=PropertyOpMapping(
             "txn",
             immediates=("ApprovalProgram",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "clear_state_program": PropertyOpMapping(
+        clear_state_program=PropertyOpMapping(
             "txn",
             immediates=("ClearStateProgram",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "rekey_to": PropertyOpMapping(
+        rekey_to=PropertyOpMapping(
             "txn",
             immediates=("RekeyTo",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "config_asset": PropertyOpMapping(
+        config_asset=PropertyOpMapping(
             "txn",
             immediates=("ConfigAsset",),
             stack_outputs=(wtypes.asset_wtype,),
         ),
-        "config_asset_total": PropertyOpMapping(
+        config_asset_total=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetTotal",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "config_asset_decimals": PropertyOpMapping(
+        config_asset_decimals=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetDecimals",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "config_asset_default_frozen": PropertyOpMapping(
+        config_asset_default_frozen=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetDefaultFrozen",),
             stack_outputs=(wtypes.bool_wtype,),
         ),
-        "config_asset_unit_name": PropertyOpMapping(
+        config_asset_unit_name=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetUnitName",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "config_asset_name": PropertyOpMapping(
+        config_asset_name=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetName",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "config_asset_url": PropertyOpMapping(
+        config_asset_url=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetURL",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "config_asset_metadata_hash": PropertyOpMapping(
+        config_asset_metadata_hash=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetMetadataHash",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "config_asset_manager": PropertyOpMapping(
+        config_asset_manager=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetManager",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "config_asset_reserve": PropertyOpMapping(
+        config_asset_reserve=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetReserve",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "config_asset_freeze": PropertyOpMapping(
+        config_asset_freeze=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetFreeze",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "config_asset_clawback": PropertyOpMapping(
+        config_asset_clawback=PropertyOpMapping(
             "txn",
             immediates=("ConfigAssetClawback",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "freeze_asset": PropertyOpMapping(
+        freeze_asset=PropertyOpMapping(
             "txn",
             immediates=("FreezeAsset",),
             stack_outputs=(wtypes.asset_wtype,),
         ),
-        "freeze_asset_account": PropertyOpMapping(
+        freeze_asset_account=PropertyOpMapping(
             "txn",
             immediates=("FreezeAssetAccount",),
             stack_outputs=(wtypes.account_wtype,),
         ),
-        "freeze_asset_frozen": PropertyOpMapping(
+        freeze_asset_frozen=PropertyOpMapping(
             "txn",
             immediates=("FreezeAssetFrozen",),
             stack_outputs=(wtypes.bool_wtype,),
         ),
-        "assets": (
+        assets=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Assets=None),
@@ -3953,12 +3953,12 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
-        "num_assets": PropertyOpMapping(
+        num_assets=PropertyOpMapping(
             "txn",
             immediates=("NumAssets",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "applications": (
+        applications=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Applications=None),
@@ -3971,42 +3971,42 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
-        "num_applications": PropertyOpMapping(
+        num_applications=PropertyOpMapping(
             "txn",
             immediates=("NumApplications",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "global_num_uint": PropertyOpMapping(
+        global_num_uint=PropertyOpMapping(
             "txn",
             immediates=("GlobalNumUint",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "global_num_byte_slice": PropertyOpMapping(
+        global_num_byte_slice=PropertyOpMapping(
             "txn",
             immediates=("GlobalNumByteSlice",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "local_num_uint": PropertyOpMapping(
+        local_num_uint=PropertyOpMapping(
             "txn",
             immediates=("LocalNumUint",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "local_num_byte_slice": PropertyOpMapping(
+        local_num_byte_slice=PropertyOpMapping(
             "txn",
             immediates=("LocalNumByteSlice",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "extra_program_pages": PropertyOpMapping(
+        extra_program_pages=PropertyOpMapping(
             "txn",
             immediates=("ExtraProgramPages",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "nonparticipation": PropertyOpMapping(
+        nonparticipation=PropertyOpMapping(
             "txn",
             immediates=("Nonparticipation",),
             stack_outputs=(wtypes.bool_wtype,),
         ),
-        "logs": (
+        logs=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Logs=None),
@@ -4019,32 +4019,32 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_logs": PropertyOpMapping(
+        num_logs=PropertyOpMapping(
             "txn",
             immediates=("NumLogs",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "created_asset_id": PropertyOpMapping(
+        created_asset_id=PropertyOpMapping(
             "txn",
             immediates=("CreatedAssetID",),
             stack_outputs=(wtypes.asset_wtype,),
         ),
-        "created_application_id": PropertyOpMapping(
+        created_application_id=PropertyOpMapping(
             "txn",
             immediates=("CreatedApplicationID",),
             stack_outputs=(wtypes.application_wtype,),
         ),
-        "last_log": PropertyOpMapping(
+        last_log=PropertyOpMapping(
             "txn",
             immediates=("LastLog",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "state_proof_pk": PropertyOpMapping(
+        state_proof_pk=PropertyOpMapping(
             "txn",
             immediates=("StateProofPK",),
             stack_outputs=(wtypes.bytes_wtype,),
         ),
-        "approval_program_pages": (
+        approval_program_pages=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(ApprovalProgramPages=None),
@@ -4057,12 +4057,12 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_approval_program_pages": PropertyOpMapping(
+        num_approval_program_pages=PropertyOpMapping(
             "txn",
             immediates=("NumApprovalProgramPages",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-        "clear_state_program_pages": (
+        clear_state_program_pages=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(ClearStateProgramPages=None),
@@ -4075,10 +4075,10 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
-        "num_clear_state_program_pages": PropertyOpMapping(
+        num_clear_state_program_pages=PropertyOpMapping(
             "txn",
             immediates=("NumClearStateProgramPages",),
             stack_outputs=(wtypes.uint64_wtype,),
         ),
-    },
-}
+    ),
+)
