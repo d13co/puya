@@ -1014,7 +1014,7 @@ def build_awst_data(
     yield "from immutabledict import immutabledict"
     yield "ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]]({"
     for enum_name in enums:
-        yield f'    "algopy.{STUB_NAMESPACE}.{get_python_enum_class(enum_name)}": {{'
+        yield f"    {get_python_enum_class(enum_name)!r}: {{"
         for enum_value in lang_spec.arg_enums[enum_name]:
             # enum names currently match enum immediate values
             yield f'    "{enum_value.name}": "{enum_value.name}",'

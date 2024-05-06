@@ -11,18 +11,18 @@ from puya.awst_build.intrinsic_models import (
 
 ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]](
     {
-        "algopy.op.Base64": {
+        "Base64": {
             "URLEncoding": "URLEncoding",
             "StdEncoding": "StdEncoding",
         },
-        "algopy.op.ECDSA": {
+        "ECDSA": {
             "Secp256k1": "Secp256k1",
             "Secp256r1": "Secp256r1",
         },
-        "algopy.op.VrfVerify": {
+        "VrfVerify": {
             "VrfAlgorand": "VrfAlgorand",
         },
-        "algopy.op.EC": {
+        "EC": {
             "BN254g1": "BN254g1",
             "BN254g2": "BN254g2",
             "BLS12_381g1": "BLS12_381g1",
