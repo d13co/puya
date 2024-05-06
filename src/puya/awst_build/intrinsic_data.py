@@ -7,7 +7,6 @@ from puya.awst import wtypes
 from puya.awst_build.intrinsic_models import (
     FunctionOpMapping,
     ImmediateArgMapping,
-    StackArgMapping,
 )
 
 ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]](
@@ -29,115 +28,91 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.addw": (
             FunctionOpMapping(
                 op_code="addw",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.uint64_wtype),
             ),
         ),
         "algopy.op.app_opted_in": (
             FunctionOpMapping(
                 op_code="app_opted_in",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(
-                        arg_name="b", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.application_wtype, wtypes.uint64_wtype),
+                },
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.arg": (
             FunctionOpMapping(
                 op_code="args",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="arg",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int),),
+                immediates=(ImmediateArgMapping("a", int),),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.balance": (
             FunctionOpMapping(
                 op_code="balance",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.base64_decode": (
             FunctionOpMapping(
                 op_code="base64_decode",
-                immediates=(ImmediateArgMapping(arg_name="e", literal_type=str),),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                immediates=(ImmediateArgMapping("e", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.bitlen": (
             FunctionOpMapping(
                 op_code="bitlen",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.bytes_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.bsqrt": (
             FunctionOpMapping(
                 op_code="bsqrt",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.biguint_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.biguint_wtype,)},
                 stack_outputs=(wtypes.biguint_wtype,),
             ),
         ),
         "algopy.op.btoi": (
             FunctionOpMapping(
                 op_code="btoi",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.bzero": (
             FunctionOpMapping(
                 op_code="bzero",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.concat": (
             FunctionOpMapping(
                 op_code="concat",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.divmodw": (
             FunctionOpMapping(
                 op_code="divmodw",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="d", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.uint64_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                    "d": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(
                     wtypes.uint64_wtype,
                     wtypes.uint64_wtype,
@@ -149,433 +124,360 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.divw": (
             FunctionOpMapping(
                 op_code="divw",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.uint64_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.ecdsa_pk_decompress": (
             FunctionOpMapping(
                 op_code="ecdsa_pk_decompress",
-                immediates=(ImmediateArgMapping(arg_name="v", literal_type=str),),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                immediates=(ImmediateArgMapping("v", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bytes_wtype),
             ),
         ),
         "algopy.op.ecdsa_pk_recover": (
             FunctionOpMapping(
                 op_code="ecdsa_pk_recover",
-                immediates=(ImmediateArgMapping(arg_name="v", literal_type=str),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="d", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("v", str),),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.bytes_wtype,),
+                    "d": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bytes_wtype),
             ),
         ),
         "algopy.op.ecdsa_verify": (
             FunctionOpMapping(
                 op_code="ecdsa_verify",
-                immediates=(ImmediateArgMapping(arg_name="v", literal_type=str),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="d", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="e", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("v", str),),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.bytes_wtype,),
+                    "c": (wtypes.bytes_wtype,),
+                    "d": (wtypes.bytes_wtype,),
+                    "e": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.ed25519verify": (
             FunctionOpMapping(
                 op_code="ed25519verify",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.bytes_wtype,),
+                    "c": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.ed25519verify_bare": (
             FunctionOpMapping(
                 op_code="ed25519verify_bare",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.bytes_wtype,),
+                    "c": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.err": (FunctionOpMapping(op_code="err"),),
         "algopy.op.exit": (
-            FunctionOpMapping(
-                op_code="return",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
-            ),
+            FunctionOpMapping(op_code="return", stack_inputs={"a": (wtypes.uint64_wtype,)}),
         ),
         "algopy.op.exp": (
             FunctionOpMapping(
                 op_code="exp",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.expw": (
             FunctionOpMapping(
                 op_code="expw",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.uint64_wtype),
             ),
         ),
         "algopy.op.extract": (
             FunctionOpMapping(
                 op_code="extract3",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="extract",
-                immediates=(
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                    ImmediateArgMapping(arg_name="c", literal_type=int),
-                ),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                immediates=(ImmediateArgMapping("b", int), ImmediateArgMapping("c", int)),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.extract_uint16": (
             FunctionOpMapping(
                 op_code="extract_uint16",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.extract_uint32": (
             FunctionOpMapping(
                 op_code="extract_uint32",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.extract_uint64": (
             FunctionOpMapping(
                 op_code="extract_uint64",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.gaid": (
             FunctionOpMapping(
                 op_code="gaids",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gaid",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int),),
+                immediates=(ImmediateArgMapping("a", int),),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.getbit": (
             FunctionOpMapping(
                 op_code="getbit",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.bytes_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.getbyte": (
             FunctionOpMapping(
                 op_code="getbyte",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.gload_bytes": (
             FunctionOpMapping(
                 op_code="gloadss",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gload",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                ),
+                immediates=(ImmediateArgMapping("a", int), ImmediateArgMapping("b", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gloads",
-                immediates=(ImmediateArgMapping(arg_name="b", literal_type=int),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("b", int),),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.gload_uint64": (
             FunctionOpMapping(
                 op_code="gloadss",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gload",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                ),
+                immediates=(ImmediateArgMapping("a", int), ImmediateArgMapping("b", int)),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gloads",
-                immediates=(ImmediateArgMapping(arg_name="b", literal_type=int),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("b", int),),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.itob": (
             FunctionOpMapping(
                 op_code="itob",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.keccak256": (
             FunctionOpMapping(
                 op_code="keccak256",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.min_balance": (
             FunctionOpMapping(
                 op_code="min_balance",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.mulw": (
             FunctionOpMapping(
                 op_code="mulw",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.uint64_wtype),
             ),
         ),
         "algopy.op.replace": (
             FunctionOpMapping(
                 op_code="replace3",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="replace2",
-                immediates=(ImmediateArgMapping(arg_name="b", literal_type=int),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("b", int),),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "c": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.select_bytes": (
             FunctionOpMapping(
                 op_code="select",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(
-                        arg_name="c", allowed_types=(wtypes.bool_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.bytes_wtype,),
+                    "c": (wtypes.bool_wtype, wtypes.uint64_wtype),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.select_uint64": (
             FunctionOpMapping(
                 op_code="select",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(
-                        arg_name="c", allowed_types=(wtypes.bool_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.uint64_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.bool_wtype, wtypes.uint64_wtype),
+                },
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.setbit_bytes": (
             FunctionOpMapping(
                 op_code="setbit",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.setbit_uint64": (
             FunctionOpMapping(
                 op_code="setbit",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.uint64_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.setbyte": (
             FunctionOpMapping(
                 op_code="setbyte",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.sha256": (
             FunctionOpMapping(
                 op_code="sha256",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.sha3_256": (
             FunctionOpMapping(
                 op_code="sha3_256",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.sha512_256": (
             FunctionOpMapping(
                 op_code="sha512_256",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.shl": (
             FunctionOpMapping(
                 op_code="shl",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.shr": (
             FunctionOpMapping(
                 op_code="shr",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.sqrt": (
             FunctionOpMapping(
                 op_code="sqrt",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.substring": (
             FunctionOpMapping(
                 op_code="substring3",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="substring",
-                immediates=(
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                    ImmediateArgMapping(arg_name="c", literal_type=int),
-                ),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                immediates=(ImmediateArgMapping("b", int), ImmediateArgMapping("c", int)),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.vrf_verify": (
             FunctionOpMapping(
                 op_code="vrf_verify",
-                immediates=(ImmediateArgMapping(arg_name="s", literal_type=str),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("s", str),),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.bytes_wtype,),
+                    "c": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -583,11 +485,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctBalance",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -595,11 +493,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctMinBalance",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -607,11 +501,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctAuthAddr",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -619,11 +509,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalNumUint",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -631,11 +517,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalNumByteSlice",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -643,11 +525,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalExtraAppPages",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -655,11 +533,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalAppsCreated",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -667,11 +541,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalAppsOptedIn",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -679,11 +549,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalAssetsCreated",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -691,11 +557,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalAssets",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -703,11 +565,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalBoxes",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -715,157 +573,122 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="acct_params_get",
                 immediates=("AcctTotalBoxBytes",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
         "algopy.op.AppGlobal.get_bytes": (
             FunctionOpMapping(
                 op_code="app_global_get",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.AppGlobal.get_uint64": (
             FunctionOpMapping(
                 op_code="app_global_get",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.AppGlobal.get_ex_bytes": (
             FunctionOpMapping(
                 op_code="app_global_get_ex",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.application_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
         "algopy.op.AppGlobal.get_ex_uint64": (
             FunctionOpMapping(
                 op_code="app_global_get_ex",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.application_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
         "algopy.op.AppGlobal.delete": (
-            FunctionOpMapping(
-                op_code="app_global_del",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
-            ),
+            FunctionOpMapping(op_code="app_global_del", stack_inputs={"a": (wtypes.bytes_wtype,)}),
         ),
         "algopy.op.AppGlobal.put": (
             FunctionOpMapping(
                 op_code="app_global_put",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(
-                        arg_name="b", allowed_types=(wtypes.bytes_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.bytes_wtype, wtypes.uint64_wtype),
+                },
             ),
         ),
         "algopy.op.AppLocal.get_bytes": (
             FunctionOpMapping(
                 op_code="app_local_get",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.AppLocal.get_uint64": (
             FunctionOpMapping(
                 op_code="app_local_get",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.AppLocal.get_ex_bytes": (
             FunctionOpMapping(
                 op_code="app_local_get_ex",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(
-                        arg_name="b", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.application_wtype, wtypes.uint64_wtype),
+                    "c": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
         "algopy.op.AppLocal.get_ex_uint64": (
             FunctionOpMapping(
                 op_code="app_local_get_ex",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(
-                        arg_name="b", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.application_wtype, wtypes.uint64_wtype),
+                    "c": (wtypes.bytes_wtype,),
+                },
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
         "algopy.op.AppLocal.delete": (
             FunctionOpMapping(
                 op_code="app_local_del",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.bytes_wtype,),
+                },
             ),
         ),
         "algopy.op.AppLocal.put": (
             FunctionOpMapping(
                 op_code="app_local_put",
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(
-                        arg_name="c", allowed_types=(wtypes.bytes_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.bytes_wtype,),
+                    "c": (wtypes.bytes_wtype, wtypes.uint64_wtype),
+                },
             ),
         ),
         "algopy.op.AppParamsGet.app_approval_program": (
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppApprovalProgram",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -873,11 +696,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppClearStateProgram",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -885,11 +704,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppGlobalNumUint",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -897,11 +712,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppGlobalNumByteSlice",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -909,11 +720,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppLocalNumUint",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -921,11 +728,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppLocalNumByteSlice",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -933,11 +736,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppExtraProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -945,11 +744,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppCreator",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -957,11 +752,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="app_params_get",
                 immediates=("AppAddress",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -969,14 +760,10 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_holding_get",
                 immediates=("AssetBalance",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(
-                        arg_name="b", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.asset_wtype, wtypes.uint64_wtype),
+                },
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -984,14 +771,10 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_holding_get",
                 immediates=("AssetFrozen",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.account_wtype, wtypes.uint64_wtype)
-                    ),
-                    StackArgMapping(
-                        arg_name="b", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.account_wtype, wtypes.uint64_wtype),
+                    "b": (wtypes.asset_wtype, wtypes.uint64_wtype),
+                },
                 stack_outputs=(wtypes.bool_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -999,11 +782,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetTotal",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1011,11 +790,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetDecimals",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1023,11 +798,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetDefaultFrozen",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.bool_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1035,11 +806,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetUnitName",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1047,11 +814,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetName",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1059,11 +822,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetURL",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1071,11 +830,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetMetadataHash",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1083,11 +838,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetManager",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1095,11 +846,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetReserve",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1107,11 +854,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetFreeze",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1119,11 +862,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetClawback",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1131,11 +870,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="asset_params_get",
                 immediates=("AssetCreator",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
                 stack_outputs=(wtypes.account_wtype, wtypes.bool_wtype),
             ),
         ),
@@ -1143,9 +878,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="block",
                 immediates=("BlkSeed",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -1153,359 +886,325 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="block",
                 immediates=("BlkTimestamp",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Box.create": (
             FunctionOpMapping(
                 op_code="box_create",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.Box.delete": (
             FunctionOpMapping(
                 op_code="box_del",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.Box.extract": (
             FunctionOpMapping(
                 op_code="box_extract",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                },
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Box.get": (
             FunctionOpMapping(
                 op_code="box_get",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype, wtypes.bool_wtype),
             ),
         ),
         "algopy.op.Box.length": (
             FunctionOpMapping(
                 op_code="box_len",
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype, wtypes.bool_wtype),
             ),
         ),
         "algopy.op.Box.put": (
             FunctionOpMapping(
                 op_code="box_put",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.Box.replace": (
             FunctionOpMapping(
                 op_code="box_replace",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.bytes_wtype,),
+                },
             ),
         ),
         "algopy.op.Box.resize": (
             FunctionOpMapping(
                 op_code="box_resize",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.Box.splice": (
             FunctionOpMapping(
                 op_code="box_splice",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="c", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="d", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={
+                    "a": (wtypes.bytes_wtype,),
+                    "b": (wtypes.uint64_wtype,),
+                    "c": (wtypes.uint64_wtype,),
+                    "d": (wtypes.bytes_wtype,),
+                },
             ),
         ),
         "algopy.op.EllipticCurve.add": (
             FunctionOpMapping(
                 op_code="ec_add",
-                immediates=(ImmediateArgMapping(arg_name="g", literal_type=str),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("g", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.EllipticCurve.map_to": (
             FunctionOpMapping(
                 op_code="ec_map_to",
-                immediates=(ImmediateArgMapping(arg_name="g", literal_type=str),),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                immediates=(ImmediateArgMapping("g", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.EllipticCurve.scalar_mul_multi": (
             FunctionOpMapping(
                 op_code="ec_multi_scalar_mul",
-                immediates=(ImmediateArgMapping(arg_name="g", literal_type=str),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("g", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.EllipticCurve.pairing_check": (
             FunctionOpMapping(
                 op_code="ec_pairing_check",
-                immediates=(ImmediateArgMapping(arg_name="g", literal_type=str),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("g", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.EllipticCurve.scalar_mul": (
             FunctionOpMapping(
                 op_code="ec_scalar_mul",
-                immediates=(ImmediateArgMapping(arg_name="g", literal_type=str),),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("g", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.EllipticCurve.subgroup_check": (
             FunctionOpMapping(
                 op_code="ec_subgroup_check",
-                immediates=(ImmediateArgMapping(arg_name="g", literal_type=str),),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                immediates=(ImmediateArgMapping("g", str),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GITxn.sender": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Sender"),
+                immediates=(ImmediateArgMapping("t", int), "Sender"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.fee": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Fee"),
+                immediates=(ImmediateArgMapping("t", int), "Fee"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.first_valid": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "FirstValid"),
+                immediates=(ImmediateArgMapping("t", int), "FirstValid"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.first_valid_time": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "FirstValidTime"),
+                immediates=(ImmediateArgMapping("t", int), "FirstValidTime"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.last_valid": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "LastValid"),
+                immediates=(ImmediateArgMapping("t", int), "LastValid"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.note": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Note"),
+                immediates=(ImmediateArgMapping("t", int), "Note"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.lease": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Lease"),
+                immediates=(ImmediateArgMapping("t", int), "Lease"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.receiver": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Receiver"),
+                immediates=(ImmediateArgMapping("t", int), "Receiver"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.amount": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Amount"),
+                immediates=(ImmediateArgMapping("t", int), "Amount"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.close_remainder_to": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "CloseRemainderTo",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "CloseRemainderTo"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_pk": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "VotePK"),
+                immediates=(ImmediateArgMapping("t", int), "VotePK"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.selection_pk": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "SelectionPK"),
+                immediates=(ImmediateArgMapping("t", int), "SelectionPK"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_first": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "VoteFirst"),
+                immediates=(ImmediateArgMapping("t", int), "VoteFirst"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_last": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "VoteLast"),
+                immediates=(ImmediateArgMapping("t", int), "VoteLast"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.vote_key_dilution": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "VoteKeyDilution",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "VoteKeyDilution"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.type": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Type"),
+                immediates=(ImmediateArgMapping("t", int), "Type"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.type_enum": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "TypeEnum"),
+                immediates=(ImmediateArgMapping("t", int), "TypeEnum"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.xfer_asset": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "XferAsset"),
+                immediates=(ImmediateArgMapping("t", int), "XferAsset"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_amount": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "AssetAmount"),
+                immediates=(ImmediateArgMapping("t", int), "AssetAmount"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_sender": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "AssetSender"),
+                immediates=(ImmediateArgMapping("t", int), "AssetSender"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_receiver": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "AssetReceiver"),
+                immediates=(ImmediateArgMapping("t", int), "AssetReceiver"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.asset_close_to": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "AssetCloseTo"),
+                immediates=(ImmediateArgMapping("t", int), "AssetCloseTo"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.group_index": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "GroupIndex"),
+                immediates=(ImmediateArgMapping("t", int), "GroupIndex"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.tx_id": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "TxID"),
+                immediates=(ImmediateArgMapping("t", int), "TxID"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.application_id": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "ApplicationID"),
+                immediates=(ImmediateArgMapping("t", int), "ApplicationID"),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.GITxn.on_completion": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "OnCompletion"),
+                immediates=(ImmediateArgMapping("t", int), "OnCompletion"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.application_args": (
             FunctionOpMapping(
                 op_code="gitxnas",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ApplicationArgs",
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ApplicationArgs"),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gitxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
+                    ImmediateArgMapping("t", int),
                     "ApplicationArgs",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                 ),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1513,25 +1212,23 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GITxn.num_app_args": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "NumAppArgs"),
+                immediates=(ImmediateArgMapping("t", int), "NumAppArgs"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.accounts": (
             FunctionOpMapping(
                 op_code="gitxnas",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Accounts"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "Accounts"),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gitxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
+                    ImmediateArgMapping("t", int),
                     "Accounts",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                 ),
                 stack_outputs=(wtypes.account_wtype,),
             ),
@@ -1539,193 +1236,149 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GITxn.num_accounts": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "NumAccounts"),
+                immediates=(ImmediateArgMapping("t", int), "NumAccounts"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.approval_program": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ApprovalProgram",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ApprovalProgram"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.clear_state_program": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ClearStateProgram",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ClearStateProgram"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.rekey_to": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "RekeyTo"),
+                immediates=(ImmediateArgMapping("t", int), "RekeyTo"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "ConfigAsset"),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAsset"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_total": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetTotal",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetTotal"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_decimals": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetDecimals",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetDecimals"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_default_frozen": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetDefaultFrozen",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetDefaultFrozen"),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_unit_name": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetUnitName",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetUnitName"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_name": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetName",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetName"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_url": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "ConfigAssetURL"),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetURL"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_metadata_hash": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetMetadataHash",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetMetadataHash"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_manager": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetManager",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetManager"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_reserve": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetReserve",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetReserve"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_freeze": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetFreeze",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetFreeze"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.config_asset_clawback": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ConfigAssetClawback",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ConfigAssetClawback"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.freeze_asset": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "FreezeAsset"),
+                immediates=(ImmediateArgMapping("t", int), "FreezeAsset"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.freeze_asset_account": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "FreezeAssetAccount",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "FreezeAssetAccount"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
         "algopy.op.GITxn.freeze_asset_frozen": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "FreezeAssetFrozen",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "FreezeAssetFrozen"),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GITxn.assets": (
             FunctionOpMapping(
                 op_code="gitxnas",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Assets"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "Assets"),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gitxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
+                    ImmediateArgMapping("t", int),
                     "Assets",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                 ),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
@@ -1733,25 +1386,23 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GITxn.num_assets": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "NumAssets"),
+                immediates=(ImmediateArgMapping("t", int), "NumAssets"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.applications": (
             FunctionOpMapping(
                 op_code="gitxnas",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Applications"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "Applications"),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gitxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
+                    ImmediateArgMapping("t", int),
                     "Applications",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                 ),
                 stack_outputs=(wtypes.application_wtype,),
             ),
@@ -1759,142 +1410,113 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GITxn.num_applications": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "NumApplications",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "NumApplications"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.global_num_uint": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "GlobalNumUint"),
+                immediates=(ImmediateArgMapping("t", int), "GlobalNumUint"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.global_num_byte_slice": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "GlobalNumByteSlice",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "GlobalNumByteSlice"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.local_num_uint": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "LocalNumUint"),
+                immediates=(ImmediateArgMapping("t", int), "LocalNumUint"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.local_num_byte_slice": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "LocalNumByteSlice",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "LocalNumByteSlice"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.extra_program_pages": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ExtraProgramPages",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ExtraProgramPages"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.nonparticipation": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "Nonparticipation",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "Nonparticipation"),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
         "algopy.op.GITxn.logs": (
             FunctionOpMapping(
                 op_code="gitxnas",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "Logs"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "Logs"),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gitxna",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "Logs",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "Logs", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.num_logs": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "NumLogs"),
+                immediates=(ImmediateArgMapping("t", int), "NumLogs"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.created_asset_id": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "CreatedAssetID"),
+                immediates=(ImmediateArgMapping("t", int), "CreatedAssetID"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
         "algopy.op.GITxn.created_application_id": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "CreatedApplicationID",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "CreatedApplicationID"),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
         "algopy.op.GITxn.last_log": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "LastLog"),
+                immediates=(ImmediateArgMapping("t", int), "LastLog"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.state_proof_pk": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(ImmediateArgMapping(arg_name="t", literal_type=int), "StateProofPK"),
+                immediates=(ImmediateArgMapping("t", int), "StateProofPK"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.GITxn.approval_program_pages": (
             FunctionOpMapping(
                 op_code="gitxnas",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ApprovalProgramPages",
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ApprovalProgramPages"),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gitxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
+                    ImmediateArgMapping("t", int),
                     "ApprovalProgramPages",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                 ),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1902,31 +1524,23 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GITxn.num_approval_program_pages": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "NumApprovalProgramPages",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "NumApprovalProgramPages"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.GITxn.clear_state_program_pages": (
             FunctionOpMapping(
                 op_code="gitxnas",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "ClearStateProgramPages",
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("t", int), "ClearStateProgramPages"),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gitxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
+                    ImmediateArgMapping("t", int),
                     "ClearStateProgramPages",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                 ),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
@@ -1934,10 +1548,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
         "algopy.op.GITxn.num_clear_state_program_pages": (
             FunctionOpMapping(
                 op_code="gitxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="t", literal_type=int),
-                    "NumClearStateProgramPages",
-                ),
+                immediates=(ImmediateArgMapping("t", int), "NumClearStateProgramPages"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -1945,14 +1556,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Sender",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Sender"),
+                immediates=(ImmediateArgMapping("a", int), "Sender"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -1960,14 +1569,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Fee",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Fee"),
+                immediates=(ImmediateArgMapping("a", int), "Fee"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -1975,14 +1582,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("FirstValid",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "FirstValid"),
+                immediates=(ImmediateArgMapping("a", int), "FirstValid"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -1990,14 +1595,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("FirstValidTime",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "FirstValidTime"),
+                immediates=(ImmediateArgMapping("a", int), "FirstValidTime"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2005,14 +1608,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("LastValid",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "LastValid"),
+                immediates=(ImmediateArgMapping("a", int), "LastValid"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2020,14 +1621,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Note",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Note"),
+                immediates=(ImmediateArgMapping("a", int), "Note"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2035,14 +1634,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Lease",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Lease"),
+                immediates=(ImmediateArgMapping("a", int), "Lease"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2050,14 +1647,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Receiver",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Receiver"),
+                immediates=(ImmediateArgMapping("a", int), "Receiver"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2065,14 +1660,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Amount",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Amount"),
+                immediates=(ImmediateArgMapping("a", int), "Amount"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2080,17 +1673,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("CloseRemainderTo",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "CloseRemainderTo",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "CloseRemainderTo"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2098,14 +1686,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("VotePK",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "VotePK"),
+                immediates=(ImmediateArgMapping("a", int), "VotePK"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2113,14 +1699,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("SelectionPK",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "SelectionPK"),
+                immediates=(ImmediateArgMapping("a", int), "SelectionPK"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2128,14 +1712,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("VoteFirst",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "VoteFirst"),
+                immediates=(ImmediateArgMapping("a", int), "VoteFirst"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2143,14 +1725,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("VoteLast",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "VoteLast"),
+                immediates=(ImmediateArgMapping("a", int), "VoteLast"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2158,17 +1738,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("VoteKeyDilution",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "VoteKeyDilution",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "VoteKeyDilution"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2176,14 +1751,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Type",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Type"),
+                immediates=(ImmediateArgMapping("a", int), "Type"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2191,14 +1764,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("TypeEnum",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "TypeEnum"),
+                immediates=(ImmediateArgMapping("a", int), "TypeEnum"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2206,14 +1777,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("XferAsset",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "XferAsset"),
+                immediates=(ImmediateArgMapping("a", int), "XferAsset"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
@@ -2221,14 +1790,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("AssetAmount",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "AssetAmount"),
+                immediates=(ImmediateArgMapping("a", int), "AssetAmount"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2236,14 +1803,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("AssetSender",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "AssetSender"),
+                immediates=(ImmediateArgMapping("a", int), "AssetSender"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2251,14 +1816,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("AssetReceiver",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "AssetReceiver"),
+                immediates=(ImmediateArgMapping("a", int), "AssetReceiver"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2266,14 +1829,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("AssetCloseTo",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "AssetCloseTo"),
+                immediates=(ImmediateArgMapping("a", int), "AssetCloseTo"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2281,14 +1842,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("GroupIndex",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "GroupIndex"),
+                immediates=(ImmediateArgMapping("a", int), "GroupIndex"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2296,14 +1855,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("TxID",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "TxID"),
+                immediates=(ImmediateArgMapping("a", int), "TxID"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2311,14 +1868,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ApplicationID",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "ApplicationID"),
+                immediates=(ImmediateArgMapping("a", int), "ApplicationID"),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
@@ -2326,14 +1881,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("OnCompletion",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "OnCompletion"),
+                immediates=(ImmediateArgMapping("a", int), "OnCompletion"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2341,41 +1894,28 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxnsas",
                 immediates=("ApplicationArgs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnsa",
-                immediates=(
-                    "ApplicationArgs",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=("ApplicationArgs", ImmediateArgMapping("b", int)),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                     "ApplicationArgs",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
+                    ImmediateArgMapping("b", int),
                 ),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnas",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ApplicationArgs",
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ApplicationArgs"),
+                stack_inputs={"b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2383,14 +1923,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("NumAppArgs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "NumAppArgs"),
+                immediates=(ImmediateArgMapping("a", int), "NumAppArgs"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2398,35 +1936,28 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxnsas",
                 immediates=("Accounts",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnsa",
-                immediates=("Accounts", ImmediateArgMapping(arg_name="b", literal_type=int)),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=("Accounts", ImmediateArgMapping("b", int)),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                     "Accounts",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
+                    ImmediateArgMapping("b", int),
                 ),
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnas",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Accounts"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "Accounts"),
+                stack_inputs={"b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2434,14 +1965,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("NumAccounts",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "NumAccounts"),
+                immediates=(ImmediateArgMapping("a", int), "NumAccounts"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2449,17 +1978,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ApprovalProgram",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ApprovalProgram",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ApprovalProgram"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2467,17 +1991,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ClearStateProgram",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ClearStateProgram",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ClearStateProgram"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2485,14 +2004,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("RekeyTo",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "RekeyTo"),
+                immediates=(ImmediateArgMapping("a", int), "RekeyTo"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2500,14 +2017,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAsset",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "ConfigAsset"),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAsset"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
@@ -2515,17 +2030,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetTotal",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetTotal",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetTotal"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2533,17 +2043,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetDecimals",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetDecimals",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetDecimals"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2551,17 +2056,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetDefaultFrozen",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bool_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetDefaultFrozen",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetDefaultFrozen"),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
@@ -2569,17 +2069,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetUnitName",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetUnitName",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetUnitName"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2587,17 +2082,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetName",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetName",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetName"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2605,14 +2095,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetURL",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "ConfigAssetURL"),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetURL"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2620,17 +2108,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetMetadataHash",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetMetadataHash",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetMetadataHash"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -2638,17 +2121,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetManager",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetManager",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetManager"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2656,17 +2134,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetReserve",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetReserve",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetReserve"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2674,17 +2147,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetFreeze",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetFreeze",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetFreeze"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2692,17 +2160,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ConfigAssetClawback",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ConfigAssetClawback",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ConfigAssetClawback"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2710,14 +2173,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("FreezeAsset",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "FreezeAsset"),
+                immediates=(ImmediateArgMapping("a", int), "FreezeAsset"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
@@ -2725,17 +2186,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("FreezeAssetAccount",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "FreezeAssetAccount",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "FreezeAssetAccount"),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -2743,17 +2199,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("FreezeAssetFrozen",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bool_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "FreezeAssetFrozen",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "FreezeAssetFrozen"),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
@@ -2761,35 +2212,28 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxnsas",
                 immediates=("Assets",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnsa",
-                immediates=("Assets", ImmediateArgMapping(arg_name="b", literal_type=int)),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=("Assets", ImmediateArgMapping("b", int)),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                     "Assets",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
+                    ImmediateArgMapping("b", int),
                 ),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnas",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Assets"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "Assets"),
+                stack_inputs={"b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
@@ -2797,14 +2241,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("NumAssets",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "NumAssets"),
+                immediates=(ImmediateArgMapping("a", int), "NumAssets"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2812,35 +2254,28 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxnsas",
                 immediates=("Applications",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnsa",
-                immediates=("Applications", ImmediateArgMapping(arg_name="b", literal_type=int)),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=("Applications", ImmediateArgMapping("b", int)),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                     "Applications",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
+                    ImmediateArgMapping("b", int),
                 ),
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnas",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Applications"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "Applications"),
+                stack_inputs={"b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
@@ -2848,17 +2283,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("NumApplications",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "NumApplications",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "NumApplications"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2866,14 +2296,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("GlobalNumUint",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "GlobalNumUint"),
+                immediates=(ImmediateArgMapping("a", int), "GlobalNumUint"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2881,17 +2309,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("GlobalNumByteSlice",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "GlobalNumByteSlice",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "GlobalNumByteSlice"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2899,14 +2322,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("LocalNumUint",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "LocalNumUint"),
+                immediates=(ImmediateArgMapping("a", int), "LocalNumUint"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2914,17 +2335,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("LocalNumByteSlice",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "LocalNumByteSlice",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "LocalNumByteSlice"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2932,17 +2348,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("ExtraProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ExtraProgramPages",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ExtraProgramPages"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -2950,17 +2361,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("Nonparticipation",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bool_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "Nonparticipation",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "Nonparticipation"),
                 stack_outputs=(wtypes.bool_wtype,),
             ),
         ),
@@ -2968,35 +2374,24 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxnsas",
                 immediates=("Logs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnsa",
-                immediates=("Logs", ImmediateArgMapping(arg_name="b", literal_type=int)),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=("Logs", ImmediateArgMapping("b", int)),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxna",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "Logs",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "Logs", ImmediateArgMapping("b", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnas",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "Logs"),
-                stack_inputs=(
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "Logs"),
+                stack_inputs={"b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3004,14 +2399,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("NumLogs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "NumLogs"),
+                immediates=(ImmediateArgMapping("a", int), "NumLogs"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -3019,14 +2412,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("CreatedAssetID",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "CreatedAssetID"),
+                immediates=(ImmediateArgMapping("a", int), "CreatedAssetID"),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
@@ -3034,17 +2425,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("CreatedApplicationID",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "CreatedApplicationID",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "CreatedApplicationID"),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
@@ -3052,14 +2438,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("LastLog",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "LastLog"),
+                immediates=(ImmediateArgMapping("a", int), "LastLog"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3067,14 +2451,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("StateProofPK",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(ImmediateArgMapping(arg_name="a", literal_type=int), "StateProofPK"),
+                immediates=(ImmediateArgMapping("a", int), "StateProofPK"),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3082,41 +2464,28 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxnsas",
                 immediates=("ApprovalProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnsa",
-                immediates=(
-                    "ApprovalProgramPages",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=("ApprovalProgramPages", ImmediateArgMapping("b", int)),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                     "ApprovalProgramPages",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
+                    ImmediateArgMapping("b", int),
                 ),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnas",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ApprovalProgramPages",
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ApprovalProgramPages"),
+                stack_inputs={"b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3124,17 +2493,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("NumApprovalProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "NumApprovalProgramPages",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "NumApprovalProgramPages"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -3142,41 +2506,28 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxnsas",
                 immediates=("ClearStateProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,), "b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnsa",
-                immediates=(
-                    "ClearStateProgramPages",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=("ClearStateProgramPages", ImmediateArgMapping("b", int)),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxna",
                 immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
+                    ImmediateArgMapping("a", int),
                     "ClearStateProgramPages",
-                    ImmediateArgMapping(arg_name="b", literal_type=int),
+                    ImmediateArgMapping("b", int),
                 ),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxnas",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "ClearStateProgramPages",
-                ),
-                stack_inputs=(
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                immediates=(ImmediateArgMapping("a", int), "ClearStateProgramPages"),
+                stack_inputs={"b": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3184,17 +2535,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="gtxns",
                 immediates=("NumClearStateProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
             FunctionOpMapping(
                 op_code="gtxn",
-                immediates=(
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                    "NumClearStateProgramPages",
-                ),
+                immediates=(ImmediateArgMapping("a", int), "NumClearStateProgramPages"),
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -3454,17 +2800,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxnas",
                 immediates=("ApplicationArgs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="itxna",
-                immediates=(
-                    "ApplicationArgs",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                ),
+                immediates=("ApplicationArgs", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3477,14 +2818,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxnas",
                 immediates=("Accounts",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="itxna",
-                immediates=("Accounts", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Accounts", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -3615,14 +2954,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxnas",
                 immediates=("Assets",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="itxna",
-                immediates=("Assets", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Assets", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
@@ -3635,14 +2972,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxnas",
                 immediates=("Applications",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="itxna",
-                immediates=("Applications", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Applications", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
@@ -3695,14 +3030,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxnas",
                 immediates=("Logs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="itxna",
-                immediates=("Logs", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Logs", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3737,17 +3070,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxnas",
                 immediates=("ApprovalProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="itxna",
-                immediates=(
-                    "ApprovalProgramPages",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                ),
+                immediates=("ApprovalProgramPages", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3762,17 +3090,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxnas",
                 immediates=("ClearStateProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="itxna",
-                immediates=(
-                    "ClearStateProgramPages",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                ),
+                immediates=("ClearStateProgramPages", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -3790,455 +3113,364 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Sender",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_fee": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Fee",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_note": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Note",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_receiver": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Receiver",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_amount": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Amount",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_close_remainder_to": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("CloseRemainderTo",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_pk": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("VotePK",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_selection_pk": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("SelectionPK",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_first": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("VoteFirst",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_last": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("VoteLast",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_vote_key_dilution": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("VoteKeyDilution",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_type": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Type",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_type_enum": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("TypeEnum",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_xfer_asset": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("XferAsset",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_amount": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("AssetAmount",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_sender": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("AssetSender",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_receiver": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("AssetReceiver",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_asset_close_to": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("AssetCloseTo",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_application_id": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ApplicationID",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.application_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.application_wtype, wtypes.uint64_wtype)},
             ),
         ),
         "algopy.op.ITxnCreate.set_on_completion": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("OnCompletion",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_application_args": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ApplicationArgs",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_accounts": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Accounts",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_approval_program": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ApprovalProgram",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_clear_state_program": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ClearStateProgram",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_rekey_to": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("RekeyTo",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAsset",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_total": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetTotal",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_decimals": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetDecimals",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_default_frozen": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetDefaultFrozen",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.bool_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.bool_wtype, wtypes.uint64_wtype)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_unit_name": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetUnitName",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_name": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetName",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_url": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetURL",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_metadata_hash": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetMetadataHash",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_manager": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetManager",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_reserve": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetReserve",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_freeze": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetFreeze",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_config_asset_clawback": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ConfigAssetClawback",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_freeze_asset": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("FreezeAsset",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.asset_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.asset_wtype, wtypes.uint64_wtype)},
             ),
         ),
         "algopy.op.ITxnCreate.set_freeze_asset_account": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("FreezeAssetAccount",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.account_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.account_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_freeze_asset_frozen": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("FreezeAssetFrozen",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.bool_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.bool_wtype, wtypes.uint64_wtype)},
             ),
         ),
         "algopy.op.ITxnCreate.set_assets": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Assets",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_applications": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Applications",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_global_num_uint": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("GlobalNumUint",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_global_num_byte_slice": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("GlobalNumByteSlice",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_local_num_uint": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("LocalNumUint",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_local_num_byte_slice": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("LocalNumByteSlice",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_extra_program_pages": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ExtraProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_nonparticipation": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("Nonparticipation",),
-                stack_inputs=(
-                    StackArgMapping(
-                        arg_name="a", allowed_types=(wtypes.bool_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={"a": (wtypes.bool_wtype, wtypes.uint64_wtype)},
             ),
         ),
         "algopy.op.ITxnCreate.set_state_proof_pk": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("StateProofPK",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_approval_program_pages": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ApprovalProgramPages",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.ITxnCreate.set_clear_state_program_pages": (
             FunctionOpMapping(
                 op_code="itxn_field",
                 immediates=("ClearStateProgramPages",),
-                stack_inputs=(StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),),
+                stack_inputs={"a": (wtypes.bytes_wtype,)},
             ),
         ),
         "algopy.op.JsonRef.json_string": (
             FunctionOpMapping(
                 op_code="json_ref",
                 immediates=("JSONString",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -4246,10 +3478,7 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="json_ref",
                 immediates=("JSONUint64",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
@@ -4257,40 +3486,31 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="json_ref",
                 immediates=("JSONObject",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.bytes_wtype,)),
-                    StackArgMapping(arg_name="b", allowed_types=(wtypes.bytes_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.bytes_wtype,), "b": (wtypes.bytes_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Scratch.load_bytes": (
             FunctionOpMapping(
                 op_code="loads",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
         "algopy.op.Scratch.load_uint64": (
             FunctionOpMapping(
                 op_code="loads",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.uint64_wtype,),
             ),
         ),
         "algopy.op.Scratch.store": (
             FunctionOpMapping(
                 op_code="stores",
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                    StackArgMapping(
-                        arg_name="b", allowed_types=(wtypes.bytes_wtype, wtypes.uint64_wtype)
-                    ),
-                ),
+                stack_inputs={
+                    "a": (wtypes.uint64_wtype,),
+                    "b": (wtypes.bytes_wtype, wtypes.uint64_wtype),
+                },
             ),
         ),
         "algopy.op.Txn.sender": (
@@ -4433,17 +3653,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="txnas",
                 immediates=("ApplicationArgs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="txna",
-                immediates=(
-                    "ApplicationArgs",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                ),
+                immediates=("ApplicationArgs", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -4456,14 +3671,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="txnas",
                 immediates=("Accounts",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.account_wtype,),
             ),
             FunctionOpMapping(
                 op_code="txna",
-                immediates=("Accounts", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Accounts", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.account_wtype,),
             ),
         ),
@@ -4590,14 +3803,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="txnas",
                 immediates=("Assets",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.asset_wtype,),
             ),
             FunctionOpMapping(
                 op_code="txna",
-                immediates=("Assets", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Assets", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.asset_wtype,),
             ),
         ),
@@ -4610,14 +3821,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="txnas",
                 immediates=("Applications",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.application_wtype,),
             ),
             FunctionOpMapping(
                 op_code="txna",
-                immediates=("Applications", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Applications", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.application_wtype,),
             ),
         ),
@@ -4668,14 +3877,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="txnas",
                 immediates=("Logs",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="txna",
-                immediates=("Logs", ImmediateArgMapping(arg_name="a", literal_type=int)),
+                immediates=("Logs", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -4710,17 +3917,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="txnas",
                 immediates=("ApprovalProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="txna",
-                immediates=(
-                    "ApprovalProgramPages",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                ),
+                immediates=("ApprovalProgramPages", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),
@@ -4735,17 +3937,12 @@ STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping
             FunctionOpMapping(
                 op_code="txnas",
                 immediates=("ClearStateProgramPages",),
-                stack_inputs=(
-                    StackArgMapping(arg_name="a", allowed_types=(wtypes.uint64_wtype,)),
-                ),
+                stack_inputs={"a": (wtypes.uint64_wtype,)},
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
             FunctionOpMapping(
                 op_code="txna",
-                immediates=(
-                    "ClearStateProgramPages",
-                    ImmediateArgMapping(arg_name="a", literal_type=int),
-                ),
+                immediates=("ClearStateProgramPages", ImmediateArgMapping("a", int)),
                 stack_outputs=(wtypes.bytes_wtype,),
             ),
         ),

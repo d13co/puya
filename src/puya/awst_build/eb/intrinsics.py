@@ -205,24 +205,22 @@ def _map_call(
                 immediates.append(arg_value)
 
     stack_args = list[Expression]()
-    for arg_mapping in op_mapping.stack_inputs:
-        arg_in = args.pop(arg_mapping.arg_name, None)
+    for arg_name, allowed_types in op_mapping.stack_inputs.items():
+        arg_in = args.pop(arg_name, None)
         if arg_in is None:
-            logger.error(
-                f"Missing expected argument {arg_mapping.arg_name}", location=node_location
-            )
+            logger.error(f"Missing expected argument {arg_name}", location=node_location)
         elif isinstance(arg_in, Expression):
             # TODO this is identity based, match types instead?
-            if arg_in.wtype not in arg_mapping.allowed_types:
+            if arg_in.wtype not in allowed_types:
                 logger.error(
                     f'Invalid argument type "{arg_in.wtype}"'
-                    f' for argument "{arg_mapping.arg_name}" when calling {callee}',
+                    f' for argument "{arg_name}" when calling {callee}',
                     location=arg_in.source_location,
                 )
             stack_args.append(arg_in)
         else:
             literal_value = arg_in.value
-            for allowed_type in arg_mapping.allowed_types:
+            for allowed_type in allowed_types:
                 if allowed_type.is_valid_literal(literal_value):
                     literal_expr = convert_literal(arg_in, allowed_type)
                     stack_args.append(literal_expr)

@@ -12,11 +12,7 @@ from pathlib import Path
 import attrs
 from puya import log
 from puya.awst import wtypes
-from puya.awst_build.intrinsic_models import (
-    FunctionOpMapping,
-    ImmediateArgMapping,
-    StackArgMapping,
-)
+from puya.awst_build.intrinsic_models import FunctionOpMapping, ImmediateArgMapping
 from puya.awst_build.utils import snake_case
 
 from scripts.transform_lang_spec import (
@@ -757,18 +753,15 @@ def build_function_op_mapping(
             )
             for arg in op.immediate_args
         ],
-        stack_inputs=[
-            StackArgMapping(
-                arg_name=arg_name_map[arg.name],
-                allowed_types=list(
-                    sub_types(
-                        any_as if arg.stack_type == StackType.any and any_as else arg.stack_type,
-                        covariant=True,
-                    )
-                ),
+        stack_inputs={
+            arg_name_map[arg.name]: tuple(
+                sub_types(
+                    any_as if arg.stack_type == StackType.any and any_as else arg.stack_type,
+                    covariant=True,
+                )
             )
             for arg in op.stack_inputs
-        ],
+        },
         stack_outputs=[
             sub_types(
                 any_as if o.stack_type == StackType.any and any_as else o.stack_type,
@@ -945,25 +938,12 @@ def build_wtype(wtype: wtypes.WType) -> str:
     raise ValueError("Unexpected wtype")
 
 
-def build_stack_arg_mapping(arg_mapping: StackArgMapping) -> Iterable[str]:
-    yield "StackArgMapping("
-    yield f'    arg_name="{arg_mapping.arg_name}",'
-    yield "    allowed_types=("
-    for allowed_type in arg_mapping.allowed_types:
-        if isinstance(allowed_type, wtypes.WType):
-            yield build_wtype(allowed_type)
-        else:
-            yield allowed_type.__name__
+def build_stack_arg_mapping(arg_name: str, allowed_types: Sequence[wtypes.WType]) -> Iterable[str]:
+    yield f"{arg_name!r}: ("
+    for allowed_type in allowed_types:
+        yield build_wtype(allowed_type)
         yield ","
     yield "    ),"
-    yield ")"
-
-
-def build_immediate_arg_mapping(arg_mapping: ImmediateArgMapping) -> Iterable[str]:
-    yield "ImmediateArgMapping("
-    yield f'    arg_name="{arg_mapping.arg_name}",'
-    yield f"    literal_type={arg_mapping.literal_type.__name__},"
-    yield ")"
 
 
 def build_op_specification_body(name_suffix: str, function: FunctionDef) -> Iterable[str]:
@@ -979,15 +959,18 @@ def build_op_specification_body(name_suffix: str, function: FunctionDef) -> Iter
                 if isinstance(immediate, str):
                     yield f'        "{immediate}",'
                 else:
-                    yield from build_immediate_arg_mapping(immediate)
-                    yield ","
+                    yield (
+                        f"ImmediateArgMapping("
+                        f"{immediate.arg_name!r},"
+                        f" {immediate.literal_type.__name__}"
+                        f"),"
+                    )
             yield "    ),"
         if op_mapping.stack_inputs:
-            yield "    stack_inputs=("
-            for stack_input in op_mapping.stack_inputs:
-                yield from build_stack_arg_mapping(stack_input)
-                yield ","
-            yield "    ),"
+            yield "    stack_inputs={"
+            for arg_name, allowed_types in op_mapping.stack_inputs.items():
+                yield from build_stack_arg_mapping(arg_name, allowed_types)
+            yield "    },"
         if op_mapping.stack_outputs:
             yield "    stack_outputs=("
             for stack_output in op_mapping.stack_outputs:
