@@ -1011,31 +1011,29 @@ def build_awst_data(
         "from puya.awst_build.intrinsic_models import"
         " FunctionOpMapping, ImmediateArgMapping, PropertyOpMapping"
     )
-    yield "from immutabledict import immutabledict"
-    yield "ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]]({"
+    yield "ENUM_CLASSES: typing.Final[Mapping[str, Mapping[str, str]]] = {"
     for enum_name in enums:
         yield f"    {get_python_enum_class(enum_name)!r}: {{"
         for enum_value in lang_spec.arg_enums[enum_name]:
             # enum names currently match enum immediate values
             yield f'    "{enum_value.name}": "{enum_value.name}",'
         yield "     },"
-    yield "})"
+    yield "}"
     yield ""
-    yield "FUNC_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping]]({"
+    yield "FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = {"
     for function_op in function_ops:
         yield "".join(build_op_specification_body(function_op))
-    yield "})"
+    yield "}"
 
     yield (
-        "NAMESPACE_CLASSES: typing.Final = "
-        "immutabledict[str, immutabledict[str, PropertyOpMapping | Sequence[FunctionOpMapping]]]({"
+        "NAMESPACE_CLASSES: typing.Final[Mapping[str, Mapping[str, PropertyOpMapping | Sequence[FunctionOpMapping]]]] = {"
     )
     for class_op in class_ops:
-        yield f"{class_op.name!r}: immutabledict({{"
+        yield f"{class_op.name!r}: {{"
         for method in class_op.methods:
             yield "".join(build_op_specification_body(method))
-        yield "}),"
-    yield "})"
+        yield "},"
+    yield "}"
 
 
 def output_stub(
