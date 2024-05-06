@@ -948,14 +948,14 @@ def build_wtype(wtype: wtypes.WType) -> str:
 def build_stack_arg_mapping(arg_mapping: StackArgMapping) -> Iterable[str]:
     yield "StackArgMapping("
     yield f'    arg_name="{arg_mapping.arg_name}",'
-    yield "    allowed_types=["
+    yield "    allowed_types=("
     for allowed_type in arg_mapping.allowed_types:
         if isinstance(allowed_type, wtypes.WType):
             yield build_wtype(allowed_type)
         else:
             yield allowed_type.__name__
         yield ","
-    yield "    ],"
+    yield "    ),"
     yield ")"
 
 
@@ -967,31 +967,35 @@ def build_immediate_arg_mapping(arg_mapping: ImmediateArgMapping) -> Iterable[st
 
 
 def build_op_specification_body(name_suffix: str, function: FunctionDef) -> Iterable[str]:
-    yield f'    "algopy.{STUB_NAMESPACE}.{name_suffix}": ['
+    yield f'    "algopy.{STUB_NAMESPACE}.{name_suffix}": ('
     for op_mapping in function.op_mappings:
         yield "FunctionOpMapping("
         yield f'    op_code="{op_mapping.op_code}",'
-        yield f"    is_property={op_mapping.is_property},"
-        yield "    immediates=["
-        for immediate in op_mapping.immediates:
-            if isinstance(immediate, str):
-                yield f'        "{immediate}",'
-            else:
-                yield from build_immediate_arg_mapping(immediate)
+        if op_mapping.is_property:
+            yield f"    is_property={op_mapping.is_property},"
+        if op_mapping.immediates:
+            yield "    immediates=("
+            for immediate in op_mapping.immediates:
+                if isinstance(immediate, str):
+                    yield f'        "{immediate}",'
+                else:
+                    yield from build_immediate_arg_mapping(immediate)
+                    yield ","
+            yield "    ),"
+        if op_mapping.stack_inputs:
+            yield "    stack_inputs=("
+            for stack_input in op_mapping.stack_inputs:
+                yield from build_stack_arg_mapping(stack_input)
                 yield ","
-        yield "    ],"
-        yield "    stack_inputs=["
-        for stack_input in op_mapping.stack_inputs:
-            yield from build_stack_arg_mapping(stack_input)
-            yield ","
-        yield "    ],"
-        yield "    stack_outputs=["
-        for stack_output in op_mapping.stack_outputs:
-            yield build_wtype(stack_output)
-            yield ","
-        yield "    ],"
+            yield "    ),"
+        if op_mapping.stack_outputs:
+            yield "    stack_outputs=("
+            for stack_output in op_mapping.stack_outputs:
+                yield build_wtype(stack_output)
+                yield ","
+            yield "    ),"
         yield "),"
-    yield "    ],"
+    yield "    ),"
 
 
 def build_awst_data(
@@ -1000,22 +1004,25 @@ def build_awst_data(
     function_ops: list[FunctionDef],
     class_ops: list[ClassDef],
 ) -> Iterable[str]:
+    yield "import typing"
+    yield "from collections.abc import Mapping, Sequence"
+    yield "from immutabledict import immutabledict"
     yield "from puya.awst import wtypes"
     yield (
         "from puya.awst_build.intrinsic_models import"
         " FunctionOpMapping, ImmediateArgMapping, StackArgMapping"
     )
     yield ""
-    yield "ENUM_CLASSES = {"
+    yield "ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]]({"
     for enum_name in enums:
         yield f'    "algopy.{STUB_NAMESPACE}.{get_python_enum_class(enum_name)}": {{'
         for enum_value in lang_spec.arg_enums[enum_name]:
             # enum names currently match enum immediate values
             yield f'    "{enum_value.name}": "{enum_value.name}",'
         yield "     },"
-    yield "}"
+    yield "})"
     yield ""
-    yield "STUB_TO_AST_MAPPER = {"
+    yield "STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping]]({"
     for function_op in function_ops:
         yield from build_op_specification_body(function_op.name, function_op)
 
@@ -1023,7 +1030,7 @@ def build_awst_data(
         for method in class_op.methods:
             yield from build_op_specification_body(f"{class_op.name}.{method.name}", method)
 
-    yield "}"
+    yield "})"
 
 
 def output_stub(
@@ -1069,7 +1076,10 @@ def output_awst_data(
 
     awst_data_path = VCS_ROOT / "src" / "puya" / "awst_build" / "intrinsic_data.py"
     awst_data_path.write_text("\n".join(awst_data), encoding="utf-8")
-    subprocess.run(["black", str(awst_data_path)], check=True, cwd=VCS_ROOT)
+    subprocess.run(
+        ["black", "--skip-magic-trailing-comma", str(awst_data_path)], check=True, cwd=VCS_ROOT
+    )
+    subprocess.run(["ruff", "check", "--fix", str(awst_data_path)], check=False, cwd=VCS_ROOT)
 
 
 def _get_algorand_doc(op: str) -> str:

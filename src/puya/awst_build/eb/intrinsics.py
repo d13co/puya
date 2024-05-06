@@ -147,7 +147,7 @@ def _get_arg_mapping_funcdef(
 
 
 def _best_op_mapping(
-    op_mappings: list[FunctionOpMapping], args: dict[str, Expression | Literal]
+    op_mappings: Sequence[FunctionOpMapping], args: dict[str, Expression | Literal]
 ) -> FunctionOpMapping:
     """Find op mapping that matches as many arguments to immediate args as possible"""
     literal_arg_names = {arg_name for arg_name, arg in args.items() if isinstance(arg, Literal)}

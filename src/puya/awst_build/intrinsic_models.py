@@ -13,7 +13,7 @@ from puya.awst import wtypes
 class StackArgMapping:
     arg_name: str
     """Name of algopy argument to obtain value from"""
-    allowed_types: Sequence[wtypes.WType] = attrs.field()
+    allowed_types: Sequence[wtypes.WType] = attrs.field(validator=attrs.validators.min_len(1))
     """Valid types for this argument, in descending priority for literal conversions"""
 
     @allowed_types.validator
