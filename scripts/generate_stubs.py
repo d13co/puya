@@ -938,47 +938,52 @@ def build_wtype(wtype: wtypes.WType) -> str:
     raise ValueError("Unexpected wtype")
 
 
-def build_stack_arg_mapping(arg_name: str, allowed_types: Sequence[wtypes.WType]) -> Iterable[str]:
-    yield f"{arg_name!r}: ("
-    for allowed_type in allowed_types:
-        yield build_wtype(allowed_type)
-        yield ","
-    yield "    ),"
-
-
 def build_op_specification_body(name_suffix: str, function: FunctionDef) -> Iterable[str]:
     yield f'    "algopy.{STUB_NAMESPACE}.{name_suffix}": ('
     for op_mapping in function.op_mappings:
-        yield "FunctionOpMapping("
-        yield f'    op_code="{op_mapping.op_code}",'
+        yield f"FunctionOpMapping({op_mapping.op_code!r},"
         if op_mapping.is_property:
-            yield f"    is_property={op_mapping.is_property},"
+            yield f" is_property={op_mapping.is_property},"
         if op_mapping.immediates:
-            yield "    immediates=("
+            yield " immediates=("
+            immediate_parts = []
             for immediate in op_mapping.immediates:
                 if isinstance(immediate, str):
-                    yield f'        "{immediate}",'
+                    immediate_parts.append(repr(immediate))
                 else:
-                    yield (
-                        f"ImmediateArgMapping("
+                    immediate_parts.append(
+                        "ImmediateArgMapping("
                         f"{immediate.arg_name!r},"
                         f" {immediate.literal_type.__name__}"
-                        f"),"
+                        ")"
                     )
-            yield "    ),"
+            if len(immediate_parts) == 1:
+                immediate_parts.append("")
+            yield ", ".join(immediate_parts) + "),"
         if op_mapping.stack_inputs:
-            yield "    stack_inputs={"
-            for arg_name, allowed_types in op_mapping.stack_inputs.items():
-                yield from build_stack_arg_mapping(arg_name, allowed_types)
-            yield "    },"
+            yield " stack_inputs=dict("
+            for idx, (arg_name, allowed_types) in enumerate(op_mapping.stack_inputs.items()):
+                if idx:
+                    yield ", "
+                yield f"{arg_name}="
+                if len(allowed_types) == 1:
+                    yield f"({build_wtype(*allowed_types)},)"
+                else:
+                    yield "("
+                    for idx2, allowed_type in enumerate(allowed_types):
+                        if idx2:
+                            yield ","
+                        yield build_wtype(allowed_type)
+                    yield ")"
+            yield "),"
         if op_mapping.stack_outputs:
-            yield "    stack_outputs=("
+            yield " stack_outputs=("
             for stack_output in op_mapping.stack_outputs:
                 yield build_wtype(stack_output)
                 yield ","
-            yield "    ),"
+            yield "),"
         yield "),"
-    yield "    ),"
+    yield "),"
 
 
 def build_awst_data(
@@ -992,8 +997,7 @@ def build_awst_data(
     yield "from immutabledict import immutabledict"
     yield "from puya.awst import wtypes"
     yield (
-        "from puya.awst_build.intrinsic_models import"
-        " FunctionOpMapping, ImmediateArgMapping, StackArgMapping"
+        "from puya.awst_build.intrinsic_models import" " FunctionOpMapping, ImmediateArgMapping"
     )
     yield ""
     yield "ENUM_CLASSES: typing.Final = immutabledict[str, Mapping[str, str]]({"
@@ -1007,11 +1011,11 @@ def build_awst_data(
     yield ""
     yield "STUB_TO_AST_MAPPER: typing.Final = immutabledict[str, Sequence[FunctionOpMapping]]({"
     for function_op in function_ops:
-        yield from build_op_specification_body(function_op.name, function_op)
+        yield "".join(build_op_specification_body(function_op.name, function_op))
 
     for class_op in class_ops:
         for method in class_op.methods:
-            yield from build_op_specification_body(f"{class_op.name}.{method.name}", method)
+            yield "".join(build_op_specification_body(f"{class_op.name}.{method.name}", method))
 
     yield "})"
 
@@ -1059,9 +1063,7 @@ def output_awst_data(
 
     awst_data_path = VCS_ROOT / "src" / "puya" / "awst_build" / "intrinsic_data.py"
     awst_data_path.write_text("\n".join(awst_data), encoding="utf-8")
-    subprocess.run(
-        ["black", "--skip-magic-trailing-comma", str(awst_data_path)], check=True, cwd=VCS_ROOT
-    )
+    subprocess.run(["black", str(awst_data_path)], check=True, cwd=VCS_ROOT)
     subprocess.run(["ruff", "check", "--fix", str(awst_data_path)], check=False, cwd=VCS_ROOT)
 
 
