@@ -32,9 +32,8 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
         FunctionOpMapping(
             "addw",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(
-                pytypes.UInt64Type,
-                pytypes.UInt64Type,
+            result=pytypes.GenericTupleType.parameterise(
+                (pytypes.UInt64Type, pytypes.UInt64Type), source_location=None
             ),
         ),
     ),
@@ -45,26 +44,26 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
                 a=(pytypes.AccountType, pytypes.UInt64Type),
                 b=(pytypes.ApplicationType, pytypes.UInt64Type),
             ),
-            stack_outputs=(pytypes.BoolType,),
+            result=pytypes.BoolType,
         ),
     ),
     arg=(
         FunctionOpMapping(
             "args",
             stack_inputs=dict(a=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
         FunctionOpMapping(
             "arg",
             immediates=dict(a=int),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     balance=(
         FunctionOpMapping(
             "balance",
             stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     base64_decode=(
@@ -72,42 +71,42 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             "base64_decode",
             immediates=dict(e=str),
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     bitlen=(
         FunctionOpMapping(
             "bitlen",
             stack_inputs=dict(a=(pytypes.BytesType, pytypes.UInt64Type)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     bsqrt=(
         FunctionOpMapping(
             "bsqrt",
             stack_inputs=dict(a=(pytypes.BigUIntType,)),
-            stack_outputs=(pytypes.BigUIntType,),
+            result=pytypes.BigUIntType,
         ),
     ),
     btoi=(
         FunctionOpMapping(
             "btoi",
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     bzero=(
         FunctionOpMapping(
             "bzero",
             stack_inputs=dict(a=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     concat=(
         FunctionOpMapping(
             "concat",
             stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     divmodw=(
@@ -119,11 +118,9 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
                 c=(pytypes.UInt64Type,),
                 d=(pytypes.UInt64Type,),
             ),
-            stack_outputs=(
-                pytypes.UInt64Type,
-                pytypes.UInt64Type,
-                pytypes.UInt64Type,
-                pytypes.UInt64Type,
+            result=pytypes.GenericTupleType.parameterise(
+                (pytypes.UInt64Type, pytypes.UInt64Type, pytypes.UInt64Type, pytypes.UInt64Type),
+                source_location=None,
             ),
         ),
     ),
@@ -133,7 +130,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,), c=(pytypes.UInt64Type,)
             ),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     ecdsa_pk_decompress=(
@@ -141,9 +138,8 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             "ecdsa_pk_decompress",
             immediates=dict(v=str),
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(
-                pytypes.BytesType,
-                pytypes.BytesType,
+            result=pytypes.GenericTupleType.parameterise(
+                (pytypes.BytesType, pytypes.BytesType), source_location=None
             ),
         ),
     ),
@@ -157,9 +153,8 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
                 c=(pytypes.BytesType,),
                 d=(pytypes.BytesType,),
             ),
-            stack_outputs=(
-                pytypes.BytesType,
-                pytypes.BytesType,
+            result=pytypes.GenericTupleType.parameterise(
+                (pytypes.BytesType, pytypes.BytesType), source_location=None
             ),
         ),
     ),
@@ -174,7 +169,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
                 d=(pytypes.BytesType,),
                 e=(pytypes.BytesType,),
             ),
-            stack_outputs=(pytypes.BoolType,),
+            result=pytypes.BoolType,
         ),
     ),
     ed25519verify=(
@@ -183,7 +178,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.BytesType,), c=(pytypes.BytesType,)
             ),
-            stack_outputs=(pytypes.BoolType,),
+            result=pytypes.BoolType,
         ),
     ),
     ed25519verify_bare=(
@@ -192,7 +187,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.BytesType,), c=(pytypes.BytesType,)
             ),
-            stack_outputs=(pytypes.BoolType,),
+            result=pytypes.BoolType,
         ),
     ),
     err=(
@@ -210,16 +205,15 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
         FunctionOpMapping(
             "exp",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     expw=(
         FunctionOpMapping(
             "expw",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(
-                pytypes.UInt64Type,
-                pytypes.UInt64Type,
+            result=pytypes.GenericTupleType.parameterise(
+                (pytypes.UInt64Type, pytypes.UInt64Type), source_location=None
             ),
         ),
     ),
@@ -229,126 +223,125 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.UInt64Type,), c=(pytypes.UInt64Type,)
             ),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
         FunctionOpMapping(
             "extract",
             immediates=dict(b=int, c=int),
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     extract_uint16=(
         FunctionOpMapping(
             "extract_uint16",
             stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     extract_uint32=(
         FunctionOpMapping(
             "extract_uint32",
             stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     extract_uint64=(
         FunctionOpMapping(
             "extract_uint64",
             stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     gaid=(
         FunctionOpMapping(
             "gaids",
             stack_inputs=dict(a=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.ApplicationType,),
+            result=pytypes.ApplicationType,
         ),
         FunctionOpMapping(
             "gaid",
             immediates=dict(a=int),
-            stack_outputs=(pytypes.ApplicationType,),
+            result=pytypes.ApplicationType,
         ),
     ),
     getbit=(
         FunctionOpMapping(
             "getbit",
             stack_inputs=dict(a=(pytypes.BytesType, pytypes.UInt64Type), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     getbyte=(
         FunctionOpMapping(
             "getbyte",
             stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     gload_bytes=(
         FunctionOpMapping(
             "gloadss",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
         FunctionOpMapping(
             "gload",
             immediates=dict(a=int, b=int),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
         FunctionOpMapping(
             "gloads",
             immediates=dict(b=int),
             stack_inputs=dict(a=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     gload_uint64=(
         FunctionOpMapping(
             "gloadss",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
         FunctionOpMapping(
             "gload",
             immediates=dict(a=int, b=int),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
         FunctionOpMapping(
             "gloads",
             immediates=dict(b=int),
             stack_inputs=dict(a=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     itob=(
         FunctionOpMapping(
             "itob",
             stack_inputs=dict(a=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     keccak256=(
         FunctionOpMapping(
             "keccak256",
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     min_balance=(
         FunctionOpMapping(
             "min_balance",
             stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     mulw=(
         FunctionOpMapping(
             "mulw",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(
-                pytypes.UInt64Type,
-                pytypes.UInt64Type,
+            result=pytypes.GenericTupleType.parameterise(
+                (pytypes.UInt64Type, pytypes.UInt64Type), source_location=None
             ),
         ),
     ),
@@ -358,13 +351,13 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.UInt64Type,), c=(pytypes.BytesType,)
             ),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
         FunctionOpMapping(
             "replace2",
             immediates=dict(b=int),
             stack_inputs=dict(a=(pytypes.BytesType,), c=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     select_bytes=(
@@ -375,7 +368,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
                 b=(pytypes.BytesType,),
                 c=(pytypes.BoolType, pytypes.UInt64Type),
             ),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     select_uint64=(
@@ -386,7 +379,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
                 b=(pytypes.UInt64Type,),
                 c=(pytypes.BoolType, pytypes.UInt64Type),
             ),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     setbit_bytes=(
@@ -395,7 +388,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.UInt64Type,), c=(pytypes.UInt64Type,)
             ),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     setbit_uint64=(
@@ -404,7 +397,7 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,), c=(pytypes.UInt64Type,)
             ),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     setbyte=(
@@ -413,49 +406,49 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.UInt64Type,), c=(pytypes.UInt64Type,)
             ),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     sha256=(
         FunctionOpMapping(
             "sha256",
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     sha3_256=(
         FunctionOpMapping(
             "sha3_256",
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     sha512_256=(
         FunctionOpMapping(
             "sha512_256",
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     shl=(
         FunctionOpMapping(
             "shl",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     shr=(
         FunctionOpMapping(
             "shr",
             stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     sqrt=(
         FunctionOpMapping(
             "sqrt",
             stack_inputs=dict(a=(pytypes.UInt64Type,)),
-            stack_outputs=(pytypes.UInt64Type,),
+            result=pytypes.UInt64Type,
         ),
     ),
     substring=(
@@ -464,13 +457,13 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.UInt64Type,), c=(pytypes.UInt64Type,)
             ),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
         FunctionOpMapping(
             "substring",
             immediates=dict(b=int, c=int),
             stack_inputs=dict(a=(pytypes.BytesType,)),
-            stack_outputs=(pytypes.BytesType,),
+            result=pytypes.BytesType,
         ),
     ),
     vrf_verify=(
@@ -480,9 +473,8 @@ FUNC_TO_AST_MAPPER: typing.Final[Mapping[str, Sequence[FunctionOpMapping]]] = di
             stack_inputs=dict(
                 a=(pytypes.BytesType,), b=(pytypes.BytesType,), c=(pytypes.BytesType,)
             ),
-            stack_outputs=(
-                pytypes.BytesType,
-                pytypes.BoolType,
+            result=pytypes.GenericTupleType.parameterise(
+                (pytypes.BytesType, pytypes.BoolType), source_location=None
             ),
         ),
     ),
@@ -496,9 +488,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctBalance=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -507,9 +498,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctMinBalance=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -518,9 +508,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctAuthAddr=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -529,9 +518,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalNumUint=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -540,9 +528,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalNumByteSlice=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -551,9 +538,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalExtraAppPages=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -562,9 +548,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalAppsCreated=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -573,9 +558,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalAppsOptedIn=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -584,9 +568,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalAssetsCreated=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -595,9 +578,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalAssets=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -606,9 +588,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalBoxes=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -617,9 +598,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "acct_params_get",
                 immediates=dict(AcctTotalBoxBytes=None),
                 stack_inputs=dict(a=(pytypes.AccountType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -629,14 +609,14 @@ NAMESPACE_CLASSES: typing.Final[
             FunctionOpMapping(
                 "app_global_get",
                 stack_inputs=dict(a=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         get_uint64=(
             FunctionOpMapping(
                 "app_global_get",
                 stack_inputs=dict(a=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         get_ex_bytes=(
@@ -645,9 +625,8 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_inputs=dict(
                     a=(pytypes.ApplicationType, pytypes.UInt64Type), b=(pytypes.BytesType,)
                 ),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -657,9 +636,8 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_inputs=dict(
                     a=(pytypes.ApplicationType, pytypes.UInt64Type), b=(pytypes.BytesType,)
                 ),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -685,7 +663,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_inputs=dict(
                     a=(pytypes.AccountType, pytypes.UInt64Type), b=(pytypes.BytesType,)
                 ),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         get_uint64=(
@@ -694,7 +672,7 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_inputs=dict(
                     a=(pytypes.AccountType, pytypes.UInt64Type), b=(pytypes.BytesType,)
                 ),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         get_ex_bytes=(
@@ -705,9 +683,8 @@ NAMESPACE_CLASSES: typing.Final[
                     b=(pytypes.ApplicationType, pytypes.UInt64Type),
                     c=(pytypes.BytesType,),
                 ),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -719,9 +696,8 @@ NAMESPACE_CLASSES: typing.Final[
                     b=(pytypes.ApplicationType, pytypes.UInt64Type),
                     c=(pytypes.BytesType,),
                 ),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -750,9 +726,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppApprovalProgram=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -761,9 +736,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppClearStateProgram=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -772,9 +746,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppGlobalNumUint=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -783,9 +756,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppGlobalNumByteSlice=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -794,9 +766,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppLocalNumUint=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -805,9 +776,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppLocalNumByteSlice=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -816,9 +786,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppExtraProgramPages=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -827,9 +796,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppCreator=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -838,9 +806,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "app_params_get",
                 immediates=dict(AppAddress=None),
                 stack_inputs=dict(a=(pytypes.ApplicationType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -854,9 +821,8 @@ NAMESPACE_CLASSES: typing.Final[
                     a=(pytypes.AccountType, pytypes.UInt64Type),
                     b=(pytypes.AssetType, pytypes.UInt64Type),
                 ),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -868,9 +834,8 @@ NAMESPACE_CLASSES: typing.Final[
                     a=(pytypes.AccountType, pytypes.UInt64Type),
                     b=(pytypes.AssetType, pytypes.UInt64Type),
                 ),
-                stack_outputs=(
-                    pytypes.BoolType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BoolType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -881,9 +846,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetTotal=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -892,9 +856,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetDecimals=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -903,9 +866,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetDefaultFrozen=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.BoolType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BoolType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -914,9 +876,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetUnitName=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -925,9 +886,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetName=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -936,9 +896,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetURL=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -947,9 +906,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetMetadataHash=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -958,9 +916,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetManager=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -969,9 +926,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetReserve=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -980,9 +936,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetFreeze=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -991,9 +946,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetClawback=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -1002,9 +956,8 @@ NAMESPACE_CLASSES: typing.Final[
                 "asset_params_get",
                 immediates=dict(AssetCreator=None),
                 stack_inputs=dict(a=(pytypes.AssetType, pytypes.UInt64Type)),
-                stack_outputs=(
-                    pytypes.AccountType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.AccountType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -1015,7 +968,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "block",
                 immediates=dict(BlkSeed=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         blk_timestamp=(
@@ -1023,7 +976,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "block",
                 immediates=dict(BlkTimestamp=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
     ),
@@ -1032,14 +985,14 @@ NAMESPACE_CLASSES: typing.Final[
             FunctionOpMapping(
                 "box_create",
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         delete=(
             FunctionOpMapping(
                 "box_del",
                 stack_inputs=dict(a=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         extract=(
@@ -1048,16 +1001,15 @@ NAMESPACE_CLASSES: typing.Final[
                 stack_inputs=dict(
                     a=(pytypes.BytesType,), b=(pytypes.UInt64Type,), c=(pytypes.UInt64Type,)
                 ),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         get=(
             FunctionOpMapping(
                 "box_get",
                 stack_inputs=dict(a=(pytypes.BytesType,)),
-                stack_outputs=(
-                    pytypes.BytesType,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.BytesType, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -1065,9 +1017,8 @@ NAMESPACE_CLASSES: typing.Final[
             FunctionOpMapping(
                 "box_len",
                 stack_inputs=dict(a=(pytypes.BytesType,)),
-                stack_outputs=(
-                    pytypes.UInt64Type,
-                    pytypes.BoolType,
+                result=pytypes.GenericTupleType.parameterise(
+                    (pytypes.UInt64Type, pytypes.BoolType), source_location=None
                 ),
             ),
         ),
@@ -1109,7 +1060,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "ec_add",
                 immediates=dict(g=str),
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         map_to=(
@@ -1117,7 +1068,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "ec_map_to",
                 immediates=dict(g=str),
                 stack_inputs=dict(a=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         scalar_mul_multi=(
@@ -1125,7 +1076,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "ec_multi_scalar_mul",
                 immediates=dict(g=str),
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         pairing_check=(
@@ -1133,7 +1084,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "ec_pairing_check",
                 immediates=dict(g=str),
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         scalar_mul=(
@@ -1141,7 +1092,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "ec_scalar_mul",
                 immediates=dict(g=str),
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         subgroup_check=(
@@ -1149,7 +1100,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "ec_subgroup_check",
                 immediates=dict(g=str),
                 stack_inputs=dict(a=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
     ),
@@ -1158,182 +1109,182 @@ NAMESPACE_CLASSES: typing.Final[
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Sender=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         fee=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Fee=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         first_valid=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FirstValid=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         first_valid_time=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FirstValidTime=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         last_valid=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LastValid=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         note=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Note=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         lease=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Lease=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         receiver=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Receiver=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         amount=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Amount=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         close_remainder_to=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, CloseRemainderTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         vote_pk=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VotePK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         selection_pk=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, SelectionPK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         vote_first=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VoteFirst=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         vote_last=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VoteLast=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         vote_key_dilution=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, VoteKeyDilution=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         type=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Type=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         type_enum=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, TypeEnum=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         xfer_asset=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, XferAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         asset_amount=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetAmount=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         asset_sender=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetSender=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         asset_receiver=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetReceiver=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         asset_close_to=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, AssetCloseTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         group_index=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, GroupIndex=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         tx_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, TxID=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         application_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ApplicationID=None),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         on_completion=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, OnCompletion=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         application_args=(
@@ -1341,19 +1292,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "gitxnas",
                 immediates=dict(t=int, ApplicationArgs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gitxna",
                 immediates=dict(t=int, ApplicationArgs=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_app_args=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumAppArgs=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         accounts=(
@@ -1361,145 +1312,145 @@ NAMESPACE_CLASSES: typing.Final[
                 "gitxnas",
                 immediates=dict(t=int, Accounts=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gitxna",
                 immediates=dict(t=int, Accounts=None, a=int),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         num_accounts=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumAccounts=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         approval_program=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ApprovalProgram=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         clear_state_program=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ClearStateProgram=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         rekey_to=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, RekeyTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         config_asset_total=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetTotal=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         config_asset_decimals=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetDecimals=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         config_asset_default_frozen=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetDefaultFrozen=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         config_asset_unit_name=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetUnitName=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_name=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetName=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_url=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetURL=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_metadata_hash=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetMetadataHash=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_manager=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetManager=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_reserve=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetReserve=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_freeze=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetFreeze=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_clawback=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ConfigAssetClawback=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         freeze_asset=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FreezeAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         freeze_asset_account=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FreezeAssetAccount=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         freeze_asset_frozen=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, FreezeAssetFrozen=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         assets=(
@@ -1507,19 +1458,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "gitxnas",
                 immediates=dict(t=int, Assets=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gitxna",
                 immediates=dict(t=int, Assets=None, a=int),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         num_assets=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumAssets=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         applications=(
@@ -1527,61 +1478,61 @@ NAMESPACE_CLASSES: typing.Final[
                 "gitxnas",
                 immediates=dict(t=int, Applications=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "gitxna",
                 immediates=dict(t=int, Applications=None, a=int),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         num_applications=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumApplications=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         global_num_uint=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, GlobalNumUint=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         global_num_byte_slice=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, GlobalNumByteSlice=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         local_num_uint=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LocalNumUint=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         local_num_byte_slice=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LocalNumByteSlice=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         extra_program_pages=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, ExtraProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         nonparticipation=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, Nonparticipation=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         logs=(
@@ -1589,47 +1540,47 @@ NAMESPACE_CLASSES: typing.Final[
                 "gitxnas",
                 immediates=dict(t=int, Logs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gitxna",
                 immediates=dict(t=int, Logs=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_logs=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumLogs=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         created_asset_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, CreatedAssetID=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         created_application_id=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, CreatedApplicationID=None),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         last_log=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, LastLog=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         state_proof_pk=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, StateProofPK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         approval_program_pages=(
@@ -1637,19 +1588,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "gitxnas",
                 immediates=dict(t=int, ApprovalProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gitxna",
                 immediates=dict(t=int, ApprovalProgramPages=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_approval_program_pages=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumApprovalProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         clear_state_program_pages=(
@@ -1657,19 +1608,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "gitxnas",
                 immediates=dict(t=int, ClearStateProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gitxna",
                 immediates=dict(t=int, ClearStateProgramPages=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_clear_state_program_pages=(
             FunctionOpMapping(
                 "gitxn",
                 immediates=dict(t=int, NumClearStateProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
     ),
@@ -1679,12 +1630,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Sender=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Sender=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         fee=(
@@ -1692,12 +1643,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Fee=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Fee=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         first_valid=(
@@ -1705,12 +1656,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(FirstValid=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, FirstValid=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         first_valid_time=(
@@ -1718,12 +1669,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(FirstValidTime=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, FirstValidTime=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         last_valid=(
@@ -1731,12 +1682,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(LastValid=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, LastValid=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         note=(
@@ -1744,12 +1695,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Note=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Note=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         lease=(
@@ -1757,12 +1708,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Lease=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Lease=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         receiver=(
@@ -1770,12 +1721,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Receiver=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Receiver=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         amount=(
@@ -1783,12 +1734,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Amount=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Amount=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         close_remainder_to=(
@@ -1796,12 +1747,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(CloseRemainderTo=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, CloseRemainderTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         vote_pk=(
@@ -1809,12 +1760,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(VotePK=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, VotePK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         selection_pk=(
@@ -1822,12 +1773,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(SelectionPK=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, SelectionPK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         vote_first=(
@@ -1835,12 +1786,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(VoteFirst=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, VoteFirst=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         vote_last=(
@@ -1848,12 +1799,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(VoteLast=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, VoteLast=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         vote_key_dilution=(
@@ -1861,12 +1812,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(VoteKeyDilution=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, VoteKeyDilution=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         type=(
@@ -1874,12 +1825,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Type=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Type=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         type_enum=(
@@ -1887,12 +1838,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(TypeEnum=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, TypeEnum=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         xfer_asset=(
@@ -1900,12 +1851,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(XferAsset=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, XferAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         asset_amount=(
@@ -1913,12 +1864,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(AssetAmount=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, AssetAmount=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         asset_sender=(
@@ -1926,12 +1877,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(AssetSender=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, AssetSender=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         asset_receiver=(
@@ -1939,12 +1890,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(AssetReceiver=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, AssetReceiver=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         asset_close_to=(
@@ -1952,12 +1903,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(AssetCloseTo=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, AssetCloseTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         group_index=(
@@ -1965,12 +1916,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(GroupIndex=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, GroupIndex=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         tx_id=(
@@ -1978,12 +1929,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(TxID=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, TxID=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         application_id=(
@@ -1991,12 +1942,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ApplicationID=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ApplicationID=None),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         on_completion=(
@@ -2004,12 +1955,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(OnCompletion=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, OnCompletion=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         application_args=(
@@ -2017,24 +1968,24 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxnsas",
                 immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnsa",
                 immediates=dict(ApplicationArgs=None, b=int),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxna",
                 immediates=dict(a=int, ApplicationArgs=None, b=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnas",
                 immediates=dict(a=int, ApplicationArgs=None),
                 stack_inputs=dict(b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_app_args=(
@@ -2042,12 +1993,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(NumAppArgs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, NumAppArgs=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         accounts=(
@@ -2055,24 +2006,24 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxnsas",
                 immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxnsa",
                 immediates=dict(Accounts=None, b=int),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxna",
                 immediates=dict(a=int, Accounts=None, b=int),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxnas",
                 immediates=dict(a=int, Accounts=None),
                 stack_inputs=dict(b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         num_accounts=(
@@ -2080,12 +2031,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(NumAccounts=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, NumAccounts=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         approval_program=(
@@ -2093,12 +2044,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ApprovalProgram=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ApprovalProgram=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         clear_state_program=(
@@ -2106,12 +2057,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ClearStateProgram=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ClearStateProgram=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         rekey_to=(
@@ -2119,12 +2070,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(RekeyTo=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, RekeyTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset=(
@@ -2132,12 +2083,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAsset=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         config_asset_total=(
@@ -2145,12 +2096,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetTotal=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetTotal=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         config_asset_decimals=(
@@ -2158,12 +2109,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetDecimals=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetDecimals=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         config_asset_default_frozen=(
@@ -2171,12 +2122,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetDefaultFrozen=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetDefaultFrozen=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         config_asset_unit_name=(
@@ -2184,12 +2135,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetUnitName=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetUnitName=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_name=(
@@ -2197,12 +2148,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetName=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetName=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_url=(
@@ -2210,12 +2161,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetURL=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetURL=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_metadata_hash=(
@@ -2223,12 +2174,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetMetadataHash=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetMetadataHash=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_manager=(
@@ -2236,12 +2187,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetManager=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetManager=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_reserve=(
@@ -2249,12 +2200,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetReserve=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetReserve=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_freeze=(
@@ -2262,12 +2213,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetFreeze=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetFreeze=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_clawback=(
@@ -2275,12 +2226,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ConfigAssetClawback=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ConfigAssetClawback=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         freeze_asset=(
@@ -2288,12 +2239,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(FreezeAsset=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, FreezeAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         freeze_asset_account=(
@@ -2301,12 +2252,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(FreezeAssetAccount=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, FreezeAssetAccount=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         freeze_asset_frozen=(
@@ -2314,12 +2265,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(FreezeAssetFrozen=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, FreezeAssetFrozen=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         assets=(
@@ -2327,24 +2278,24 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxnsas",
                 immediates=dict(Assets=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gtxnsa",
                 immediates=dict(Assets=None, b=int),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gtxna",
                 immediates=dict(a=int, Assets=None, b=int),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gtxnas",
                 immediates=dict(a=int, Assets=None),
                 stack_inputs=dict(b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         num_assets=(
@@ -2352,12 +2303,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(NumAssets=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, NumAssets=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         applications=(
@@ -2365,24 +2316,24 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxnsas",
                 immediates=dict(Applications=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "gtxnsa",
                 immediates=dict(Applications=None, b=int),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "gtxna",
                 immediates=dict(a=int, Applications=None, b=int),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "gtxnas",
                 immediates=dict(a=int, Applications=None),
                 stack_inputs=dict(b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         num_applications=(
@@ -2390,12 +2341,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(NumApplications=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, NumApplications=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         global_num_uint=(
@@ -2403,12 +2354,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(GlobalNumUint=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, GlobalNumUint=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         global_num_byte_slice=(
@@ -2416,12 +2367,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(GlobalNumByteSlice=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, GlobalNumByteSlice=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         local_num_uint=(
@@ -2429,12 +2380,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(LocalNumUint=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, LocalNumUint=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         local_num_byte_slice=(
@@ -2442,12 +2393,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(LocalNumByteSlice=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, LocalNumByteSlice=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         extra_program_pages=(
@@ -2455,12 +2406,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(ExtraProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, ExtraProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         nonparticipation=(
@@ -2468,12 +2419,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(Nonparticipation=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, Nonparticipation=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         logs=(
@@ -2481,24 +2432,24 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxnsas",
                 immediates=dict(Logs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnsa",
                 immediates=dict(Logs=None, b=int),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxna",
                 immediates=dict(a=int, Logs=None, b=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnas",
                 immediates=dict(a=int, Logs=None),
                 stack_inputs=dict(b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_logs=(
@@ -2506,12 +2457,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(NumLogs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, NumLogs=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         created_asset_id=(
@@ -2519,12 +2470,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(CreatedAssetID=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, CreatedAssetID=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         created_application_id=(
@@ -2532,12 +2483,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(CreatedApplicationID=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, CreatedApplicationID=None),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         last_log=(
@@ -2545,12 +2496,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(LastLog=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, LastLog=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         state_proof_pk=(
@@ -2558,12 +2509,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(StateProofPK=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, StateProofPK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         approval_program_pages=(
@@ -2571,24 +2522,24 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxnsas",
                 immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnsa",
                 immediates=dict(ApprovalProgramPages=None, b=int),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxna",
                 immediates=dict(a=int, ApprovalProgramPages=None, b=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnas",
                 immediates=dict(a=int, ApprovalProgramPages=None),
                 stack_inputs=dict(b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_approval_program_pages=(
@@ -2596,12 +2547,12 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(NumApprovalProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, NumApprovalProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         clear_state_program_pages=(
@@ -2609,24 +2560,24 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxnsas",
                 immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,), b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnsa",
                 immediates=dict(ClearStateProgramPages=None, b=int),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxna",
                 immediates=dict(a=int, ClearStateProgramPages=None, b=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "gtxnas",
                 immediates=dict(a=int, ClearStateProgramPages=None),
                 stack_inputs=dict(b=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_clear_state_program_pages=(
@@ -2634,107 +2585,107 @@ NAMESPACE_CLASSES: typing.Final[
                 "gtxns",
                 immediates=dict(NumClearStateProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
             FunctionOpMapping(
                 "gtxn",
                 immediates=dict(a=int, NumClearStateProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
     ),
     Global=dict(
         min_txn_fee=PropertyOpMapping(
             "global",
-            immediates=("MinTxnFee",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "MinTxnFee",
+            pytypes.UInt64Type,
         ),
         min_balance=PropertyOpMapping(
             "global",
-            immediates=("MinBalance",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "MinBalance",
+            pytypes.UInt64Type,
         ),
         max_txn_life=PropertyOpMapping(
             "global",
-            immediates=("MaxTxnLife",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "MaxTxnLife",
+            pytypes.UInt64Type,
         ),
         zero_address=PropertyOpMapping(
             "global",
-            immediates=("ZeroAddress",),
-            stack_outputs=(pytypes.AccountType,),
+            "ZeroAddress",
+            pytypes.AccountType,
         ),
         group_size=PropertyOpMapping(
             "global",
-            immediates=("GroupSize",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "GroupSize",
+            pytypes.UInt64Type,
         ),
         logic_sig_version=PropertyOpMapping(
             "global",
-            immediates=("LogicSigVersion",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "LogicSigVersion",
+            pytypes.UInt64Type,
         ),
         round=PropertyOpMapping(
             "global",
-            immediates=("Round",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "Round",
+            pytypes.UInt64Type,
         ),
         latest_timestamp=PropertyOpMapping(
             "global",
-            immediates=("LatestTimestamp",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "LatestTimestamp",
+            pytypes.UInt64Type,
         ),
         current_application_id=PropertyOpMapping(
             "global",
-            immediates=("CurrentApplicationID",),
-            stack_outputs=(pytypes.ApplicationType,),
+            "CurrentApplicationID",
+            pytypes.ApplicationType,
         ),
         creator_address=PropertyOpMapping(
             "global",
-            immediates=("CreatorAddress",),
-            stack_outputs=(pytypes.AccountType,),
+            "CreatorAddress",
+            pytypes.AccountType,
         ),
         current_application_address=PropertyOpMapping(
             "global",
-            immediates=("CurrentApplicationAddress",),
-            stack_outputs=(pytypes.AccountType,),
+            "CurrentApplicationAddress",
+            pytypes.AccountType,
         ),
         group_id=PropertyOpMapping(
             "global",
-            immediates=("GroupID",),
-            stack_outputs=(pytypes.BytesType,),
+            "GroupID",
+            pytypes.BytesType,
         ),
         opcode_budget=(
             FunctionOpMapping(
                 "global",
                 immediates=dict(OpcodeBudget=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         caller_application_id=PropertyOpMapping(
             "global",
-            immediates=("CallerApplicationID",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "CallerApplicationID",
+            pytypes.UInt64Type,
         ),
         caller_application_address=PropertyOpMapping(
             "global",
-            immediates=("CallerApplicationAddress",),
-            stack_outputs=(pytypes.AccountType,),
+            "CallerApplicationAddress",
+            pytypes.AccountType,
         ),
         asset_create_min_balance=PropertyOpMapping(
             "global",
-            immediates=("AssetCreateMinBalance",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "AssetCreateMinBalance",
+            pytypes.UInt64Type,
         ),
         asset_opt_in_min_balance=PropertyOpMapping(
             "global",
-            immediates=("AssetOptInMinBalance",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "AssetOptInMinBalance",
+            pytypes.UInt64Type,
         ),
         genesis_hash=PropertyOpMapping(
             "global",
-            immediates=("GenesisHash",),
-            stack_outputs=(pytypes.BytesType,),
+            "GenesisHash",
+            pytypes.BytesType,
         ),
     ),
     ITxn=dict(
@@ -2742,182 +2693,182 @@ NAMESPACE_CLASSES: typing.Final[
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Sender=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         fee=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Fee=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         first_valid=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FirstValid=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         first_valid_time=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FirstValidTime=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         last_valid=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LastValid=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         note=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Note=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         lease=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Lease=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         receiver=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Receiver=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         amount=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Amount=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         close_remainder_to=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(CloseRemainderTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         vote_pk=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VotePK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         selection_pk=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(SelectionPK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         vote_first=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VoteFirst=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         vote_last=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VoteLast=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         vote_key_dilution=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(VoteKeyDilution=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         type=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Type=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         type_enum=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(TypeEnum=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         xfer_asset=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(XferAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         asset_amount=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetAmount=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         asset_sender=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetSender=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         asset_receiver=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetReceiver=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         asset_close_to=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(AssetCloseTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         group_index=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(GroupIndex=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         tx_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(TxID=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         application_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ApplicationID=None),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         on_completion=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(OnCompletion=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         application_args=(
@@ -2925,19 +2876,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "itxnas",
                 immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "itxna",
                 immediates=dict(ApplicationArgs=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_app_args=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumAppArgs=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         accounts=(
@@ -2945,145 +2896,145 @@ NAMESPACE_CLASSES: typing.Final[
                 "itxnas",
                 immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "itxna",
                 immediates=dict(Accounts=None, a=int),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         num_accounts=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumAccounts=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         approval_program=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ApprovalProgram=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         clear_state_program=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ClearStateProgram=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         rekey_to=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(RekeyTo=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         config_asset_total=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetTotal=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         config_asset_decimals=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetDecimals=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         config_asset_default_frozen=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetDefaultFrozen=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         config_asset_unit_name=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetUnitName=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_name=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetName=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_url=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetURL=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_metadata_hash=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetMetadataHash=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         config_asset_manager=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetManager=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_reserve=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetReserve=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_freeze=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetFreeze=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         config_asset_clawback=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ConfigAssetClawback=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         freeze_asset=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FreezeAsset=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         freeze_asset_account=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FreezeAssetAccount=None),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         freeze_asset_frozen=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(FreezeAssetFrozen=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         assets=(
@@ -3091,19 +3042,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "itxnas",
                 immediates=dict(Assets=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "itxna",
                 immediates=dict(Assets=None, a=int),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         num_assets=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumAssets=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         applications=(
@@ -3111,61 +3062,61 @@ NAMESPACE_CLASSES: typing.Final[
                 "itxnas",
                 immediates=dict(Applications=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "itxna",
                 immediates=dict(Applications=None, a=int),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         num_applications=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumApplications=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         global_num_uint=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(GlobalNumUint=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         global_num_byte_slice=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(GlobalNumByteSlice=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         local_num_uint=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LocalNumUint=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         local_num_byte_slice=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LocalNumByteSlice=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         extra_program_pages=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(ExtraProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         nonparticipation=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(Nonparticipation=None),
-                stack_outputs=(pytypes.BoolType,),
+                result=pytypes.BoolType,
             ),
         ),
         logs=(
@@ -3173,47 +3124,47 @@ NAMESPACE_CLASSES: typing.Final[
                 "itxnas",
                 immediates=dict(Logs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "itxna",
                 immediates=dict(Logs=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_logs=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumLogs=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         created_asset_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(CreatedAssetID=None),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         created_application_id=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(CreatedApplicationID=None),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         last_log=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(LastLog=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         state_proof_pk=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(StateProofPK=None),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         approval_program_pages=(
@@ -3221,19 +3172,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "itxnas",
                 immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "itxna",
                 immediates=dict(ApprovalProgramPages=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_approval_program_pages=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumApprovalProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         clear_state_program_pages=(
@@ -3241,19 +3192,19 @@ NAMESPACE_CLASSES: typing.Final[
                 "itxnas",
                 immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "itxna",
                 immediates=dict(ClearStateProgramPages=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_clear_state_program_pages=(
             FunctionOpMapping(
                 "itxn",
                 immediates=dict(NumClearStateProgramPages=None),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
     ),
@@ -3637,7 +3588,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "json_ref",
                 immediates=dict(JSONString=None),
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         json_uint64=(
@@ -3645,7 +3596,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "json_ref",
                 immediates=dict(JSONUint64=None),
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         json_object=(
@@ -3653,7 +3604,7 @@ NAMESPACE_CLASSES: typing.Final[
                 "json_ref",
                 immediates=dict(JSONObject=None),
                 stack_inputs=dict(a=(pytypes.BytesType,), b=(pytypes.BytesType,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
     ),
@@ -3662,14 +3613,14 @@ NAMESPACE_CLASSES: typing.Final[
             FunctionOpMapping(
                 "loads",
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         load_uint64=(
             FunctionOpMapping(
                 "loads",
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.UInt64Type,),
+                result=pytypes.UInt64Type,
             ),
         ),
         store=(
@@ -3684,399 +3635,399 @@ NAMESPACE_CLASSES: typing.Final[
     Txn=dict(
         sender=PropertyOpMapping(
             "txn",
-            immediates=("Sender",),
-            stack_outputs=(pytypes.AccountType,),
+            "Sender",
+            pytypes.AccountType,
         ),
         fee=PropertyOpMapping(
             "txn",
-            immediates=("Fee",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "Fee",
+            pytypes.UInt64Type,
         ),
         first_valid=PropertyOpMapping(
             "txn",
-            immediates=("FirstValid",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "FirstValid",
+            pytypes.UInt64Type,
         ),
         first_valid_time=PropertyOpMapping(
             "txn",
-            immediates=("FirstValidTime",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "FirstValidTime",
+            pytypes.UInt64Type,
         ),
         last_valid=PropertyOpMapping(
             "txn",
-            immediates=("LastValid",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "LastValid",
+            pytypes.UInt64Type,
         ),
         note=PropertyOpMapping(
             "txn",
-            immediates=("Note",),
-            stack_outputs=(pytypes.BytesType,),
+            "Note",
+            pytypes.BytesType,
         ),
         lease=PropertyOpMapping(
             "txn",
-            immediates=("Lease",),
-            stack_outputs=(pytypes.BytesType,),
+            "Lease",
+            pytypes.BytesType,
         ),
         receiver=PropertyOpMapping(
             "txn",
-            immediates=("Receiver",),
-            stack_outputs=(pytypes.AccountType,),
+            "Receiver",
+            pytypes.AccountType,
         ),
         amount=PropertyOpMapping(
             "txn",
-            immediates=("Amount",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "Amount",
+            pytypes.UInt64Type,
         ),
         close_remainder_to=PropertyOpMapping(
             "txn",
-            immediates=("CloseRemainderTo",),
-            stack_outputs=(pytypes.AccountType,),
+            "CloseRemainderTo",
+            pytypes.AccountType,
         ),
         vote_pk=PropertyOpMapping(
             "txn",
-            immediates=("VotePK",),
-            stack_outputs=(pytypes.BytesType,),
+            "VotePK",
+            pytypes.BytesType,
         ),
         selection_pk=PropertyOpMapping(
             "txn",
-            immediates=("SelectionPK",),
-            stack_outputs=(pytypes.BytesType,),
+            "SelectionPK",
+            pytypes.BytesType,
         ),
         vote_first=PropertyOpMapping(
             "txn",
-            immediates=("VoteFirst",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "VoteFirst",
+            pytypes.UInt64Type,
         ),
         vote_last=PropertyOpMapping(
             "txn",
-            immediates=("VoteLast",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "VoteLast",
+            pytypes.UInt64Type,
         ),
         vote_key_dilution=PropertyOpMapping(
             "txn",
-            immediates=("VoteKeyDilution",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "VoteKeyDilution",
+            pytypes.UInt64Type,
         ),
         type=PropertyOpMapping(
             "txn",
-            immediates=("Type",),
-            stack_outputs=(pytypes.BytesType,),
+            "Type",
+            pytypes.BytesType,
         ),
         type_enum=PropertyOpMapping(
             "txn",
-            immediates=("TypeEnum",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "TypeEnum",
+            pytypes.UInt64Type,
         ),
         xfer_asset=PropertyOpMapping(
             "txn",
-            immediates=("XferAsset",),
-            stack_outputs=(pytypes.AssetType,),
+            "XferAsset",
+            pytypes.AssetType,
         ),
         asset_amount=PropertyOpMapping(
             "txn",
-            immediates=("AssetAmount",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "AssetAmount",
+            pytypes.UInt64Type,
         ),
         asset_sender=PropertyOpMapping(
             "txn",
-            immediates=("AssetSender",),
-            stack_outputs=(pytypes.AccountType,),
+            "AssetSender",
+            pytypes.AccountType,
         ),
         asset_receiver=PropertyOpMapping(
             "txn",
-            immediates=("AssetReceiver",),
-            stack_outputs=(pytypes.AccountType,),
+            "AssetReceiver",
+            pytypes.AccountType,
         ),
         asset_close_to=PropertyOpMapping(
             "txn",
-            immediates=("AssetCloseTo",),
-            stack_outputs=(pytypes.AccountType,),
+            "AssetCloseTo",
+            pytypes.AccountType,
         ),
         group_index=PropertyOpMapping(
             "txn",
-            immediates=("GroupIndex",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "GroupIndex",
+            pytypes.UInt64Type,
         ),
         tx_id=PropertyOpMapping(
             "txn",
-            immediates=("TxID",),
-            stack_outputs=(pytypes.BytesType,),
+            "TxID",
+            pytypes.BytesType,
         ),
         application_id=PropertyOpMapping(
             "txn",
-            immediates=("ApplicationID",),
-            stack_outputs=(pytypes.ApplicationType,),
+            "ApplicationID",
+            pytypes.ApplicationType,
         ),
         on_completion=PropertyOpMapping(
             "txn",
-            immediates=("OnCompletion",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "OnCompletion",
+            pytypes.UInt64Type,
         ),
         application_args=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(ApplicationArgs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "txna",
                 immediates=dict(ApplicationArgs=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_app_args=PropertyOpMapping(
             "txn",
-            immediates=("NumAppArgs",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "NumAppArgs",
+            pytypes.UInt64Type,
         ),
         accounts=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Accounts=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
             FunctionOpMapping(
                 "txna",
                 immediates=dict(Accounts=None, a=int),
-                stack_outputs=(pytypes.AccountType,),
+                result=pytypes.AccountType,
             ),
         ),
         num_accounts=PropertyOpMapping(
             "txn",
-            immediates=("NumAccounts",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "NumAccounts",
+            pytypes.UInt64Type,
         ),
         approval_program=PropertyOpMapping(
             "txn",
-            immediates=("ApprovalProgram",),
-            stack_outputs=(pytypes.BytesType,),
+            "ApprovalProgram",
+            pytypes.BytesType,
         ),
         clear_state_program=PropertyOpMapping(
             "txn",
-            immediates=("ClearStateProgram",),
-            stack_outputs=(pytypes.BytesType,),
+            "ClearStateProgram",
+            pytypes.BytesType,
         ),
         rekey_to=PropertyOpMapping(
             "txn",
-            immediates=("RekeyTo",),
-            stack_outputs=(pytypes.AccountType,),
+            "RekeyTo",
+            pytypes.AccountType,
         ),
         config_asset=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAsset",),
-            stack_outputs=(pytypes.AssetType,),
+            "ConfigAsset",
+            pytypes.AssetType,
         ),
         config_asset_total=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetTotal",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "ConfigAssetTotal",
+            pytypes.UInt64Type,
         ),
         config_asset_decimals=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetDecimals",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "ConfigAssetDecimals",
+            pytypes.UInt64Type,
         ),
         config_asset_default_frozen=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetDefaultFrozen",),
-            stack_outputs=(pytypes.BoolType,),
+            "ConfigAssetDefaultFrozen",
+            pytypes.BoolType,
         ),
         config_asset_unit_name=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetUnitName",),
-            stack_outputs=(pytypes.BytesType,),
+            "ConfigAssetUnitName",
+            pytypes.BytesType,
         ),
         config_asset_name=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetName",),
-            stack_outputs=(pytypes.BytesType,),
+            "ConfigAssetName",
+            pytypes.BytesType,
         ),
         config_asset_url=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetURL",),
-            stack_outputs=(pytypes.BytesType,),
+            "ConfigAssetURL",
+            pytypes.BytesType,
         ),
         config_asset_metadata_hash=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetMetadataHash",),
-            stack_outputs=(pytypes.BytesType,),
+            "ConfigAssetMetadataHash",
+            pytypes.BytesType,
         ),
         config_asset_manager=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetManager",),
-            stack_outputs=(pytypes.AccountType,),
+            "ConfigAssetManager",
+            pytypes.AccountType,
         ),
         config_asset_reserve=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetReserve",),
-            stack_outputs=(pytypes.AccountType,),
+            "ConfigAssetReserve",
+            pytypes.AccountType,
         ),
         config_asset_freeze=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetFreeze",),
-            stack_outputs=(pytypes.AccountType,),
+            "ConfigAssetFreeze",
+            pytypes.AccountType,
         ),
         config_asset_clawback=PropertyOpMapping(
             "txn",
-            immediates=("ConfigAssetClawback",),
-            stack_outputs=(pytypes.AccountType,),
+            "ConfigAssetClawback",
+            pytypes.AccountType,
         ),
         freeze_asset=PropertyOpMapping(
             "txn",
-            immediates=("FreezeAsset",),
-            stack_outputs=(pytypes.AssetType,),
+            "FreezeAsset",
+            pytypes.AssetType,
         ),
         freeze_asset_account=PropertyOpMapping(
             "txn",
-            immediates=("FreezeAssetAccount",),
-            stack_outputs=(pytypes.AccountType,),
+            "FreezeAssetAccount",
+            pytypes.AccountType,
         ),
         freeze_asset_frozen=PropertyOpMapping(
             "txn",
-            immediates=("FreezeAssetFrozen",),
-            stack_outputs=(pytypes.BoolType,),
+            "FreezeAssetFrozen",
+            pytypes.BoolType,
         ),
         assets=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Assets=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
             FunctionOpMapping(
                 "txna",
                 immediates=dict(Assets=None, a=int),
-                stack_outputs=(pytypes.AssetType,),
+                result=pytypes.AssetType,
             ),
         ),
         num_assets=PropertyOpMapping(
             "txn",
-            immediates=("NumAssets",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "NumAssets",
+            pytypes.UInt64Type,
         ),
         applications=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Applications=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
             FunctionOpMapping(
                 "txna",
                 immediates=dict(Applications=None, a=int),
-                stack_outputs=(pytypes.ApplicationType,),
+                result=pytypes.ApplicationType,
             ),
         ),
         num_applications=PropertyOpMapping(
             "txn",
-            immediates=("NumApplications",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "NumApplications",
+            pytypes.UInt64Type,
         ),
         global_num_uint=PropertyOpMapping(
             "txn",
-            immediates=("GlobalNumUint",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "GlobalNumUint",
+            pytypes.UInt64Type,
         ),
         global_num_byte_slice=PropertyOpMapping(
             "txn",
-            immediates=("GlobalNumByteSlice",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "GlobalNumByteSlice",
+            pytypes.UInt64Type,
         ),
         local_num_uint=PropertyOpMapping(
             "txn",
-            immediates=("LocalNumUint",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "LocalNumUint",
+            pytypes.UInt64Type,
         ),
         local_num_byte_slice=PropertyOpMapping(
             "txn",
-            immediates=("LocalNumByteSlice",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "LocalNumByteSlice",
+            pytypes.UInt64Type,
         ),
         extra_program_pages=PropertyOpMapping(
             "txn",
-            immediates=("ExtraProgramPages",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "ExtraProgramPages",
+            pytypes.UInt64Type,
         ),
         nonparticipation=PropertyOpMapping(
             "txn",
-            immediates=("Nonparticipation",),
-            stack_outputs=(pytypes.BoolType,),
+            "Nonparticipation",
+            pytypes.BoolType,
         ),
         logs=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(Logs=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "txna",
                 immediates=dict(Logs=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_logs=PropertyOpMapping(
             "txn",
-            immediates=("NumLogs",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "NumLogs",
+            pytypes.UInt64Type,
         ),
         created_asset_id=PropertyOpMapping(
             "txn",
-            immediates=("CreatedAssetID",),
-            stack_outputs=(pytypes.AssetType,),
+            "CreatedAssetID",
+            pytypes.AssetType,
         ),
         created_application_id=PropertyOpMapping(
             "txn",
-            immediates=("CreatedApplicationID",),
-            stack_outputs=(pytypes.ApplicationType,),
+            "CreatedApplicationID",
+            pytypes.ApplicationType,
         ),
         last_log=PropertyOpMapping(
             "txn",
-            immediates=("LastLog",),
-            stack_outputs=(pytypes.BytesType,),
+            "LastLog",
+            pytypes.BytesType,
         ),
         state_proof_pk=PropertyOpMapping(
             "txn",
-            immediates=("StateProofPK",),
-            stack_outputs=(pytypes.BytesType,),
+            "StateProofPK",
+            pytypes.BytesType,
         ),
         approval_program_pages=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(ApprovalProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "txna",
                 immediates=dict(ApprovalProgramPages=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_approval_program_pages=PropertyOpMapping(
             "txn",
-            immediates=("NumApprovalProgramPages",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "NumApprovalProgramPages",
+            pytypes.UInt64Type,
         ),
         clear_state_program_pages=(
             FunctionOpMapping(
                 "txnas",
                 immediates=dict(ClearStateProgramPages=None),
                 stack_inputs=dict(a=(pytypes.UInt64Type,)),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
             FunctionOpMapping(
                 "txna",
                 immediates=dict(ClearStateProgramPages=None, a=int),
-                stack_outputs=(pytypes.BytesType,),
+                result=pytypes.BytesType,
             ),
         ),
         num_clear_state_program_pages=PropertyOpMapping(
             "txn",
-            immediates=("NumClearStateProgramPages",),
-            stack_outputs=(pytypes.UInt64Type,),
+            "NumClearStateProgramPages",
+            pytypes.UInt64Type,
         ),
     ),
 )

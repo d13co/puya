@@ -23,8 +23,10 @@ class ImmediateArgMapping:
 @attrs.frozen
 class PropertyOpMapping:
     op_code: str
-    immediates: Sequence[str]
-    stack_outputs: Sequence[pytypes.PyType] = attrs.field(validator=attrs.validators.min_len(1))
+    immediate: str
+    typ: pytypes.PyType = attrs.field(
+        validator=attrs.validators.not_(attrs.validators.in_([pytypes.NoneType]))
+    )
 
 
 @attrs.frozen
@@ -36,7 +38,7 @@ class FunctionOpMapping:
     stack_inputs: Mapping[str, Sequence[pytypes.PyType]] = attrs.field(default={})
     """Mapping of stack argument names to valid types for the argument,
      in descending priority for literal conversions"""
-    stack_outputs: Sequence[pytypes.PyType] = attrs.field(factory=tuple)
+    result: pytypes.PyType = pytypes.NoneType
     """Types output by TEAL op"""
 
     @cached_property

@@ -739,6 +739,19 @@ def build_function_op_mapping(
     else:
         arg_name_map = {n.name.upper(): n.name for n in signature_args}
     # replace immediate reference to arg enum with a constant enum value
+    result_ptypes = [
+        sub_types(
+            any_as if o.stack_type == StackType.any and any_as else o.stack_type,
+            covariant=False,
+        )[0]
+        for o in op.stack_outputs
+    ]
+    if not result_ptypes:
+        result_typ = pytypes.NoneType
+    elif len(op.stack_outputs) == 1:
+        (result_typ,) = result_ptypes
+    else:
+        result_typ = pytypes.GenericTupleType.parameterise(result_ptypes, source_location=None)
 
     return FunctionOpMapping(
         op_code=op.name,
@@ -763,13 +776,7 @@ def build_function_op_mapping(
             )
             for arg in op.stack_inputs
         },
-        stack_outputs=[
-            sub_types(
-                any_as if o.stack_type == StackType.any and any_as else o.stack_type,
-                covariant=False,
-            )[0]
-            for o in op.stack_outputs
-        ],
+        result=result_typ,
     )
 
 
@@ -920,8 +927,8 @@ def build_grouped_ops(
     return class_def
 
 
-def build_wtype(wtype: pytypes.PyType) -> str:
-    match wtype:
+def pytype_repr(typ: pytypes.PyType) -> str:
+    match typ:
         case pytypes.BoolType:
             return "pytypes.BoolType"
         case pytypes.UInt64Type:
@@ -936,25 +943,30 @@ def build_wtype(wtype: pytypes.PyType) -> str:
             return "pytypes.BytesType"
         case pytypes.BigUIntType:
             return "pytypes.BigUIntType"
-    raise ValueError("Unexpected pytype")
+        case pytypes.TupleType(generic=pytypes.GenericTupleType, items=tuple_items) if len(
+            tuple_items
+        ) > 1:
+            item_strs = [pytype_repr(item) for item in tuple_items]
+            return (
+                f"pytypes.GenericTupleType.parameterise("
+                f"({', '.join(item_strs)}), source_location=None)"
+            )
+    raise ValueError(f"Unexpected pytype: {typ}")
 
 
 def build_op_specification_body(function: FunctionDef) -> Iterable[str]:
     if function.is_property:
         assert len(function.op_mappings) == 1
+        (op_mapping,) = function.op_mappings
+        assert len(op_mapping.immediates) == 1
+        (immediate,) = op_mapping.immediates
+        yield (
+            f"{function.name}=PropertyOpMapping("
+            f"{op_mapping.op_code!r}, {immediate!r}, {pytype_repr(op_mapping.result)},"
+            f"),"
+        )
     else:
         assert len(function.op_mappings) >= 1
-    if function.is_property:
-        yield f"{function.name}="
-        (op_mapping,) = function.op_mappings
-        yield f"PropertyOpMapping({op_mapping.op_code!r},"
-        yield f" immediates={tuple(op_mapping.immediates.keys())!r}"
-        yield ", stack_outputs=("
-        for stack_output in op_mapping.stack_outputs:
-            yield build_wtype(stack_output)
-            yield ","
-        yield "),),"
-    else:
         yield f"{function.name}=("
         for op_mapping in function.op_mappings:
             yield f"FunctionOpMapping({op_mapping.op_code!r},"
@@ -979,21 +991,17 @@ def build_op_specification_body(function: FunctionDef) -> Iterable[str]:
                         yield ", "
                     yield f"{arg_name}="
                     if len(allowed_types) == 1:
-                        yield f"({build_wtype(*allowed_types)},)"
+                        yield f"({pytype_repr(*allowed_types)},)"
                     else:
                         yield "("
                         for idx2, allowed_type in enumerate(allowed_types):
                             if idx2:
                                 yield ","
-                            yield build_wtype(allowed_type)
+                            yield pytype_repr(allowed_type)
                         yield ")"
                 yield "),"
-            if op_mapping.stack_outputs:
-                yield " stack_outputs=("
-                for stack_output in op_mapping.stack_outputs:
-                    yield build_wtype(stack_output)
-                    yield ","
-                yield "),"
+            if op_mapping.result is not pytypes.NoneType:
+                yield f" result={pytype_repr(op_mapping.result)},"
             yield "),"
         yield "),"
 
