@@ -14,7 +14,7 @@ from puya.awst import (
     wtypes,
 )
 from puya.awst.nodes import DecimalConstant, Expression, Literal
-from puya.awst_build import constants
+from puya.awst_build import constants, pytypes
 from puya.awst_build.arc4_utils import arc4_encode, get_arc4_method_config, get_func_types
 from puya.awst_build.eb.base import ExpressionBuilder
 from puya.awst_build.utils import convert_literal, get_decorators_by_fullname
@@ -137,14 +137,14 @@ def expect_arc4_operand_wtype(
 @attrs.frozen
 class ARC4Signature:
     method_name: str
-    arg_types: list[wtypes.WType]
-    return_type: wtypes.WType | None
+    arg_types: Sequence[pytypes.PyType] = attrs.field(converter=tuple[pytypes.PyType, ...])
+    return_type: pytypes.PyType | None
 
     @property
     def method_selector(self) -> str:
-        args = ",".join(map(arc4_util.wtype_to_arc4, self.arg_types))
-        return_type = self.return_type or wtypes.void_wtype
-        return f"{self.method_name}({args}){arc4_util.wtype_to_arc4(return_type)}"
+        args = ",".join(map(arc4_util.pytype_to_arc4, self.arg_types))
+        return_type = self.return_type or pytypes.NoneType
+        return f"{self.method_name}({args}){arc4_util.pytype_to_arc4(return_type)}"
 
 
 def get_arc4_signature(
