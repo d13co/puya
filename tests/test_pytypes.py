@@ -37,19 +37,6 @@ def stub_class_names_and_predefined_aliases() -> list[str]:
                     result.add(alias_name)
                 case nodes.TypeInfo(fullname=class_name):
                     result.add(class_name)
-                case _:
-                    pass
-
-    # for pyi_path in stubs_dir.rglob(f"*{_STUB_SUFFIX}"):
-    #     assert pyi_path.is_file()
-    #     rel_path = pyi_path.relative_to(stubs_dir).with_suffix("")
-    #     module_name = "algopy." + ".".join(rel_path.parts).removesuffix(".__init__")
-    #     with pyi_path.open() as fp:
-    #         for ln in fp:
-    #             m = re.match(r"class ([^_][^:(]+)", ln)
-    #             if m:
-    #                 (class_name,) = m.groups()
-    #                 result.add(".".join((module_name, class_name)))
     return sorted(result)
 
 
