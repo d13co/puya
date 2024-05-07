@@ -26,7 +26,7 @@ from puya.awst.nodes import (
     TxnFields,
     UInt64Constant,
 )
-from puya.awst_build import constants
+from puya.awst_build import constants, pytypes
 from puya.awst_build.constants import TransactionType
 from puya.awst_build.eb.arc4._utils import (
     ARC4Signature,
@@ -188,7 +188,7 @@ class ABICallClassExpressionBuilder(TypeClassExpressionBuilder):
                     # the generated method_selector against the supplied method_str
                     signature = attrs.evolve(signature, return_type=result_wtype)
                 elif signature.return_type is None:
-                    signature = attrs.evolve(signature, return_type=wtypes.void_wtype)
+                    signature = attrs.evolve(signature, return_type=pytypes.NoneType)
                 if not signature.method_selector.startswith(method_str):
                     raise CodeError(
                         f"Method selector from args '{signature.method_selector}' "
@@ -341,7 +341,7 @@ def _create_abi_call_expr(
     )
     return TupleExpression.from_items(
         (
-            ARC4FromLogBuilder.abi_expr_from_log(signature.return_type, last_log, location),
+            ARC4FromLogBuilder.abi_expr_from_log(signature.return_type.wtype, last_log, location),
             itxn_tmp,
         ),
         location,
