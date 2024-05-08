@@ -13,6 +13,7 @@ from immutabledict import immutabledict
 from puya.awst import wtypes
 from puya.awst.wtypes import WType
 from puya.errors import CodeError, InternalError
+from puya.models import CompiledReferenceField
 
 if t.TYPE_CHECKING:
     import decimal
@@ -374,6 +375,31 @@ class StringConstant(Expression):
 
     def accept(self, visitor: ExpressionVisitor[T]) -> T:
         return visitor.visit_string_constant(self)
+
+
+@attrs.frozen
+class CompiledReference(Expression):
+    artifact: str
+    """Contract or logic sig fullname"""
+    field: CompiledReferenceField
+    template_variables: Mapping[str, bytes | int] = attrs.field(converter=immutabledict)
+    wtype: wtypes.WType = attrs.field(init=False)
+
+    @wtype.default
+    def _wtype_default(self) -> wtypes.WType:
+        return {
+            CompiledReferenceField.approval: wtypes.bytes_wtype,
+            CompiledReferenceField.clear_state: wtypes.bytes_wtype,
+            CompiledReferenceField.account: wtypes.account_wtype,
+            CompiledReferenceField.global_uints: wtypes.uint64_wtype,
+            CompiledReferenceField.global_bytes: wtypes.uint64_wtype,
+            CompiledReferenceField.local_uints: wtypes.uint64_wtype,
+            CompiledReferenceField.local_bytes: wtypes.uint64_wtype,
+            CompiledReferenceField.extra_program_pages: wtypes.uint64_wtype,
+        }[self.field]
+
+    def accept(self, visitor: ExpressionVisitor[T]) -> T:
+        return visitor.visit_compiled_reference(self)
 
 
 @attrs.frozen

@@ -63,6 +63,7 @@ from puya.awst_build.eb.base import (
     StateProxyMemberBuilder,
 )
 from puya.awst_build.eb.bool import BoolClassExpressionBuilder
+from puya.awst_build.eb.compile import LogicSigReferenceExpressionBuilder
 from puya.awst_build.eb.contracts import (
     ContractSelfExpressionBuilder,
     ContractTypeExpressionBuilder,
@@ -671,6 +672,20 @@ class FunctionASTConverter(
                     location=expr_loc,
                     func_type=func_type,
                 )
+            case mypy.nodes.RefExpr(
+                fullname=fullname,
+                node=mypy.nodes.Decorator(
+                    decorators=decorators,
+                    type=mypy.types.Instance(
+                        type=mypy.nodes.TypeInfo(fullname=constants.LOGICSIG)
+                    ),
+                ),
+            ) if any(
+                get_unaliased_fullname(de) == constants.LOGICSIG_DECORATOR
+                for de in decorators
+                if isinstance(de, mypy.nodes.RefExpr)
+            ):
+                return LogicSigReferenceExpressionBuilder(fullname, expr_loc)
             case mypy.nodes.RefExpr(node=mypy.nodes.FuncDef()):
                 raise CodeError(
                     f"Cannot invoke {fullname} as it is not "

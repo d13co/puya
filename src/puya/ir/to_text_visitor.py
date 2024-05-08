@@ -42,6 +42,16 @@ class ToTextVisitor(IRVisitor[str]):
     def visit_itxn_constant(self, op: models.ITxnConstant) -> str:
         return f"{op.ir_type.name}({op.value})"
 
+    def visit_compiled_reference(self, const: models.CompiledReference) -> str:
+        template_vars = ", ".join(
+            f"{var}={val.hex() if isinstance(val, bytes) else str(val)}"
+            for var, val in const.template_variables.items()
+        )
+        result = f"compiled({const.artifact!r}, field={const.field.name}"
+        if template_vars:
+            result += f", {template_vars}"
+        return result + ")"
+
     def visit_intrinsic_op(self, intrinsic: models.Intrinsic) -> str:
         callee = intrinsic.op.code
         immediates = list(map(str, intrinsic.immediates))

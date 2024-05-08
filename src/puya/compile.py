@@ -27,6 +27,7 @@ from puya.ir.models import (
     LogicSignature,
     ModuleArtifact,
 )
+from puya.mir.context import MIRContext
 from puya.mir.main import program_ir_to_mir
 from puya.models import CompilationArtifact, CompiledContract, CompiledLogicSignature
 from puya.options import PuyaOptions
@@ -38,8 +39,8 @@ from puya.parse import (
 from puya.teal.main import mir_to_teal
 from puya.teal.models import TealProgram
 from puya.teal.output import emit_teal
-from puya.ussemble.main import assemble_program
-from puya.utils import determine_out_dir, make_path_relative_to_cwd
+from puya.ussemble.main import assemble_program, get_template_vars
+from puya.utils import attrs_extend, determine_out_dir, make_path_relative_to_cwd
 
 # this should contain the lowest version number that this compiler does NOT support
 # i.e. the next minor version after what is defined in stubs/pyproject.toml:tool.poetry.version
@@ -162,6 +163,11 @@ def module_irs_to_teal(
     result = dict[ParseSource, list[CompilationArtifact]]()
     # used to check for conflicts that would occur on output
     artifacts_by_output_base = dict[Path, ModuleArtifact]()
+    mir_context = attrs_extend(
+        MIRContext,
+        context,
+        all_artifacts=[a for artifacts in module_irs.values() for a in artifacts],
+    )
     for src, artifact_irs in module_irs.items():
         for artifact_ir in artifact_irs:
             out_dir = determine_out_dir(src.path.parent, context.options)
@@ -179,10 +185,10 @@ def module_irs_to_teal(
             match artifact_ir:
                 case ContractIR() as contract:
                     compiled: CompilationArtifact = _contract_ir_to_teal(
-                        context, contract, artifact_ir_base_path
+                        mir_context, contract, artifact_ir_base_path
                     )
                 case LogicSignature() as logic_sig:
-                    compiled = _logic_sig_to_teal(context, logic_sig, artifact_ir_base_path)
+                    compiled = _logic_sig_to_teal(mir_context, logic_sig, artifact_ir_base_path)
                 case _:
                     typing.assert_never(artifact_ir)
 
@@ -269,7 +275,7 @@ def _check_algopy_version(site_packages: Path) -> None:
 
 
 def _contract_ir_to_teal(
-    context: CompileContext, contract_ir: ContractIR, contract_ir_base_path: Path
+    context: MIRContext, contract_ir: ContractIR, contract_ir_base_path: Path
 ) -> CompiledContract:
     approval_mir = program_ir_to_mir(
         context, contract_ir.approval_program, contract_ir_base_path.with_suffix(".approval.mir")
@@ -288,7 +294,7 @@ def _contract_ir_to_teal(
 
 
 def _logic_sig_to_teal(
-    context: CompileContext, logic_sig_ir: LogicSignature, logic_sig_ir_base_path: Path
+    context: MIRContext, logic_sig_ir: LogicSignature, logic_sig_ir_base_path: Path
 ) -> CompiledLogicSignature:
     program_mir = program_ir_to_mir(
         context, logic_sig_ir.program, logic_sig_ir_base_path.with_suffix(".mir")
@@ -372,6 +378,8 @@ def write_program_bytecode(
 ) -> None:
     for suffix, program in programs.items():
         output_path = base_path.with_suffix(suffix)
-        assembled = assemble_program(context, program)
+        assembled = assemble_program(
+            context, program, template_variables=get_template_vars(context)
+        )
         logger.info(f"Writing {make_path_relative_to_cwd(output_path)}")
         output_path.write_bytes(assembled.bytecode)

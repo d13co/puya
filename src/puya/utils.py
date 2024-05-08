@@ -30,6 +30,19 @@ class Address:
     is_valid: bool = False
 
     @classmethod
+    def from_public_key(cls, public_key: bytes) -> typing.Self:
+        check_sum = sha512_256_hash(public_key)[-ADDRESS_CHECKSUM_LENGTH:]
+        address_bytes = public_key + check_sum
+        address = base64.b32encode(address_bytes).decode("utf8").rstrip("=")
+        assert len(address) == ENCODED_ADDRESS_LENGTH
+        return cls(
+            address=address,
+            public_key=public_key,
+            check_sum=check_sum,
+            is_valid=True,
+        )
+
+    @classmethod
     def parse(cls, address: str) -> typing.Self:
         # Pad address so it's a valid b32 string
         padded_address = address + (6 * "=")
@@ -41,12 +54,12 @@ class Address:
 
         public_key_hash = address_bytes[:PUBLIC_KEY_HASH_LENGTH]
         check_sum = address_bytes[PUBLIC_KEY_HASH_LENGTH:]
-        verified_check_sum = sha512_256_hash(public_key_hash)[-ADDRESS_CHECKSUM_LENGTH:]
+        verified_address = cls.from_public_key(public_key_hash)
         return cls(
             address=address,
             public_key=public_key_hash,
             check_sum=check_sum,
-            is_valid=verified_check_sum == check_sum,
+            is_valid=verified_address.check_sum == check_sum,
         )
 
 
@@ -100,9 +113,8 @@ def sha512_256_hash(value: bytes) -> bytes:
 def attrs_extend(
     new_type: type[T_A], base_instance: typing.Any, **changes: typing.Any  # noqa: ANN401
 ) -> T_A:
-    """Like attrs.evolve but allows creating a sub-type"""
+    """Like attrs.evolve but allows creating a related type"""
     base_type = type(base_instance)
-    assert issubclass(new_type, base_type)
     old_type_fields = attrs.fields_dict(base_type)
     new_type_fields = attrs.fields(new_type)
     for a in new_type_fields:

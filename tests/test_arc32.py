@@ -27,9 +27,19 @@ from tests.utils.merkle_tree import MerkleTree, sha_256_raw
 pytestmark = pytest.mark.localnet
 
 
-def compile_arc32(src_path: Path, *, optimization_level: int = 1, debug_level: int = 2) -> str:
+def compile_arc32(
+    src_path: Path,
+    *,
+    optimization_level: int = 1,
+    debug_level: int = 2,
+    contract_name: str | None = None,
+) -> str:
     result = compile_src(src_path, optimization_level=optimization_level, debug_level=debug_level)
-    ((contract,),) = result.teal.values()
+    artifacts = [a for artifacts in result.teal.values() for a in artifacts]
+    if contract_name is None:
+        (contract,) = artifacts
+    else:
+        contract = next(a for a in artifacts if a.metadata.name == contract_name)
     assert isinstance(contract, CompiledContract), "Compilation artifact must be a contract"
     approval = emit_teal(result.context, contract.approval_program)
     clear = emit_teal(result.context, contract.clear_program)
@@ -1096,3 +1106,21 @@ def _get_tic_tac_toe_game_status(
         winner_index  # type: ignore[index]
     ]
     return board, winner
+
+
+def test_compile(algod_client: AlgodClient, account: algokit_utils.Account) -> None:
+    example = TEST_CASES_DIR / "compile"
+
+    app_spec = algokit_utils.ApplicationSpecification.from_json(
+        compile_arc32(example, contract_name="HelloFactory")
+    )
+    app_client = algokit_utils.ApplicationClient(algod_client, app_spec, signer=account)
+
+    app_client.create()
+
+    increased_fee = algod_client.suggested_params()
+    increased_fee.flat_fee = True
+    increased_fee.fee = constants.min_txn_fee * 4
+    txn_params = algokit_utils.OnCompleteCallParameters(suggested_params=increased_fee)
+    algokit_utils.config.config.configure(debug=True, trace_all=True)
+    app_client.call("do_some_stuff", transaction_parameters=txn_params)

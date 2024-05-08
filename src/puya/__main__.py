@@ -106,11 +106,10 @@ def main() -> None:
         dest="template_vars",
         metavar="VAR=VALUE",
         action="append",
-        help="Define template vars for use when assembling via --output-bytecode,"
-        " without TMPL prefix e.g."
-        " -T SOME_INT=1234"
-        " -T SOME_BYTES=0x1A2B"
-        " -T SOME_STR=\\'hello\\'",
+        help="Define template vars for use when assembling via --output-bytecode, e.g."
+        " -T TMPL_SOME_INT=1234"
+        " -T TMPL_SOME_BYTES=0x1A2B"
+        " -T TMPL_SOME_STR=\\'hello\\'",
     )
     parser.add_argument(
         "--template-vars-path",

@@ -1,0 +1,87 @@
+#pragma version 10
+
+test_cases.compile.factory.Hello.approval_program:
+    txn NumAppArgs
+    bz main_bare_routing@6
+    method "create(string)void"
+    method "greet(string)string"
+    txna ApplicationArgs 0
+    match main_create_route@2 main_greet_route@3
+    err // reject transaction
+
+main_create_route@2:
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    !
+    assert // is creating
+    txna ApplicationArgs 1
+    extract 2 0
+    callsub create
+    int 1
+    return
+
+main_greet_route@3:
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    txna ApplicationArgs 1
+    extract 2 0
+    callsub greet
+    dup
+    len
+    itob
+    extract 6 2
+    swap
+    concat
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_bare_routing@6:
+    int 5
+    txn OnCompletion
+    match main_delete@7
+    err // reject transaction
+
+main_delete@7:
+    txn ApplicationID
+    assert // is not creating
+    callsub delete
+    int 1
+    return
+
+
+// test_cases.compile.factory.Hello.create(greeting: bytes) -> void:
+create:
+    proto 1 0
+    byte "greeting"
+    frame_dig -1
+    app_global_put
+    retsub
+
+
+// test_cases.compile.factory.Hello.greet(name: bytes) -> bytes:
+greet:
+    proto 1 1
+    int 0
+    byte "greeting"
+    app_global_get_ex
+    assert // check greeting exists
+    byte " "
+    concat
+    frame_dig -1
+    concat
+    retsub
+
+
+// test_cases.compile.factory.Hello.delete() -> void:
+delete:
+    proto 0 0
+    retsub

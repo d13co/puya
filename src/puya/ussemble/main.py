@@ -1,5 +1,5 @@
 import contextlib
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 
 import attrs
@@ -23,13 +23,12 @@ class AssembledProgram:
 
 
 def assemble_program(
-    ctx: CompileContext,
-    program: teal.TealProgram,
+    ctx: CompileContext, program: teal.TealProgram, template_variables: Mapping[str, int | bytes]
 ) -> AssembledProgram:
     assemble_ctx = attrs_extend(
         AssembleContext,
         ctx,
-        template_variables=get_template_vars(ctx),
+        template_variables=template_variables,
     )
     avm_ops = lower_ops(assemble_ctx, program)
     validate_labels(avm_ops)
@@ -41,7 +40,7 @@ def assemble_program(
     )
 
 
-def get_template_vars(context: CompileContext) -> dict[str, int | bytes]:
+def get_template_vars(context: CompileContext) -> Mapping[str, int | bytes]:
     options = context.options
     return {
         **_load_template_vars(options.template_vars_path),
@@ -49,7 +48,7 @@ def get_template_vars(context: CompileContext) -> dict[str, int | bytes]:
     }
 
 
-def _load_template_vars(path: Path | None) -> dict[str, int | bytes]:
+def _load_template_vars(path: Path | None) -> Mapping[str, int | bytes]:
     if path is None:
         return {}
     return _parse_template_vars(
@@ -78,4 +77,4 @@ def _parse_template_var(var: str) -> tuple[str, int | bytes]:
                 value = int(value_str)
     if value is None or name is None:
         raise PuyaError(f"Invalid template var definition: {var}")
-    return f"TMPL_{name}", value
+    return name, value

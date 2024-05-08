@@ -1,22 +1,26 @@
 import typing
+from collections.abc import Mapping
 
 import attrs
 
 from puya import log
-from puya.errors import InternalError
+from puya.algo_constants import MAX_APP_PAGE_SIZE
+from puya.errors import CodeError, InternalError
 from puya.ir import models as ir
 from puya.ir.types_ import AVMBytesEncoding
 from puya.ir.visitor import IRVisitor
 from puya.mir import models
-from puya.mir.context import ProgramCodeGenContext
-from puya.utils import biguint_bytes_eval
+from puya.mir.context import ProgramMIRContext
+from puya.models import CompiledReferenceField
+from puya.parse import SourceLocation
+from puya.utils import Address, biguint_bytes_eval, sha512_256_hash
 
 logger = log.get_logger(__name__)
 
 
 @attrs.define
 class MemoryIRBuilder(IRVisitor[None]):
-    context: ProgramCodeGenContext = attrs.field(on_setattr=attrs.setters.frozen)
+    context: ProgramMIRContext = attrs.field(on_setattr=attrs.setters.frozen)
     current_subroutine: ir.Subroutine
     is_main: bool
     current_ops: list[models.BaseOp] = attrs.field(factory=list)
@@ -129,6 +133,64 @@ class MemoryIRBuilder(IRVisitor[None]):
                 source_location=const.source_location,
             )
         )
+
+    def visit_compiled_reference(self, const: ir.CompiledReference) -> None:
+        match const.field:
+            case CompiledReferenceField.approval | CompiledReferenceField.clear_state:
+                program_id = f"{const.artifact}.{const.field.name}"
+                program = _assemble_program_bytes(
+                    self.context, program_id, const.template_variables, const.source_location
+                )
+                self._add_op(
+                    models.PushBytes(
+                        value=program,
+                        encoding=AVMBytesEncoding.base64,
+                        source_location=const.source_location,
+                    )
+                )
+            case CompiledReferenceField.account:
+                program = _assemble_program_bytes(
+                    self.context, const.artifact, const.template_variables, const.source_location
+                )
+                address_public_key = sha512_256_hash(b"Program" + program)
+                self._add_op(
+                    models.PushAddress(
+                        value=Address.from_public_key(address_public_key).address,
+                        source_location=const.source_location,
+                    )
+                )
+            case CompiledReferenceField.extra_program_pages:
+                total_bytes = 0
+                for field in (CompiledReferenceField.approval, CompiledReferenceField.clear_state):
+                    program_id = f"{const.artifact}.{field.name}"
+                    program = _assemble_program_bytes(
+                        self.context, program_id, const.template_variables, const.source_location
+                    )
+                    total_bytes += len(program)
+                extra_pages = (total_bytes - 1) // MAX_APP_PAGE_SIZE
+                self._add_op(
+                    models.PushInt(
+                        value=extra_pages,
+                        source_location=const.source_location,
+                    )
+                )
+            case (
+                CompiledReferenceField.global_uints
+                | CompiledReferenceField.global_bytes
+                | CompiledReferenceField.local_uints
+                | CompiledReferenceField.local_bytes
+            ) as state_field:
+                total = _get_state_total(
+                    self.context, const.artifact, state_field, const.source_location
+                )
+                self._add_op(
+                    models.PushInt(
+                        value=total,
+                        source_location=const.source_location,
+                    )
+                )
+            case _:
+                typing.assert_never(const.field)
 
     def visit_intrinsic_op(self, intrinsic: ir.Intrinsic) -> None:
         discard_results = intrinsic is self.active_op
@@ -311,3 +373,67 @@ def _unexpected_node(node: ir.IRVisitable) -> typing.Never:
         f" - should have been eliminated in prior stages",
         node.source_location,
     )
+
+
+def _get_state_total(
+    context: ProgramMIRContext,
+    contract: str,
+    field: typing.Literal[
+        CompiledReferenceField.global_uints,
+        CompiledReferenceField.global_bytes,
+        CompiledReferenceField.local_uints,
+        CompiledReferenceField.local_bytes,
+    ],
+    loc: SourceLocation | None,
+) -> int:
+    try:
+        contract_ir = context.all_contracts[contract]
+    except KeyError as ex:
+        raise InternalError(f"Unknown contract reference: {contract}", loc) from ex
+    totals = contract_ir.metadata.state_totals
+    total = attrs.asdict(totals).get(field.name)
+    if not isinstance(total, int):
+        raise InternalError(f"Invalid state total field: {field.name}", loc)
+    return total
+
+
+def _assemble_program_bytes(
+    context: ProgramMIRContext,
+    program_id: str,
+    template_vars: Mapping[str, int | bytes],
+    loc: SourceLocation | None,
+) -> bytes:
+    from puya.mir.main import program_ir_to_mir
+    from puya.teal.main import mir_to_teal
+    from puya.ussemble.main import assemble_program, get_template_vars
+
+    try:
+        program_ir = context.all_programs[program_id]
+    except KeyError as ex:
+        raise CodeError(f"Unknown program reference: {program_id}", loc) from ex
+
+    try:
+        program_index = context.current_assembles.index(program_id)
+    except ValueError:
+        pass
+    else:
+        chain = " -> ".join(context.current_assembles[program_index:] + [program_id])
+        raise CodeError(f"Self referencing program cycle detected: {chain}", loc)
+    context.current_assembles.append(program_id)
+    context = attrs.evolve(
+        context,
+        options=attrs.evolve(
+            context.options,
+            output_teal=False,
+            output_memory_ir=False,
+            output_bytecode=False,
+        ),
+    )
+    program_mir = program_ir_to_mir(context, program_ir, None)
+    program_teal = mir_to_teal(context, program_mir)
+    template_vars = {
+        **get_template_vars(context),
+        **template_vars,
+    }
+    context.current_assembles.pop()
+    return assemble_program(context, program_teal, template_vars).bytecode

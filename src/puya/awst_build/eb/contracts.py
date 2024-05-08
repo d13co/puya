@@ -27,11 +27,11 @@ class ContractTypeExpressionBuilder(IntermediateExpressionBuilder):
     ):
         super().__init__(location)
         self.context = context
-        self._type_info = type_info
+        self.type_info = type_info
 
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         return BaseClassSubroutineInvokerExpressionBuilder(
-            context=self.context, type_info=self._type_info, name=name, location=location
+            context=self.context, type_info=self.type_info, name=name, location=location
         )
 
 

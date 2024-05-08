@@ -1,7 +1,7 @@
 import abc
 import typing
 import typing as t
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 
 import attrs
 
@@ -12,7 +12,7 @@ from puya.ir.avm_ops import AVMOp
 from puya.ir.avm_ops_models import OpSignature, StackType, Variant
 from puya.ir.types_ import AVMBytesEncoding, IRType, stack_type_to_avm_type, stack_type_to_ir_type
 from puya.ir.visitor import IRVisitor
-from puya.models import ContractMetaData, LogicSignatureMetaData
+from puya.models import CompiledReferenceField, ContractMetaData, LogicSignatureMetaData
 from puya.parse import SourceLocation
 from puya.utils import unique
 
@@ -270,6 +270,17 @@ class BytesConstant(Constant):
 
     def accept(self, visitor: IRVisitor[T]) -> T:
         return visitor.visit_bytes_constant(self)
+
+
+@attrs.frozen
+class CompiledReference(Value):
+    artifact: str
+    field: CompiledReferenceField
+    template_variables: Mapping[str, bytes | int]
+    source_location: SourceLocation | None = attrs.field(eq=False)
+
+    def accept(self, visitor: IRVisitor[T]) -> T:
+        return visitor.visit_compiled_reference(self)
 
 
 @attrs.frozen
@@ -880,6 +891,7 @@ class Program(Context):
     # return
     #
     # ie, just omit the subroutine header, and replace any&all retsub ops with a return instead
+    id: str
     main: Subroutine
     subroutines: Sequence[Subroutine]
     source_location: SourceLocation | None = None

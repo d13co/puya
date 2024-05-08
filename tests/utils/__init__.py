@@ -1,5 +1,4 @@
 import functools
-import tempfile
 import typing
 from collections.abc import Iterable
 from pathlib import Path
@@ -71,13 +70,10 @@ class CompilationResult:
     module_awst: dict[str, Module]
     logs: list[Log]
     teal: dict[ParseSource, list[CompilationArtifact]]
-    output_files: dict[Path, str]
     src_path: Path
     """original source path"""
     root_dir: Path
     """examples or test_cases path"""
-    tmp_dir: Path
-    """tmp path used during compilation"""
 
 
 def narrow_sources(parse_result: ParseResult, src_path: Path) -> ParseResult:
@@ -144,13 +140,20 @@ def awst_to_teal(
     return compiled_contracts
 
 
-@functools.cache
-def compile_src(
-    src_path: Path,
-    optimization_level: int,
-    debug_level: int,
-    template_vars_path: Path | None = None,
-) -> CompilationResult:
+def compile_src(path: Path, *, optimization_level: int, debug_level: int) -> CompilationResult:
+    return compile_src_from_options(
+        PuyaOptions(
+            paths=(path,),
+            optimization_level=optimization_level,
+            debug_level=debug_level,
+            output_arc32=False,
+            output_teal=False,
+        )
+    )
+
+
+def compile_src_from_options(options: PuyaOptions) -> CompilationResult:
+    (src_path,) = options.paths
     root_dir = _get_root_dir(src_path)
     context, awst, awst_logs = get_awst_cache(root_dir)
     awst_logs = _filter_logs(awst_logs, root_dir, src_path)
@@ -159,34 +162,20 @@ def compile_src(
     if awst_errors:
         raise CodeError(awst_errors)
     # create a new context from cache and specified src
-    with tempfile.TemporaryDirectory() as tmp_dir_, logging_context() as log_ctx:
-        tmp_dir = Path(tmp_dir_)
+    with logging_context() as log_ctx:
         context = attrs.evolve(
             context,
+            options=options,
             parse_result=narrow_sources(context.parse_result, src_path),
-            options=PuyaOptions(
-                paths=(src_path,),
-                optimization_level=optimization_level,
-                debug_level=debug_level,
-                output_teal=True,
-                output_awst=True,
-                output_destructured_ir=True,
-                output_arc32=True,
-                output_ssa_ir=optimization_level < 2,
-                output_optimization_ir=optimization_level < 2,
-                output_memory_ir=True,
-                output_client=True,
-                out_dir=tmp_dir,
-                template_vars_path=template_vars_path,
-            ),
         )
 
         with pushd(root_dir):
             # write AWST
-            sources = tuple(str(s.path) for s in context.parse_result.sources)
-            for module in awst.values():
-                if module.source_file_path.startswith(sources):
-                    output_awst(module, context.options)
+            if options.output_awst:
+                sources = tuple(str(s.path) for s in context.parse_result.sources)
+                for module in awst.values():
+                    if module.source_file_path.startswith(sources):
+                        output_awst(module, context.options)
 
             teal = awst_to_teal(log_ctx, context, awst)
             if teal is None:
@@ -194,18 +183,11 @@ def compile_src(
 
             write_artifacts(context, teal)
 
-        output_files = {
-            file.relative_to(tmp_dir): file.read_text("utf8")
-            for file in tmp_dir.iterdir()
-            if file.suffix in APPROVAL_EXTENSIONS
-        }
         return CompilationResult(
             context=context,
             module_awst=awst,
             logs=awst_logs + log_ctx.logs,
             teal=teal,
-            output_files=output_files,
-            tmp_dir=tmp_dir,
             root_dir=root_dir,
             src_path=src_path,
         )
@@ -223,7 +205,7 @@ class PuyaExample:
     @property
     def template_vars_path(self) -> Path | None:
         template_vars_path = self.path / "template.vars"
-        return template_vars_path if template_vars_path.exists() else None
+        return template_vars_path.resolve() if template_vars_path.exists() else None
 
     @property
     def id(self) -> str:

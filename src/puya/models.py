@@ -150,3 +150,14 @@ class CompiledLogicSignature:
 
 
 CompilationArtifact: typing.TypeAlias = CompiledContract | CompiledLogicSignature
+
+
+class CompiledReferenceField(enum.StrEnum):
+    approval = enum.auto()
+    clear_state = enum.auto()
+    account = enum.auto()  # logic sig only
+    global_uints = enum.auto()
+    global_bytes = enum.auto()
+    local_uints = enum.auto()
+    local_bytes = enum.auto()
+    extra_program_pages = enum.auto()

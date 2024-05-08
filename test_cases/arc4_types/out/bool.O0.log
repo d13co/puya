@@ -10,39 +10,39 @@ PC  Teal               Stack
 16  int 0              0x80, 0x00, 0, 0                                                             
 17  setbit             0x80, 0x00                                                                   
 18  callsub test_stuff 0x80, 0x00                                                                   
-280 proto 2 0          0x80, 0x00                                                                   
-283 frame_dig -2       0x80, 0x00, 0x80                                                             
-285 int 0              0x80, 0x00, 0x80, 0                                                          
-286 getbit             0x80, 0x00, 1                                                                
-287 assert             0x80, 0x00                                                                   
-288 frame_dig -1       0x80, 0x00, 0x00                                                             
-290 int 0              0x80, 0x00, 0x00, 0                                                          
-291 getbit             0x80, 0x00, 0                                                                
-292 !                  0x80, 0x00, 1                                                                
-293 assert             0x80, 0x00                                                                   
-294 frame_dig -2       0x80, 0x00, 0x80                                                             
-296 int 0              0x80, 0x00, 0x80, 0                                                          
-297 getbit             0x80, 0x00, 1                                                                
-298 byte 0x00          0x80, 0x00, 1, 0x00                                                          
-299 int 0              0x80, 0x00, 1, 0x00, 0                                                       
-300 uncover 2          0x80, 0x00, 0x00, 0, 1                                                       
-302 setbit             0x80, 0x00, 0x80                                                             
-303 frame_dig -2       0x80, 0x00, 0x80, 0x80                                                       
-305 swap               0x80, 0x00, 0x80, 0x80                                                       
-306 ==                 0x80, 0x00, 1                                                                
-307 assert             0x80, 0x00                                                                   
-308 frame_dig -1       0x80, 0x00, 0x00                                                             
-310 int 0              0x80, 0x00, 0x00, 0                                                          
-311 getbit             0x80, 0x00, 0                                                                
-312 byte 0x00          0x80, 0x00, 0, 0x00                                                          
-313 int 0              0x80, 0x00, 0, 0x00, 0                                                       
-314 uncover 2          0x80, 0x00, 0x00, 0, 0                                                       
-316 setbit             0x80, 0x00, 0x00                                                             
-317 frame_dig -1       0x80, 0x00, 0x00, 0x00                                                       
-319 swap               0x80, 0x00, 0x00, 0x00                                                       
-320 ==                 0x80, 0x00, 1                                                                
-321 assert             0x80, 0x00                                                                   
-322 retsub                                                                                          
+305 proto 2 0          0x80, 0x00                                                                   
+308 frame_dig -2       0x80, 0x00, 0x80                                                             
+310 int 0              0x80, 0x00, 0x80, 0                                                          
+311 getbit             0x80, 0x00, 1                                                                
+312 assert             0x80, 0x00                                                                   
+313 frame_dig -1       0x80, 0x00, 0x00                                                             
+315 int 0              0x80, 0x00, 0x00, 0                                                          
+316 getbit             0x80, 0x00, 0                                                                
+317 !                  0x80, 0x00, 1                                                                
+318 assert             0x80, 0x00                                                                   
+319 frame_dig -2       0x80, 0x00, 0x80                                                             
+321 int 0              0x80, 0x00, 0x80, 0                                                          
+322 getbit             0x80, 0x00, 1                                                                
+323 byte 0x00          0x80, 0x00, 1, 0x00                                                          
+324 int 0              0x80, 0x00, 1, 0x00, 0                                                       
+325 uncover 2          0x80, 0x00, 0x00, 0, 1                                                       
+327 setbit             0x80, 0x00, 0x80                                                             
+328 frame_dig -2       0x80, 0x00, 0x80, 0x80                                                       
+330 uncover 1          0x80, 0x00, 0x80, 0x80                                                       
+332 ==                 0x80, 0x00, 1                                                                
+333 assert             0x80, 0x00                                                                   
+334 frame_dig -1       0x80, 0x00, 0x00                                                             
+336 int 0              0x80, 0x00, 0x00, 0                                                          
+337 getbit             0x80, 0x00, 0                                                                
+338 byte 0x00          0x80, 0x00, 0, 0x00                                                          
+339 int 0              0x80, 0x00, 0, 0x00, 0                                                       
+340 uncover 2          0x80, 0x00, 0x00, 0, 0                                                       
+342 setbit             0x80, 0x00, 0x00                                                             
+343 frame_dig -1       0x80, 0x00, 0x00, 0x00                                                       
+345 uncover 1          0x80, 0x00, 0x00, 0x00                                                       
+347 ==                 0x80, 0x00, 1                                                                
+348 assert             0x80, 0x00                                                                   
+349 retsub                                                                                          
 21  byte 0x00          0x00                                                                         
 22  int 0              0x00, 0                                                                      
 23  int 1              0x00, 0, 1                                                                   
@@ -104,150 +104,150 @@ PC  Teal               Stack
 89  byte 0x            0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x   
 91  uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x, 0x80   
 93  concat             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80       
-94  swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80       
-95  int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0    
-96  getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1          
-97  swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0x80          
-98  int 1              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0x80, 1       
-99  uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 1       
-101 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0             
-102 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 0x80             
-103 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 0x80, 0          
-104 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 1                
-105 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xC0                
-106 int 2              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xC0, 2             
-108 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 2, 1             
-110 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0                   
-111 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 0x80                   
-112 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 0x80, 0                
-113 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 1                      
-114 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xE0                      
-115 int 3              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xE0, 3                   
-117 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 3, 1                   
-119 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0                         
-120 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 0x80                         
-121 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 0x80, 0                      
-122 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 1                            
-123 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF0                            
-124 int 4              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF0, 4                         
-126 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 4, 1                         
-128 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8                               
-129 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 0x80                               
-130 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 0x80, 0                            
-131 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 1                                  
-132 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF8                                  
-133 int 5              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF8, 5                               
-135 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 5, 1                               
-137 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xFC                                     
-138 swap               0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 0x80                                     
-139 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 0x80, 0                                  
-140 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 1                                        
-141 swap               0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xFC                                        
-142 int 6              0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xFC, 6                                     
-144 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 6, 1                                     
-146 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0xFE                                           
-147 swap               0x80, 0x80, 0x80, 0x80, 0xFE, 0x80                                           
-148 int 0              0x80, 0x80, 0x80, 0x80, 0xFE, 0x80, 0                                        
-149 getbit             0x80, 0x80, 0x80, 0x80, 0xFE, 1                                              
-150 swap               0x80, 0x80, 0x80, 0x80, 1, 0xFE                                              
-151 int 7              0x80, 0x80, 0x80, 0x80, 1, 0xFE, 7                                           
-153 uncover 2          0x80, 0x80, 0x80, 0x80, 0xFE, 7, 1                                           
-155 setbit             0x80, 0x80, 0x80, 0x80, 0xFF                                                 
-156 uncover 2          0x80, 0x80, 0x80, 0xFF, 0x80                                                 
-158 concat             0x80, 0x80, 0x80, 0xFF80                                                     
-159 swap               0x80, 0x80, 0xFF80, 0x80                                                     
-160 int 0              0x80, 0x80, 0xFF80, 0x80, 0                                                  
-161 getbit             0x80, 0x80, 0xFF80, 1                                                        
-162 swap               0x80, 0x80, 1, 0xFF80                                                        
-163 int 9              0x80, 0x80, 1, 0xFF80, 9                                                     
-165 uncover 2          0x80, 0x80, 0xFF80, 9, 1                                                     
-167 setbit             0x80, 0x80, 0xFFC0                                                           
-168 swap               0x80, 0xFFC0, 0x80                                                           
-169 int 0              0x80, 0xFFC0, 0x80, 0                                                        
-170 getbit             0x80, 0xFFC0, 1                                                              
-171 swap               0x80, 1, 0xFFC0                                                              
-172 int 10             0x80, 1, 0xFFC0, 10                                                          
-174 uncover 2          0x80, 0xFFC0, 10, 1                                                          
-176 setbit             0x80, 0xFFE0                                                                 
-177 swap               0xFFE0, 0x80                                                                 
-178 int 0              0xFFE0, 0x80, 0                                                              
-179 getbit             0xFFE0, 1                                                                    
-180 swap               1, 0xFFE0                                                                    
-181 int 11             1, 0xFFE0, 11                                                                
-183 uncover 2          0xFFE0, 11, 1                                                                
-185 setbit             0xFFF0                                                                       
-186 dup                0xFFF0, 0xFFF0                                                               
-187 byte 0xfff0        0xFFF0, 0xFFF0, 0xFFF0                                                       
-191 ==                 0xFFF0, 1                                                                    
-192 assert             0xFFF0                                                                       
-193 int 0              0xFFF0, 0                                                                    
-194 int 1              0xFFF0, 0, 1                                                                 
-195 *                  0xFFF0, 0                                                                    
-196 dig 1              0xFFF0, 0, 0xFFF0                                                            
-198 swap               0xFFF0, 0xFFF0, 0                                                            
-199 getbit             0xFFF0, 1                                                                    
-200 byte 0x00          0xFFF0, 1, 0x00                                                              
-201 int 0              0xFFF0, 1, 0x00, 0                                                           
-202 uncover 2          0xFFF0, 0x00, 0, 1                                                           
-204 setbit             0xFFF0, 0x80                                                                 
-205 byte 0x00          0xFFF0, 0x80, 0x00                                                           
-206 int 0              0xFFF0, 0x80, 0x00, 0                                                        
-207 int 1              0xFFF0, 0x80, 0x00, 0, 1                                                     
-208 setbit             0xFFF0, 0x80, 0x80                                                           
-209 ==                 0xFFF0, 1                                                                    
-210 assert             0xFFF0                                                                       
-211 int 12             0xFFF0, 12                                                                   
-212 int 1              0xFFF0, 12, 1                                                                
-213 -                  0xFFF0, 11                                                                   
-214 dup                0xFFF0, 11, 11                                                               
-215 int 12             0xFFF0, 11, 11, 12                                                           
-216 <                  0xFFF0, 11, 1                                                                
-217 assert             0xFFF0, 11                                                                   
-218 int 1              0xFFF0, 11, 1                                                                
-219 *                  0xFFF0, 11                                                                   
-220 getbit             1                                                                            
-221 byte 0x00          1, 0x00                                                                      
-222 int 0              1, 0x00, 0                                                                   
-223 uncover 2          0x00, 0, 1                                                                   
-225 setbit             0x80                                                                         
-226 byte 0x00          0x80, 0x00                                                                   
-227 int 0              0x80, 0x00, 0                                                                
-228 int 1              0x80, 0x00, 0, 1                                                             
-229 setbit             0x80, 0x80                                                                   
-230 ==                 1                                                                            
-231 assert                                                                                          
-232 byte 0x00          0x00                                                                         
-233 int 0              0x00, 0                                                                      
-234 int 1              0x00, 0, 1                                                                   
-235 setbit             0x80                                                                         
-236 byte 0x00          0x80, 0x00                                                                   
-237 int 0              0x80, 0x00, 0                                                                
-238 int 0              0x80, 0x00, 0, 0                                                             
-239 setbit             0x80, 0x00                                                                   
-240 byte 0x00          0x80, 0x00, 0x00                                                             
-241 int 0              0x80, 0x00, 0x00, 0                                                          
-242 int 1              0x80, 0x00, 0x00, 0, 1                                                       
-243 setbit             0x80, 0x00, 0x80                                                             
-244 cover 2            0x80, 0x80, 0x00                                                             
-246 byte 0x0003        0x80, 0x80, 0x00, 0x0003                                                     
-250 uncover 2          0x80, 0x00, 0x0003, 0x80                                                     
-252 concat             0x80, 0x00, 0x000380                                                         
-253 swap               0x80, 0x000380, 0x00                                                         
-254 int 0              0x80, 0x000380, 0x00, 0                                                      
-255 getbit             0x80, 0x000380, 0                                                            
-256 swap               0x80, 0, 0x000380                                                            
-257 int 17             0x80, 0, 0x000380, 17                                                        
-259 uncover 2          0x80, 0x000380, 17, 0                                                        
-261 setbit             0x80, 0x000380                                                               
-262 swap               0x000380, 0x80                                                               
-263 int 0              0x000380, 0x80, 0                                                            
-264 getbit             0x000380, 1                                                                  
-265 swap               1, 0x000380                                                                  
-266 int 18             1, 0x000380, 18                                                              
-268 uncover 2          0x000380, 18, 1                                                              
-270 setbit             0x0003A0                                                                     
-271 byte 0x0003a0      0x0003A0, 0x0003A0                                                           
-276 ==                 1                                                                            
-277 assert                                                                                          
-278 int 1              1                                                                            
-279 return             1                                                                            
+94  uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80       
+96  int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0    
+97  getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1          
+98  uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0x80          
+100 int 1              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0x80, 1       
+101 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 1       
+103 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0             
+104 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 0x80             
+106 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 0x80, 0          
+107 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 1                
+108 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xC0                
+110 int 2              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xC0, 2             
+112 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 2, 1             
+114 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0                   
+115 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 0x80                   
+117 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 0x80, 0                
+118 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 1                      
+119 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xE0                      
+121 int 3              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xE0, 3                   
+123 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xE0, 3, 1                   
+125 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0                         
+126 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 0x80                         
+128 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 0x80, 0                      
+129 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 1                            
+130 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF0                            
+132 int 4              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF0, 4                         
+134 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF0, 4, 1                         
+136 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8                               
+137 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 0x80                               
+139 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 0x80, 0                            
+140 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 1                                  
+141 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF8                                  
+143 int 5              0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xF8, 5                               
+145 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xF8, 5, 1                               
+147 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0xFC                                     
+148 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 0x80                                     
+150 int 0              0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 0x80, 0                                  
+151 getbit             0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 1                                        
+152 uncover 1          0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xFC                                        
+154 int 6              0x80, 0x80, 0x80, 0x80, 0x80, 1, 0xFC, 6                                     
+156 uncover 2          0x80, 0x80, 0x80, 0x80, 0x80, 0xFC, 6, 1                                     
+158 setbit             0x80, 0x80, 0x80, 0x80, 0x80, 0xFE                                           
+159 uncover 1          0x80, 0x80, 0x80, 0x80, 0xFE, 0x80                                           
+161 int 0              0x80, 0x80, 0x80, 0x80, 0xFE, 0x80, 0                                        
+162 getbit             0x80, 0x80, 0x80, 0x80, 0xFE, 1                                              
+163 uncover 1          0x80, 0x80, 0x80, 0x80, 1, 0xFE                                              
+165 int 7              0x80, 0x80, 0x80, 0x80, 1, 0xFE, 7                                           
+167 uncover 2          0x80, 0x80, 0x80, 0x80, 0xFE, 7, 1                                           
+169 setbit             0x80, 0x80, 0x80, 0x80, 0xFF                                                 
+170 uncover 2          0x80, 0x80, 0x80, 0xFF, 0x80                                                 
+172 concat             0x80, 0x80, 0x80, 0xFF80                                                     
+173 uncover 1          0x80, 0x80, 0xFF80, 0x80                                                     
+175 int 0              0x80, 0x80, 0xFF80, 0x80, 0                                                  
+176 getbit             0x80, 0x80, 0xFF80, 1                                                        
+177 uncover 1          0x80, 0x80, 1, 0xFF80                                                        
+179 int 9              0x80, 0x80, 1, 0xFF80, 9                                                     
+181 uncover 2          0x80, 0x80, 0xFF80, 9, 1                                                     
+183 setbit             0x80, 0x80, 0xFFC0                                                           
+184 uncover 1          0x80, 0xFFC0, 0x80                                                           
+186 int 0              0x80, 0xFFC0, 0x80, 0                                                        
+187 getbit             0x80, 0xFFC0, 1                                                              
+188 uncover 1          0x80, 1, 0xFFC0                                                              
+190 int 10             0x80, 1, 0xFFC0, 10                                                          
+192 uncover 2          0x80, 0xFFC0, 10, 1                                                          
+194 setbit             0x80, 0xFFE0                                                                 
+195 uncover 1          0xFFE0, 0x80                                                                 
+197 int 0              0xFFE0, 0x80, 0                                                              
+198 getbit             0xFFE0, 1                                                                    
+199 uncover 1          1, 0xFFE0                                                                    
+201 int 11             1, 0xFFE0, 11                                                                
+203 uncover 2          0xFFE0, 11, 1                                                                
+205 setbit             0xFFF0                                                                       
+206 dup                0xFFF0, 0xFFF0                                                               
+207 byte 0xfff0        0xFFF0, 0xFFF0, 0xFFF0                                                       
+211 ==                 0xFFF0, 1                                                                    
+212 assert             0xFFF0                                                                       
+213 int 0              0xFFF0, 0                                                                    
+214 int 1              0xFFF0, 0, 1                                                                 
+215 *                  0xFFF0, 0                                                                    
+216 dig 1              0xFFF0, 0, 0xFFF0                                                            
+218 uncover 1          0xFFF0, 0xFFF0, 0                                                            
+220 getbit             0xFFF0, 1                                                                    
+221 byte 0x00          0xFFF0, 1, 0x00                                                              
+222 int 0              0xFFF0, 1, 0x00, 0                                                           
+223 uncover 2          0xFFF0, 0x00, 0, 1                                                           
+225 setbit             0xFFF0, 0x80                                                                 
+226 byte 0x00          0xFFF0, 0x80, 0x00                                                           
+227 int 0              0xFFF0, 0x80, 0x00, 0                                                        
+228 int 1              0xFFF0, 0x80, 0x00, 0, 1                                                     
+229 setbit             0xFFF0, 0x80, 0x80                                                           
+230 ==                 0xFFF0, 1                                                                    
+231 assert             0xFFF0                                                                       
+232 int 12             0xFFF0, 12                                                                   
+233 int 1              0xFFF0, 12, 1                                                                
+234 -                  0xFFF0, 11                                                                   
+235 dup                0xFFF0, 11, 11                                                               
+236 int 12             0xFFF0, 11, 11, 12                                                           
+237 <                  0xFFF0, 11, 1                                                                
+238 assert             0xFFF0, 11                                                                   
+239 int 1              0xFFF0, 11, 1                                                                
+240 *                  0xFFF0, 11                                                                   
+241 getbit             1                                                                            
+242 byte 0x00          1, 0x00                                                                      
+243 int 0              1, 0x00, 0                                                                   
+244 uncover 2          0x00, 0, 1                                                                   
+246 setbit             0x80                                                                         
+247 byte 0x00          0x80, 0x00                                                                   
+248 int 0              0x80, 0x00, 0                                                                
+249 int 1              0x80, 0x00, 0, 1                                                             
+250 setbit             0x80, 0x80                                                                   
+251 ==                 1                                                                            
+252 assert                                                                                          
+253 byte 0x00          0x00                                                                         
+254 int 0              0x00, 0                                                                      
+255 int 1              0x00, 0, 1                                                                   
+256 setbit             0x80                                                                         
+257 byte 0x00          0x80, 0x00                                                                   
+258 int 0              0x80, 0x00, 0                                                                
+259 int 0              0x80, 0x00, 0, 0                                                             
+260 setbit             0x80, 0x00                                                                   
+261 byte 0x00          0x80, 0x00, 0x00                                                             
+262 int 0              0x80, 0x00, 0x00, 0                                                          
+263 int 1              0x80, 0x00, 0x00, 0, 1                                                       
+264 setbit             0x80, 0x00, 0x80                                                             
+265 cover 2            0x80, 0x80, 0x00                                                             
+267 byte 0x0003        0x80, 0x80, 0x00, 0x0003                                                     
+271 uncover 2          0x80, 0x00, 0x0003, 0x80                                                     
+273 concat             0x80, 0x00, 0x000380                                                         
+274 uncover 1          0x80, 0x000380, 0x00                                                         
+276 int 0              0x80, 0x000380, 0x00, 0                                                      
+277 getbit             0x80, 0x000380, 0                                                            
+278 uncover 1          0x80, 0, 0x000380                                                            
+280 int 17             0x80, 0, 0x000380, 17                                                        
+282 uncover 2          0x80, 0x000380, 17, 0                                                        
+284 setbit             0x80, 0x000380                                                               
+285 uncover 1          0x000380, 0x80                                                               
+287 int 0              0x000380, 0x80, 0                                                            
+288 getbit             0x000380, 1                                                                  
+289 uncover 1          1, 0x000380                                                                  
+291 int 18             1, 0x000380, 18                                                              
+293 uncover 2          0x000380, 18, 1                                                              
+295 setbit             0x0003A0                                                                     
+296 byte 0x0003a0      0x0003A0, 0x0003A0                                                           
+301 ==                 1                                                                            
+302 assert                                                                                          
+303 int 1              1                                                                            
+304 return             1                                                                            

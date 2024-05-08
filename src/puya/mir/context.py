@@ -1,4 +1,5 @@
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from functools import cached_property
 
 import attrs
 
@@ -10,9 +11,23 @@ from puya.utils import attrs_extend
 
 
 @attrs.define
-class ProgramCodeGenContext(CompileContext):
+class MIRContext(CompileContext):
+    all_artifacts: Sequence[ir.ModuleArtifact]
+
+    @cached_property
+    def all_programs(self) -> Mapping[str, ir.Program]:
+        return {p.id: p for artifact in self.all_artifacts for p in artifact.all_programs()}
+
+    @cached_property
+    def all_contracts(self) -> Mapping[str, ir.Contract]:
+        return {c.metadata.full_name: c for c in self.all_artifacts if isinstance(c, ir.Contract)}
+
+
+@attrs.define(kw_only=True)
+class ProgramMIRContext(MIRContext):
     program: ir.Program
     subroutine_names: Mapping[ir.Subroutine, str] = attrs.field(init=False)
+    current_assembles: list[str] = attrs.field(factory=list)
 
     @subroutine_names.default
     def _get_short_subroutine_names(self) -> dict[ir.Subroutine, str]:
@@ -44,7 +59,7 @@ class ProgramCodeGenContext(CompileContext):
 
 
 @attrs.define(frozen=False)
-class SubroutineCodeGenContext(ProgramCodeGenContext):
+class SubroutineCodeGenContext(ProgramMIRContext):
     subroutine: models.MemorySubroutine
     _vla: VariableLifetimeAnalysis | None = None
 

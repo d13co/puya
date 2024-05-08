@@ -1,0 +1,152 @@
+#pragma version 10
+
+test_cases.compile.factory.HelloFactory.approval_program:
+    // compile/factory.py:27
+    // class HelloFactory(ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@5
+    method "do_some_stuff()void"
+    txna ApplicationArgs 0
+    match main_do_some_stuff_route@2
+    err // reject transaction
+
+main_do_some_stuff_route@2:
+    // compile/factory.py:29
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub do_some_stuff
+    int 1
+    return
+
+main_bare_routing@5:
+    // compile/factory.py:27
+    // class HelloFactory(ARC4Contract):
+    txn OnCompletion
+    !
+    assert // reject transaction
+    txn ApplicationID
+    !
+    assert // is creating
+    int 1
+    return
+
+
+// test_cases.compile.factory.HelloFactory.do_some_stuff() -> void:
+do_some_stuff:
+    // compile/factory.py:29-30
+    // @arc4.abimethod()
+    // def do_some_stuff(self) -> None:
+    proto 0 0
+    // compile/factory.py:31-38
+    // # create app
+    // hello_app = arc4.abi_call(
+    //     Hello.create,
+    //     "hello",
+    //     approval_program=get_approval_program(Hello),
+    //     clear_state_program=get_clear_state_program(Hello),
+    //     global_num_bytes=1,
+    // ).created_app
+    itxn_begin
+    // compile/factory.py:35
+    // approval_program=get_approval_program(Hello),
+    byte base64 CiABASYBCGdyZWV0aW5nMRtBAEyCAgQg3zpUBNCiggA2GgCOAgABABQAMRkURDEYFEQ2GgFXAgCIADYiQzEZFEQxGEQ2GgFXAgCIACxJFRZXBgJMUIAEFR98dUxQsCJDgQUxGY4BAAEAMRhEiAAaIkOKAQAoi/9niYoBAYEAKGVEgAEgUIv/UImKAACJ
+    // compile/factory.py:36
+    // clear_state_program=get_clear_state_program(Hello),
+    byte base64 CoEBQw==
+    // compile/factory.py:37
+    // global_num_bytes=1,
+    int 1
+    itxn_field GlobalNumByteSlice
+    itxn_field ClearStateProgramPages
+    itxn_field ApprovalProgramPages
+    // compile/factory.py:31-38
+    // # create app
+    // hello_app = arc4.abi_call(
+    //     Hello.create,
+    //     "hello",
+    //     approval_program=get_approval_program(Hello),
+    //     clear_state_program=get_clear_state_program(Hello),
+    //     global_num_bytes=1,
+    // ).created_app
+    method "create(string)void"
+    itxn_field ApplicationArgs
+    // compile/factory.py:34
+    // "hello",
+    byte "\x00\x05hello"
+    itxn_field ApplicationArgs
+    // compile/factory.py:31-38
+    // # create app
+    // hello_app = arc4.abi_call(
+    //     Hello.create,
+    //     "hello",
+    //     approval_program=get_approval_program(Hello),
+    //     clear_state_program=get_clear_state_program(Hello),
+    //     global_num_bytes=1,
+    // ).created_app
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn CreatedApplicationID
+    // compile/factory.py:40-41
+    // # call the new app
+    // result, _txn = arc4.abi_call(Hello.greet, "world", app_id=hello_app)
+    itxn_begin
+    dup
+    itxn_field ApplicationID
+    method "greet(string)string"
+    itxn_field ApplicationArgs
+    byte "\x00\x05world"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn LastLog
+    dup
+    extract 4 0
+    swap
+    extract 0 4
+    byte 0x151f7c75
+    ==
+    assert // ARC4 prefix is valid
+    extract 2 0
+    // compile/factory.py:43-47
+    // # delete the app
+    // itxn.ApplicationCall(
+    //     app_id=hello_app,
+    //     on_completion=OnCompleteAction.DeleteApplication,
+    // ).submit()
+    itxn_begin
+    // compile/factory.py:46
+    // on_completion=OnCompleteAction.DeleteApplication,
+    int DeleteApplication
+    itxn_field OnCompletion
+    swap
+    itxn_field ApplicationID
+    // compile/factory.py:43-44
+    // # delete the app
+    // itxn.ApplicationCall(
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    // compile/factory.py:43-47
+    // # delete the app
+    // itxn.ApplicationCall(
+    //     app_id=hello_app,
+    //     on_completion=OnCompleteAction.DeleteApplication,
+    // ).submit()
+    itxn_submit
+    // compile/factory.py:49
+    // assert result == "hello world"
+    byte "hello world"
+    ==
+    assert
+    retsub

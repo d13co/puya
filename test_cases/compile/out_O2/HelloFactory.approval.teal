@@ -1,0 +1,86 @@
+#pragma version 10
+
+test_cases.compile.factory.HelloFactory.approval_program:
+    txn NumAppArgs
+    bz main_bare_routing@5
+    method "do_some_stuff()void"
+    txna ApplicationArgs 0
+    match main_do_some_stuff_route@2
+    err // reject transaction
+
+main_do_some_stuff_route@2:
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub do_some_stuff
+    int 1
+    return
+
+main_bare_routing@5:
+    txn OnCompletion
+    !
+    assert // reject transaction
+    txn ApplicationID
+    !
+    assert // is creating
+    int 1
+    return
+
+
+// test_cases.compile.factory.HelloFactory.do_some_stuff() -> void:
+do_some_stuff:
+    proto 0 0
+    itxn_begin
+    byte base64 CiABASYBCGdyZWV0aW5nMRtBAEyCAgQg3zpUBNCiggA2GgCOAgABABQAMRkURDEYFEQ2GgFXAgCIADYiQzEZFEQxGEQ2GgFXAgCIACxJFRZXBgJMUIAEFR98dUxQsCJDgQUxGY4BAAEAMRhEiAAaIkOKAQAoi/9niYoBAYEAKGVEgAEgUIv/UImKAACJ
+    byte base64 CoEBQw==
+    int 1
+    itxn_field GlobalNumByteSlice
+    itxn_field ClearStateProgramPages
+    itxn_field ApprovalProgramPages
+    method "create(string)void"
+    itxn_field ApplicationArgs
+    byte "\x00\x05hello"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn CreatedApplicationID
+    itxn_begin
+    dup
+    itxn_field ApplicationID
+    method "greet(string)string"
+    itxn_field ApplicationArgs
+    byte "\x00\x05world"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn LastLog
+    dup
+    extract 4 0
+    swap
+    extract 0 4
+    byte 0x151f7c75
+    ==
+    assert // ARC4 prefix is valid
+    extract 2 0
+    itxn_begin
+    int DeleteApplication
+    itxn_field OnCompletion
+    swap
+    itxn_field ApplicationID
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    byte "hello world"
+    ==
+    assert
+    retsub

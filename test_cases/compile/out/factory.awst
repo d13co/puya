@@ -1,0 +1,31 @@
+contract Hello
+{
+  globals {
+    ['greeting']: algopy.String
+  }
+  
+  abimethod create(greeting: algopy.String): None
+  {
+    this.greeting: algopy.String = greeting
+  }
+  
+  abimethod delete(): None
+  {
+  }
+  
+  abimethod greet(name: algopy.String): algopy.String
+  {
+    return this.greeting + ' ' + name
+  }
+}
+
+contract HelloFactory
+{
+  abimethod do_some_stuff(): None
+  {
+    hello_app: algopy.Application = submit_txn(create_inner_transaction(Fee=0u, TypeEnum=appl, ApplicationArgs=(Method("create(string)void"), arc4_encode('hello', algopy.arc4.String)), ApprovalProgramPages=compiled('test_cases.compile.factory.Hello', field=approval), ClearStateProgramPages=compiled('test_cases.compile.factory.Hello', field=clear_state), GlobalNumByteSlice=1u)).CreatedApplicationID
+    (result, _txn): tuple[algopy.String, algopy.itxn.ApplicationCallInnerTransaction] = (arc4_decode(reinterpret_cast<algopy.arc4.String>(checked_maybe((extract<4, 0>(SINGLE_EVAL(id=0, source=SINGLE_EVAL(id=1, source=submit_txn(create_inner_transaction(Fee=0u, TypeEnum=appl, ApplicationArgs=(Method("greet(string)string"), arc4_encode('world', algopy.arc4.String)), ApplicationID=hello_app))).LastLog)), extract<0, 4>(SINGLE_EVAL(id=0, source=SINGLE_EVAL(id=1, source=submit_txn(create_inner_transaction(Fee=0u, TypeEnum=appl, ApplicationArgs=(Method("greet(string)string"), arc4_encode('world', algopy.arc4.String)), ApplicationID=hello_app))).LastLog)) == hex<"151F7C75">))), algopy.String), SINGLE_EVAL(id=1, source=submit_txn(create_inner_transaction(Fee=0u, TypeEnum=appl, ApplicationArgs=(Method("greet(string)string"), arc4_encode('world', algopy.arc4.String)), ApplicationID=hello_app))))
+    submit_txn(create_inner_transaction(Fee=0u, TypeEnum=appl, ApplicationID=hello_app, OnCompletion=DeleteApplication))
+    assert(result == 'hello world')
+  }
+}

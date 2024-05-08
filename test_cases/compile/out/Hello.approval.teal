@@ -1,0 +1,121 @@
+#pragma version 10
+
+test_cases.compile.factory.Hello.approval_program:
+    // compile/factory.py:12
+    // class Hello(ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@6
+    method "create(string)void"
+    method "greet(string)string"
+    txna ApplicationArgs 0
+    match main_create_route@2 main_greet_route@3
+    err // reject transaction
+
+main_create_route@2:
+    // compile/factory.py:14
+    // @arc4.abimethod(create="require")
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    !
+    assert // is creating
+    // compile/factory.py:12
+    // class Hello(ARC4Contract):
+    txna ApplicationArgs 1
+    extract 2 0
+    // compile/factory.py:14
+    // @arc4.abimethod(create="require")
+    callsub create
+    int 1
+    return
+
+main_greet_route@3:
+    // compile/factory.py:22
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // compile/factory.py:12
+    // class Hello(ARC4Contract):
+    txna ApplicationArgs 1
+    extract 2 0
+    // compile/factory.py:22
+    // @arc4.abimethod()
+    callsub greet
+    dup
+    len
+    itob
+    extract 6 2
+    swap
+    concat
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_bare_routing@6:
+    // compile/factory.py:12
+    // class Hello(ARC4Contract):
+    int 5
+    txn OnCompletion
+    match main_delete@7
+    err // reject transaction
+
+main_delete@7:
+    // compile/factory.py:18
+    // @arc4.baremethod(allow_actions=["DeleteApplication"])
+    txn ApplicationID
+    assert // is not creating
+    // compile/factory.py:18-19
+    // @arc4.baremethod(allow_actions=["DeleteApplication"])
+    // def delete(self) -> None:
+    callsub delete
+    int 1
+    return
+
+
+// test_cases.compile.factory.Hello.create(greeting: bytes) -> void:
+create:
+    // compile/factory.py:14-15
+    // @arc4.abimethod(create="require")
+    // def create(self, greeting: String) -> None:
+    proto 1 0
+    // compile/factory.py:16
+    // self.greeting = greeting
+    byte "greeting"
+    frame_dig -1
+    app_global_put
+    retsub
+
+
+// test_cases.compile.factory.Hello.greet(name: bytes) -> bytes:
+greet:
+    // compile/factory.py:22-23
+    // @arc4.abimethod()
+    // def greet(self, name: String) -> String:
+    proto 1 1
+    // compile/factory.py:24
+    // return self.greeting + " " + name
+    int 0
+    byte "greeting"
+    app_global_get_ex
+    assert // check greeting exists
+    byte " "
+    concat
+    frame_dig -1
+    concat
+    retsub
+
+
+// test_cases.compile.factory.Hello.delete() -> void:
+delete:
+    // compile/factory.py:18-19
+    // @arc4.baremethod(allow_actions=["DeleteApplication"])
+    // def delete(self) -> None:
+    proto 0 0
+    retsub

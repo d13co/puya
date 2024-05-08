@@ -259,7 +259,6 @@ def main(options: CompileAllOptions) -> None:
             case_name = f"{rel_path} -O{level}"
             for bin_file in compilation_result.bin_files:
                 program_sizes.add_at_level(level, bin_file)
-                bin_file.unlink(missing_ok=True)
             if compilation_result.ok:
                 print(f"✅  {case_name}")
             else:

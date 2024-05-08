@@ -33,6 +33,7 @@ from puya.ir.models import (
     AddressConstant,
     BigUIntConstant,
     BytesConstant,
+    CompiledReference,
     ConditionalBranch,
     Fail,
     Intrinsic,
@@ -131,6 +132,15 @@ class FunctionIRBuilder(
 
     def visit_arc4_encode(self, expr: awst_nodes.ARC4Encode) -> TExpression:
         return arc4.encode_expr(self.context, expr)
+
+    def visit_compiled_reference(self, expr: awst_nodes.CompiledReference) -> TExpression:
+        return CompiledReference(
+            artifact=expr.artifact,
+            field=expr.field,
+            ir_type=wtype_to_ir_type(expr.wtype),
+            source_location=expr.source_location,
+            template_variables=expr.template_variables,
+        )
 
     def visit_assignment_statement(self, stmt: awst_nodes.AssignmentStatement) -> TStatement:
         if self._itxn.handle_inner_transaction_field_assignments(stmt):  # noqa: SIM114
