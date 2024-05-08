@@ -435,3 +435,33 @@ def _extract_abi_call_args(
     if method is None:
         raise CodeError("Missing required method positional argument", location)
     return _ABICallExpr(method=method, abi_args=abi_args, transaction_kwargs=kwargs)
+
+
+def _get_arc4_signature_and_return_wtype(
+    context: ASTConversionModuleContext,
+    type_info: mypy.nodes.TypeInfo,
+    member_name: str,
+    location: SourceLocation,
+) -> tuple[ARC4Signature, wtypes.WType]:
+    dec = type_info.get_method(member_name)
+    if isinstance(dec, mypy.nodes.Decorator):
+        decorators = get_decorators_by_fullname(context, dec)
+        abimethod_dec = decorators.get(constants.ABIMETHOD_DECORATOR)
+        if abimethod_dec is not None:
+            func_def = dec.func
+            arc4_method_config = get_arc4_method_config(context, abimethod_dec, func_def)
+            func_wtypes = get_func_types(context, func_def, location).values()
+            *_, return_wtype = func_wtypes
+            *arc4_arg_types, arc4_return_type = (
+                (
+                    wtypes.avm_to_arc4_equivalent_type(func_type)
+                    if wtypes.has_arc4_equivalent_type(func_type)
+                    else func_type
+                )
+                for func_type in func_wtypes
+            )
+            return (
+                ARC4Signature(arc4_method_config.name, arc4_arg_types, arc4_return_type),
+                return_wtype,
+            )
+    raise CodeError(f"'{type_info.fullname}.{member_name}' is not a valid ARC4 method", location)
