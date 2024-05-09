@@ -1724,7 +1724,12 @@ class ConstantDeclaration(ModuleStatement):
 @attrs.frozen
 class SubroutineArgument(Node):
     name: str
-    wtype: WType
+    wtype: WType = attrs.field()
+
+    @wtype.validator
+    def _wtype_validator(self, _attribute: object, wtype: WType) -> None:
+        if wtype == wtypes.void_wtype:
+            raise CodeError("void type arguments are not supported", self.source_location)
 
 
 @attrs.frozen
