@@ -757,14 +757,6 @@ class CheckedMaybe(Expression):
         return visitor.visit_checked_maybe(self)
 
 
-def lvalue_expr_validator(_instance: object, _attribute: object, value: Expression) -> None:
-    if not value.wtype.lvalue:
-        raise CodeError(
-            f'expression with type "{value.wtype}" can not be assigned to a variable',
-            value.source_location,
-        )
-
-
 def scalar_expr_validator(_instance: object, _attribute: object, value: Expression) -> None:
     if not value.wtype.scalar:
         raise CodeError(
@@ -1049,7 +1041,7 @@ class AssignmentStatement(Statement):
     """
 
     target: Lvalue
-    value: Expression = attrs.field(validator=[lvalue_expr_validator])
+    value: Expression
 
     def __attrs_post_init__(self) -> None:
         if self.value.wtype != self.target.wtype:
@@ -1058,6 +1050,8 @@ class AssignmentStatement(Statement):
                 f" differs from expression value type {self.value.wtype}",
                 self.source_location,
             )
+        if self.value.wtype == wtypes.void_wtype:
+            raise CodeError("void type cannot be assigned", self.source_location)
 
     def accept(self, visitor: StatementVisitor[T]) -> T:
         return visitor.visit_assignment_statement(self)
@@ -1075,7 +1069,7 @@ class AssignmentExpression(Expression):
     """
 
     target: Lvalue  # annoyingly, we can't do Lvalue "minus" TupleExpression
-    value: Expression = attrs.field(validator=[lvalue_expr_validator])
+    value: Expression
 
     def __init__(self, value: Expression, target: Lvalue, source_location: SourceLocation):
         if isinstance(target, TupleExpression):
@@ -1089,6 +1083,8 @@ class AssignmentExpression(Expression):
                 f" differs from expression value type {value.wtype}",
                 source_location,
             )
+        if value.wtype == wtypes.void_wtype:
+            raise CodeError("void type cannot be assigned", self.source_location)
         self.__attrs_init__(
             source_location=source_location,
             target=target,
