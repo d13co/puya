@@ -18,6 +18,7 @@ from packaging import version
 
 from puya import log
 from puya.arc32 import create_arc32_json, write_arc32_client
+from puya.awst.nodes import Module
 from puya.awst_build.main import transform_ast
 from puya.context import CompileContext
 from puya.errors import InternalError, log_exceptions
@@ -27,6 +28,7 @@ from puya.ir.models import (
     LogicSignature,
     ModuleArtifact,
 )
+from puya.log import LoggingContext
 from puya.mir.context import MIRContext
 from puya.mir.main import program_ir_to_mir
 from puya.models import CompilationArtifact, CompiledContract, CompiledLogicSignature
@@ -57,15 +59,24 @@ def compile_to_teal(puya_options: PuyaOptions) -> None:
         context = parse_with_mypy(puya_options)
         log_ctx.exit_if_errors()
         awst = transform_ast(context)
-        log_ctx.exit_if_errors()
-        module_irs = build_module_irs(context, awst)
-        log_ctx.exit_if_errors()
-        module_irs_destructured = optimize_and_destructure_module_irs(context, module_irs)
-        log_ctx.exit_if_errors()
-        compiled_contracts_by_source_path = module_irs_to_teal(context, module_irs_destructured)
-        log_ctx.exit_if_errors()
+        compiled_contracts_by_source_path = awst_to_teal(log_ctx, context, awst)
         write_artifacts(context, compiled_contracts_by_source_path)
     log_ctx.exit_if_errors()
+
+
+def awst_to_teal(
+    log_ctx: LoggingContext,
+    context: CompileContext,
+    module_asts: dict[str, Module],
+) -> dict[ParseSource, list[CompilationArtifact]]:
+    log_ctx.exit_if_errors()
+    module_irs = build_module_irs(context, module_asts)
+    log_ctx.exit_if_errors()
+    module_irs_destructured = optimize_and_destructure_module_irs(context, module_irs)
+    log_ctx.exit_if_errors()
+    compiled_contracts = module_irs_to_teal(context, module_irs_destructured)
+    log_ctx.exit_if_errors()
+    return compiled_contracts
 
 
 def parse_with_mypy(puya_options: PuyaOptions) -> CompileContext:

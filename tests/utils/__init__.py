@@ -7,15 +7,13 @@ import attrs
 from puya.awst.nodes import Module
 from puya.awst_build.main import output_awst, transform_ast
 from puya.compile import (
-    module_irs_to_teal,
-    optimize_and_destructure_module_irs,
+    awst_to_teal,
     parse_with_mypy,
     write_artifacts,
 )
 from puya.context import CompileContext
 from puya.errors import CodeError
-from puya.ir.main import build_module_irs
-from puya.log import Log, LoggingContext, LogLevel, logging_context
+from puya.log import Log, LogLevel, logging_context
 from puya.models import CompilationArtifact
 from puya.options import PuyaOptions
 from puya.parse import ParseResult, ParseSource, SourceLocation, get_parse_sources
@@ -121,25 +119,6 @@ def _get_log_errors(logs: Iterable[Log]) -> str:
     return "\n".join(str(log) for log in logs if log.level == LogLevel.error)
 
 
-def awst_to_teal(
-    log_ctx: LoggingContext,
-    context: CompileContext,
-    module_asts: dict[str, Module],
-) -> dict[ParseSource, list[CompilationArtifact]] | None:
-    if log_ctx.num_errors:
-        return None
-    module_irs = build_module_irs(context, module_asts)
-    if log_ctx.num_errors:
-        return None
-    module_irs_destructured = optimize_and_destructure_module_irs(context, module_irs)
-    if log_ctx.num_errors:
-        return None
-    compiled_contracts = module_irs_to_teal(context, module_irs_destructured)
-    if log_ctx.num_errors:
-        return None
-    return compiled_contracts
-
-
 def compile_src(path: Path, *, optimization_level: int, debug_level: int) -> CompilationResult:
     return compile_src_from_options(
         PuyaOptions(
@@ -177,9 +156,10 @@ def compile_src_from_options(options: PuyaOptions) -> CompilationResult:
                     if module.source_file_path.startswith(sources):
                         output_awst(module, context.options)
 
-            teal = awst_to_teal(log_ctx, context, awst)
-            if teal is None:
-                raise CodeError(_get_log_errors(log_ctx.logs))
+            try:
+                teal = awst_to_teal(log_ctx, context, awst)
+            except SystemExit as ex:
+                raise CodeError(_get_log_errors(log_ctx.logs)) from ex
 
             write_artifacts(context, teal)
 

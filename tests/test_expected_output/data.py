@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import difflib
 import tempfile
 import typing as t
@@ -9,13 +10,13 @@ import attrs
 import pytest
 from puya.awst.to_code_visitor import ToCodeVisitor
 from puya.awst_build.main import transform_ast
-from puya.compile import parse_with_mypy
+from puya.compile import awst_to_teal, parse_with_mypy
 from puya.errors import PuyaError, log_exceptions
 from puya.log import Log, LogLevel, logging_context
 from puya.options import PuyaOptions
 from puya.utils import coalesce
 
-from tests.utils import awst_to_teal, narrow_sources
+from tests.utils import narrow_sources
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
@@ -295,7 +296,8 @@ def compile_and_update_cases(cases: list[TestCase]) -> None:
                         context,
                         parse_result=narrow_sources(context.parse_result, case_path[case]),
                     )
-                    awst_to_teal(case_log_ctx, case_context, awst)
+                    with contextlib.suppress(SystemExit):
+                        awst_to_teal(case_log_ctx, case_context, awst)
                 case_logs = case_log_ctx.logs
             process_test_case(case, awst_log_ctx.logs + case_logs, awst)
 
