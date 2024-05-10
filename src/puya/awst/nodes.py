@@ -1589,7 +1589,7 @@ class ModuleStatement(Node, ABC):
 
 
 @attrs.frozen
-class BoxProxyField(Expression):
+class BoxProxyField(Expression):  # TODO: yeet me
     """
     An expression representing a box proxy class instance stored on a contract field.
 
