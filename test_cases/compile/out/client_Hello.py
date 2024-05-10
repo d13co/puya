@@ -13,6 +13,11 @@ class Hello(algopy.arc4.ARC4Client, typing.Protocol):
         greeting: algopy.arc4.String,
     ) -> None: ...
 
+    @algopy.arc4.abimethod(allow_actions=['DeleteApplication'])
+    def delete(
+        self,
+    ) -> None: ...
+
     @algopy.arc4.abimethod
     def greet(
         self,

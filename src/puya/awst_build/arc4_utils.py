@@ -15,8 +15,11 @@ from puya.awst_build import constants, intrinsic_factory
 from puya.awst_build.context import ASTConversionModuleContext
 from puya.awst_build.utils import extract_bytes_literal_from_mypy
 from puya.errors import CodeError, InternalError
+from puya.log import get_logger
 from puya.models import ARC4MethodConfig, ARC32StructDef, OnCompletionAction
 from puya.parse import SourceLocation
+
+logger = get_logger(__name__)
 
 ALLOWABLE_OCA = [oca.name for oca in OnCompletionAction if oca != OnCompletionAction.ClearState]
 
@@ -47,12 +50,12 @@ def get_arc4_method_config(
             name = abi_hints.get("name", func_def.name)
             allow_actions = abi_hints.get("allow_actions", ["NoOp"])
             if len(set(allow_actions)) != len(allow_actions):
-                context.error("Cannot have duplicate allow_actions", dec_loc)
+                logger.error("Cannot have duplicate allow_actions", location=dec_loc)
             if not allow_actions:
-                context.error("Must have at least one allow_actions", dec_loc)
+                logger.error("Must have at least one allow_actions", location=dec_loc)
             invalid_actions = [a for a in allow_actions if a not in ALLOWABLE_OCA]
             if invalid_actions:
-                context.error(
+                logger.error(
                     f"Invalid allowed actions: {invalid_actions}",
                     dec_loc,
                 )
@@ -64,8 +67,9 @@ def get_arc4_method_config(
             ]
             for parameter in default_args:
                 if parameter not in all_args:
-                    context.error(
-                        f"'{parameter}' is not a parameter of {func_def.fullname}", dec_loc
+                    logger.error(
+                        f"'{parameter}' is not a parameter of {func_def.fullname}",
+                        location=dec_loc,
                     )
 
             structs = immutabledict[str, ARC32StructDef](

@@ -382,7 +382,9 @@ class CompiledReference(Expression):
     artifact: str
     """Contract or logic sig fullname"""
     field: CompiledReferenceField
-    template_variables: Mapping[str, bytes | int] = attrs.field(converter=immutabledict)
+    template_variables: Mapping[str, bytes | int] = attrs.field(
+        converter=immutabledict, factory=immutabledict
+    )
     wtype: wtypes.WType = attrs.field(init=False)
 
     @wtype.default
@@ -720,6 +722,7 @@ TXN_FIELDS = [
 ]
 TXN_FIELDS_BY_IMMEDIATE = {f.immediate: f for f in TXN_FIELDS}
 INNER_PARAM_TXN_FIELDS = [f for f in TXN_FIELDS if f.is_inner_param]
+TXN_FIELDS_BY_IMMEDIATE = {f.immediate: f for f in TXN_FIELDS}
 
 
 @attrs.define

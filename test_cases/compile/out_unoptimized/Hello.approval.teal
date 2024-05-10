@@ -3,16 +3,15 @@
 test_cases.compile.factory.Hello.approval_program:
     // compile/factory.py:12
     // class Hello(ARC4Contract):
-    txn NumAppArgs
-    bz main_bare_routing@6
     txna ApplicationArgs 0
     method "create(string)void"
+    method "delete()void"
     method "greet(string)string"
-    uncover 2
-    match main_create_route@2 main_greet_route@3
+    uncover 3
+    match main_create_route@1 main_delete_route@2 main_greet_route@3
     b main_switch_case_default@4
 
-main_create_route@2:
+main_create_route@1:
     // compile/factory.py:14
     // @arc4.abimethod(create="require")
     txn OnCompletion
@@ -29,6 +28,19 @@ main_create_route@2:
     // compile/factory.py:14
     // @arc4.abimethod(create="require")
     callsub create
+    int 1
+    return
+
+main_delete_route@2:
+    // compile/factory.py:18
+    // @arc4.abimethod(allow_actions=["DeleteApplication"])
+    txn OnCompletion
+    int DeleteApplication
+    ==
+    assert // OnCompletion is DeleteApplication
+    txn ApplicationID
+    assert // is not creating
+    callsub delete
     int 1
     return
 
@@ -66,32 +78,6 @@ main_switch_case_default@4:
     // class Hello(ARC4Contract):
     err // reject transaction
 
-main_bare_routing@6:
-    // compile/factory.py:12
-    // class Hello(ARC4Contract):
-    txn OnCompletion
-    int 5
-    uncover 1
-    match main_delete@7
-    b main_reject_bare_on_completion@8
-
-main_delete@7:
-    // compile/factory.py:18
-    // @arc4.baremethod(allow_actions=["DeleteApplication"])
-    txn ApplicationID
-    assert // is not creating
-    // compile/factory.py:18-19
-    // @arc4.baremethod(allow_actions=["DeleteApplication"])
-    // def delete(self) -> None:
-    callsub delete
-    int 1
-    return
-
-main_reject_bare_on_completion@8:
-    // compile/factory.py:12
-    // class Hello(ARC4Contract):
-    err // reject transaction
-
 
 // test_cases.compile.factory.Hello.create(greeting: bytes) -> void:
 create:
@@ -104,6 +90,15 @@ create:
     byte "greeting"
     frame_dig -1
     app_global_put
+    retsub
+
+
+// test_cases.compile.factory.Hello.delete() -> void:
+delete:
+    // compile/factory.py:18-19
+    // @arc4.abimethod(allow_actions=["DeleteApplication"])
+    // def delete(self) -> None:
+    proto 0 0
     retsub
 
 
@@ -123,13 +118,4 @@ greet:
     concat
     frame_dig -1
     concat
-    retsub
-
-
-// test_cases.compile.factory.Hello.delete() -> void:
-delete:
-    // compile/factory.py:18-19
-    // @arc4.baremethod(allow_actions=["DeleteApplication"])
-    // def delete(self) -> None:
-    proto 0 0
     retsub
