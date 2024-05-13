@@ -1,5 +1,6 @@
 import ast
 import contextlib
+import functools
 from collections.abc import Iterator, Mapping, Sequence
 
 import attrs
@@ -174,7 +175,11 @@ class ASTConversionModuleContext(ASTConversionContext):
                 raise InternalError(f"mypy expression not present in type table: {expr}", expr_loc)
 
     def type_to_pytype(
-        self, mypy_type: mypy.types.Type, *, source_location: SourceLocation | mypy.nodes.Context
+        self,
+        mypy_type: mypy.types.Type,
+        *,
+        source_location: SourceLocation | mypy.nodes.Context,
+        in_type_args: bool = False,
     ) -> pytypes.PyType:
         loc = self._maybe_convert_location(source_location)
         proper_type_or_alias: mypy.types.ProperType | mypy.types.TypeAliasType
@@ -182,15 +187,16 @@ class ASTConversionModuleContext(ASTConversionContext):
             proper_type_or_alias = mypy_type
         else:
             proper_type_or_alias = mypy.types.get_proper_type(mypy_type)
+        recurse = functools.partial(
+            self.type_to_pytype, source_location=loc, in_type_args=in_type_args
+        )
         match proper_type_or_alias:
             case mypy.types.TypeAliasType(alias=alias, args=args):
                 if alias is None:
                     raise InternalError("mypy type alias type missing alias reference", loc)
                 result = self._pytypes.get(alias.fullname)
                 if result is None:
-                    return self.type_to_pytype(
-                        mypy.types.get_proper_type(proper_type_or_alias), source_location=loc
-                    )
+                    return recurse(mypy.types.get_proper_type(proper_type_or_alias))
                 return self._maybe_parameterise_pytype(result, args, loc)
             case mypy.types.Instance(args=args) as inst:
                 fullname = inst.type.fullname
@@ -203,7 +209,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                     raise CodeError(msg, loc)
                 return self._maybe_parameterise_pytype(result, args, loc)
             case mypy.types.TupleType(items=items, partial_fallback=true_type):
-                types = [self.type_to_pytype(it, source_location=loc) for it in items]
+                types = [recurse(it) for it in items]
                 generic = self._pytypes.get(true_type.type.fullname)
                 if generic is None:
                     raise CodeError(f"Unknown tuple base type: {true_type.type.fullname}", loc)
@@ -211,6 +217,13 @@ class ASTConversionModuleContext(ASTConversionContext):
             case mypy.types.LiteralType(
                 fallback=fallback, value=literal_value
             ) as mypy_literal_type:
+                if not in_type_args:
+                    # this is a bit clumsy, but exists for some reason, bool types
+                    # can be "narrowed" down to a typing.Literal. e.g. in the case of:
+                    #   assert a
+                    #   assert a or b
+                    # then the type of `a or b` becomes typing.Literal[True]
+                    return recurse(fallback)
                 if mypy_literal_type.is_enum_literal():
                     raise CodeError("typing literals of enum are not supported", loc)
                 our_literal_value: pytypes.TypingLiteralValue
@@ -224,7 +237,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                     our_literal_value = literal_value
                 return pytypes.TypingLiteralType(value=our_literal_value, source_location=loc)
             case mypy.types.UnionType(items=items):
-                types = [self.type_to_pytype(it, source_location=loc) for it in items]
+                types = [recurse(it) for it in items]
                 if not types:
                     raise CodeError("Cannot resolve empty type", loc)
                 if len(types) == 1:
@@ -243,34 +256,24 @@ class ASTConversionModuleContext(ASTConversionContext):
                     # note sure if this will always work for overloads, but the only overloaded
                     # constructor we have is arc4.StaticArray, so...
                     ret_type = func_like.items[0].ret_type
-                    typ_typ = self.type_to_pytype(ret_type, source_location=loc)
+                    typ_typ = recurse(ret_type)
                     return pytypes.GenericTypeType.parameterise([typ_typ], loc)
                 else:
                     if not isinstance(func_like, mypy.types.CallableType):  # vs Overloaded
                         raise CodeError(
                             "References to overloaded functions are not supported", loc
                         )
-                    ret_pytype = self.type_to_pytype(func_like.ret_type, source_location=loc)
+                    ret_pytype = recurse(func_like.ret_type)
                     func_args = []
                     for at, name, kind in zip(
                         func_like.arg_types, func_like.arg_names, func_like.arg_kinds, strict=True
                     ):
-                        func_args.append(
-                            pytypes.FuncArg(
-                                typ=self.type_to_pytype(at, source_location=loc),
-                                kind=kind,
-                                name=name,
-                            )
-                        )
+                        func_args.append(pytypes.FuncArg(typ=recurse(at), kind=kind, name=name))
                     if None in func_like.bound_args:
                         logger.debug(
                             "None contained in bound args for function reference", location=loc
                         )
-                    bound_args = [
-                        self.type_to_pytype(ba, source_location=loc)
-                        for ba in func_like.bound_args
-                        if ba is not None
-                    ]
+                    bound_args = [recurse(ba) for ba in func_like.bound_args if ba is not None]
                     if func_like.definition is not None:
                         name = func_like.definition.fullname
                     else:
@@ -295,7 +298,8 @@ class ASTConversionModuleContext(ASTConversionContext):
         if not mypy_type_args:
             return maybe_generic
         type_args_resolved = [
-            self.type_to_pytype(mta, source_location=loc) for mta in mypy_type_args
+            self.type_to_pytype(mta, source_location=loc, in_type_args=True)
+            for mta in mypy_type_args
         ]
         result = maybe_generic.parameterise(type_args_resolved, loc)
         return result

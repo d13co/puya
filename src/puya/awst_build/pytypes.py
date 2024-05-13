@@ -472,7 +472,7 @@ ARC4UIntN_Aliases: typing.Final = immutabledict[int, ARC4UIntNType](
     {
         (_bits := 2**_exp): _register_builtin(
             (GenericARC4UIntNType if _bits <= 64 else GenericARC4BigUIntNType).parameterise(
-                [_bits], source_location=None
+                [TypingLiteralType(value=_bits, source_location=None)], source_location=None
             ),
             alias=f"{constants.ARC4_PREFIX}UInt{_bits}",
         )
