@@ -1,3 +1,4 @@
+import ast
 import contextlib
 from collections.abc import Iterator, Mapping, Sequence
 
@@ -155,7 +156,9 @@ class ASTConversionModuleContext(ASTConversionContext):
 
     def mypy_expr_node_type(self, expr: mypy.nodes.Expression) -> pytypes.PyType:
         expr_loc = self.node_location(expr)
-
+        mypy_type = self.parse_result.manager.all_types.get(expr)
+        if mypy_type is not None:
+            return self.type_to_pytype(mypy_type, source_location=expr_loc)
         match expr:
             # for some reason the below don't usually appear in mypy type tables...
             case mypy.nodes.TupleExpr(items=items):
@@ -167,10 +170,8 @@ class ASTConversionModuleContext(ASTConversionContext):
                 return pytypes.BytesLiteralType
             case mypy.nodes.StrExpr():
                 return pytypes.StrLiteralType
-        mypy_type = self.parse_result.manager.all_types.get(expr)
-        if mypy_type is None:
-            raise InternalError(f"mypy expression not present in type table: {expr}", expr_loc)
-        return self.type_to_pytype(mypy_type, source_location=expr_loc)
+            case _:
+                raise InternalError(f"mypy expression not present in type table: {expr}", expr_loc)
 
     def type_to_pytype(
         self, mypy_type: mypy.types.Type, *, source_location: SourceLocation | mypy.nodes.Context
@@ -190,9 +191,7 @@ class ASTConversionModuleContext(ASTConversionContext):
                     return self.type_to_pytype(
                         mypy.types.get_proper_type(proper_type_or_alias), source_location=loc
                     )
-                if args:
-                    result = self._parameterise_pytype(result, args, loc)
-                return result
+                return self._maybe_parameterise_pytype(result, args, loc)
             case mypy.types.Instance(args=args) as inst:
                 fullname = inst.type.fullname
                 result = self._pytypes.get(fullname)
@@ -202,17 +201,28 @@ class ASTConversionModuleContext(ASTConversionContext):
                     else:
                         msg = f"Unknown type: {fullname}"
                     raise CodeError(msg, loc)
-                if args:
-                    result = self._parameterise_pytype(result, args, loc)
-                return result
+                return self._maybe_parameterise_pytype(result, args, loc)
             case mypy.types.TupleType(items=items, partial_fallback=true_type):
                 types = [self.type_to_pytype(it, source_location=loc) for it in items]
                 generic = self._pytypes.get(true_type.type.fullname)
                 if generic is None:
                     raise CodeError(f"Unknown tuple base type: {true_type.type.fullname}", loc)
                 return generic.parameterise(types, loc)
-            case mypy.types.LiteralType(fallback=fallback):
-                return self.type_to_pytype(fallback, source_location=loc)
+            case mypy.types.LiteralType(
+                fallback=fallback, value=literal_value
+            ) as mypy_literal_type:
+                if mypy_literal_type.is_enum_literal():
+                    raise CodeError("typing literals of enum are not supported", loc)
+                our_literal_value: pytypes.TypingLiteralValue
+                if fallback.type.fullname == "builtins.bytes":  # WHY^2
+                    bytes_literal_value = ast.literal_eval("b" + repr(literal_value))
+                    assert isinstance(bytes_literal_value, bytes)
+                    our_literal_value = bytes_literal_value
+                elif isinstance(literal_value, float):  # WHY
+                    raise CodeError("typing literals with float values are not supported", loc)
+                else:
+                    our_literal_value = literal_value
+                return pytypes.TypingLiteralType(value=our_literal_value, source_location=loc)
             case mypy.types.UnionType(items=items):
                 types = [self.type_to_pytype(it, source_location=loc) for it in items]
                 if not types:
@@ -276,24 +286,18 @@ class ASTConversionModuleContext(ASTConversionContext):
                     f"Unable to resolve mypy type {mypy_type!r} to known algopy type", loc
                 )
 
-    def _parameterise_pytype(
-        self, generic: pytypes.PyType, inst_args: Sequence[mypy.types.Type], loc: SourceLocation
+    def _maybe_parameterise_pytype(
+        self,
+        maybe_generic: pytypes.PyType,
+        mypy_type_args: Sequence[mypy.types.Type],
+        loc: SourceLocation,
     ) -> pytypes.PyType:
-        type_args_resolved = list[pytypes.TypeArg]()
-        for idx, ta in enumerate(inst_args):
-            if isinstance(ta, mypy.types.AnyType):
-                raise CodeError(
-                    f"Unresolved generic type parameter for {generic} at index {idx}", loc
-                )
-            if isinstance(ta, mypy.types.NoneType):
-                type_args_resolved.append(None)
-            elif isinstance(ta, mypy.types.LiteralType):
-                if isinstance(ta.value, float):
-                    raise CodeError(f"float value encountered in typing.Literal: {ta.value}", loc)
-                type_args_resolved.append(ta.value)
-            else:
-                type_args_resolved.append(self.type_to_pytype(ta, source_location=loc))
-        result = generic.parameterise(type_args_resolved, loc)
+        if not mypy_type_args:
+            return maybe_generic
+        type_args_resolved = [
+            self.type_to_pytype(mta, source_location=loc) for mta in mypy_type_args
+        ]
+        result = maybe_generic.parameterise(type_args_resolved, loc)
         return result
 
 
