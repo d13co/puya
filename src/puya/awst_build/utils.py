@@ -31,7 +31,7 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import constants, intrinsic_factory
 from puya.awst_build.context import ASTConversionModuleContext
-from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
+from puya.awst_build.eb.base import ExpressionBuilder, InstanceBuilder, TypeBuilder
 from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
 
@@ -174,6 +174,17 @@ def require_expression_builder(
             typing.assert_never(builder_or_literal)
 
 
+def require_instance_builder(
+    builder_or_literal: ExpressionBuilder | Literal,
+    *,
+    msg: str = "A Python literal is not valid at this location",
+) -> InstanceBuilder:
+    eb = require_expression_builder(builder_or_literal, msg=msg)
+    if not isinstance(eb, InstanceBuilder):
+        raise CodeError("expression is not a value", eb.source_location)
+    return eb
+
+
 def require_type_class_eb(
     builder_or_literal: ExpressionBuilder | Literal,
     *,
@@ -190,6 +201,8 @@ def expect_operand_wtype(
     literal_or_expr: Literal | Expression | ExpressionBuilder, target_wtype: wtypes.WType
 ) -> Expression:
     if isinstance(literal_or_expr, ExpressionBuilder):
+        if not isinstance(literal_or_expr, InstanceBuilder):
+            raise CodeError("expression is not a value", literal_or_expr.source_location)
         literal_or_expr = literal_or_expr.rvalue()
 
     if isinstance(literal_or_expr, Expression):
@@ -260,6 +273,8 @@ def convert_literal_to_expr(
 ) -> Expression:
     expr_or_builder = convert_literal(literal_or_expr, target_wtype)
     if isinstance(expr_or_builder, ExpressionBuilder):
+        if not isinstance(expr_or_builder, InstanceBuilder):
+            raise CodeError("expression is not a value", expr_or_builder.source_location)
         return expr_or_builder.rvalue()  # TODO: move away from rvalue/lvaue in utility functions
     return expr_or_builder
 
@@ -270,6 +285,8 @@ def bool_eval(
     from puya.awst_build.eb.bool import BoolExpressionBuilder
 
     if isinstance(builder_or_literal, ExpressionBuilder):
+        if not isinstance(builder_or_literal, InstanceBuilder):
+            raise CodeError("expression is not a value", builder_or_literal.source_location)
         return builder_or_literal.bool_eval(location=loc, negate=negate)
     constant_value = bool(builder_or_literal.value)
     if negate:

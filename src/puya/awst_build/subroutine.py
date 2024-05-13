@@ -59,6 +59,7 @@ from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     ExpressionBuilder,
+    InstanceBuilder,
     StateProxyDefinitionBuilder,
 )
 from puya.awst_build.eb.bool import BoolClassExpressionBuilder
@@ -91,6 +92,7 @@ from puya.awst_build.utils import (
     iterate_user_bases,
     qualified_class_name,
     require_expression_builder,
+    require_instance_builder,
 )
 from puya.errors import CodeError, InternalError, PuyaError
 from puya.models import ARC4MethodConfig
@@ -282,7 +284,8 @@ class FunctionASTConverter(
                 " check for a stray comma at the end of the statement",
                 stmt_loc,
             )
-        expr = require_expression_builder(stmt.expr.accept(self)).rvalue()
+        eb = require_instance_builder(stmt.expr.accept(self))
+        expr = eb.rvalue()
         if expr.wtype is not wtypes.void_wtype:
             if (
                 # special case to ignore ignoring the result of typing.reveal_type
@@ -329,7 +332,7 @@ class FunctionASTConverter(
                             " and it should be a NameExpr",
                             stmt_loc,
                         )
-        rvalue = require_expression_builder(stmt.rvalue.accept(self))
+        rvalue = require_instance_builder(stmt.rvalue.accept(self))
         rvalue_pytyp = self.context.mypy_expr_node_type(stmt.rvalue)
         if rvalue_pytyp is pytypes.BoxRefType or isinstance(
             rvalue_pytyp, pytypes.StorageProxyType | pytypes.StorageMapProxyType
@@ -417,7 +420,7 @@ class FunctionASTConverter(
         self,
         cref: ContractReference,
         lvalue: mypy.nodes.MemberExpr,
-        rvalue: ExpressionBuilder,
+        rvalue: InstanceBuilder,
         rvalue_pytyp: pytypes.PyType,
         stmt_loc: SourceLocation,
     ) -> Sequence[Statement]:
