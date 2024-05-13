@@ -34,6 +34,9 @@ logger = log.get_logger(__name__)
 
 
 class BoolClassExpressionBuilder(TypeBuilder):
+    def __init__(self, location: SourceLocation):
+        super().__init__(pytypes.TypeType(pytypes.BoolType), location)
+
     @typing.override
     def call(
         self,

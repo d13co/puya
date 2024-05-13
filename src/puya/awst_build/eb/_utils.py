@@ -11,7 +11,7 @@ from puya.awst_build.eb.bytes import BytesExpressionBuilder
 from puya.awst_build.utils import expect_operand_wtype
 
 if typing.TYPE_CHECKING:
-    from puya.awst_build.eb.base import ExpressionBuilder
+    from puya.awst_build.eb.base import ExpressionBuilder, InstanceBuilder
     from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
@@ -19,7 +19,7 @@ logger = log.get_logger(__name__)
 
 def bool_eval_to_constant(
     *, value: bool, location: SourceLocation, negate: bool = False
-) -> ExpressionBuilder:
+) -> InstanceBuilder:
     if negate:
         value = not value
     logger.warning(f"expression is always {value}", location=location)
@@ -45,5 +45,5 @@ def get_bytes_expr(expr: Expression) -> ReinterpretCast:
     )
 
 
-def get_bytes_expr_builder(expr: Expression) -> ExpressionBuilder:
+def get_bytes_expr_builder(expr: Expression) -> InstanceBuilder:
     return BytesExpressionBuilder(get_bytes_expr(expr))

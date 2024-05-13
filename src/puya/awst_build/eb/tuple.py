@@ -1,12 +1,11 @@
+import typing
 from collections.abc import Sequence
 
 import mypy.nodes
 
 from puya import log
-from puya.awst import wtypes
 from puya.awst.nodes import (
     BinaryBooleanOperator,
-    BoolConstant,
     BooleanBinaryOperation,
     Contains,
     Expression,
@@ -22,14 +21,14 @@ from puya.awst_build.eb._utils import bool_eval_to_constant
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     ExpressionBuilder,
-    GenericClassExpressionBuilder,
+    GenericTypeBuilder,
+    InstanceBuilder,
     Iteration,
-    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
-from puya.awst_build.utils import require_expression_builder
+from puya.awst_build.utils import require_instance_builder
 from puya.errors import CodeError
 from puya.parse import SourceLocation
 from puya.utils import clamp, positive_index
@@ -37,31 +36,8 @@ from puya.utils import clamp, positive_index
 logger = log.get_logger(__name__)
 
 
-class TupleTypeExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
-    def produces(self) -> wtypes.WType:
-        try:
-            return self.wtype
-        except AttributeError as ex:
-            raise CodeError(
-                "Unparameterized tuple class cannot be used as a type", self.source_location
-            ) from ex
-
-    def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> TypeBuilder:
-        tuple_item_types = list[wtypes.WType]()
-        for index in indexes:
-            match index:
-                case TypeBuilder() as type_class:
-                    wtype = type_class.produces()
-                    if wtype is wtypes.void_wtype:
-                        raise CodeError("Tuples cannot contain None values", location)
-                    tuple_item_types.append(wtype)
-                case _:
-                    raise CodeError("Expected a type", index.source_location)
-        self.wtype = wtypes.WTuple(tuple_item_types, location)
-        return self
-
+class TupleTypeExpressionBuilder(GenericTypeBuilder):
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -70,21 +46,18 @@ class TupleTypeExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
         arg_names: list[str | None],
         location: SourceLocation,
     ) -> ExpressionBuilder:
+        tuple_typ = pytypes.GenericTupleType.parameterise(arg_typs, location)
         tuple_expr = TupleExpression.from_items(
-            [require_expression_builder(a).rvalue() for a in args], location
+            [require_instance_builder(a).rvalue() for a in args], location
         )
-        return TupleExpressionBuilder(tuple_expr)
+        return TupleExpressionBuilder(tuple_typ, tuple_expr)
 
 
-class TupleExpressionBuilder(ValueExpressionBuilder):
-    def __init__(self, expr: Expression):
-        assert isinstance(expr.wtype, wtypes.WTuple)
-        self.wtype: wtypes.WTuple = expr.wtype
-        super().__init__(expr)
-
+class TupleExpressionBuilder(ValueExpressionBuilder[pytypes.TupleType]):
+    @typing.override
     def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, index: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
         # special handling of tuples, they can be indexed by int literal only,
         # mostly because they can be non-homogenous so we need to be able to resolve the
         # result type, but also we can statically validate that value
@@ -92,7 +65,7 @@ class TupleExpressionBuilder(ValueExpressionBuilder):
         match index_expr_or_literal:
             case Literal(value=int(index_value)) as index_literal:
                 try:
-                    self.wtype.types[index_value]
+                    self.pytype.items[index_value]
                 except IndexError as ex:
                     raise CodeError(
                         "Tuple index out of bounds", index_literal.source_location
@@ -109,24 +82,26 @@ class TupleExpressionBuilder(ValueExpressionBuilder):
                     index_expr_or_literal.source_location,
                 )
 
+    @typing.override
     def slice_index(
         self,
-        begin_index: ExpressionBuilder | Literal | None,
-        end_index: ExpressionBuilder | Literal | None,
-        stride: ExpressionBuilder | Literal | None,
+        begin_index: InstanceBuilder | Literal | None,
+        end_index: InstanceBuilder | Literal | None,
+        stride: InstanceBuilder | Literal | None,
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         if stride is not None:
             raise CodeError("Stride is not supported", location=stride.source_location)
 
         start_expr, start_idx = self._convert_index(begin_index)
         end_expr, end_idx = self._convert_index(end_index)
-        slice_types = self.wtype.types[start_idx:end_idx]
-        if not slice_types:
+        result_typ = pytypes.GenericTupleType.parameterise(self.pytype.items[start_idx:end_idx], location)
+        if not result_typ:
             raise CodeError("Empty slices are not supported", location)
 
-        updated_wtype = wtypes.WTuple(slice_types, location)
+        updated_wtype = result_typ.wtype
         return TupleExpressionBuilder(
+            result_typ,
             SliceExpression(
                 source_location=location,
                 base=self.expr,
@@ -137,15 +112,15 @@ class TupleExpressionBuilder(ValueExpressionBuilder):
         )
 
     def _convert_index(
-        self, index: ExpressionBuilder | Literal | None
+        self, index: InstanceBuilder | Literal | None
     ) -> tuple[IntegerConstant | None, int | None]:
         match index:
             case None:
                 expr = None
                 idx = None
             case Literal(value=int(idx), source_location=start_loc):
-                positive_idx = positive_index(idx, self.wtype.types)
-                positive_idx_clamped = clamp(positive_idx, low=0, high=len(self.wtype.types) - 1)
+                positive_idx = positive_index(idx, self.pytype.items)
+                positive_idx_clamped = clamp(positive_idx, low=0, high=len(self.pytype.items) - 1)
                 expr = UInt64Constant(value=positive_idx_clamped, source_location=start_loc)
             case _:
                 raise CodeError(
@@ -153,26 +128,28 @@ class TupleExpressionBuilder(ValueExpressionBuilder):
                 )
         return expr, idx
 
+    @typing.override
     def iterate(self) -> Iteration:
         return self.rvalue()
 
+    @typing.override
     def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
-        if isinstance(item, Literal):
-            raise CodeError(
-                "Cannot use in/not in check with a Python literal against a tuple", location
-            )
+        self, item: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
+        if isinstance(item, Literal) or item.pytype not in self.pytype.items:
+            return bool_eval_to_constant(value=False, location=location)
         item_expr = item.rvalue()
         contains_expr = Contains(source_location=location, item=item_expr, sequence=self.expr)
         return BoolExpressionBuilder(contains_expr)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         return bool_eval_to_constant(value=True, location=location, negate=negate)
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         match op:
             case BuilderComparisonOp.eq:
                 chain_op = BinaryBooleanOperator.and_
@@ -183,23 +160,18 @@ class TupleExpressionBuilder(ValueExpressionBuilder):
             case _:
                 raise CodeError(f"The {op} operator on the tuple type is not supported", location)
 
-        other_expr = require_expression_builder(other).rvalue()
-        if self.wtype != other_expr.wtype:
-            return BoolExpressionBuilder(
-                BoolConstant(value=result_if_types_differ, source_location=location)
-            )
-
-        def get_index(expr: Expression, idx: int) -> ExpressionBuilder:
-            item = TupleItemExpression(base=expr, index=idx, source_location=location)
-            return var_expression(item)
+        other_builder = require_instance_builder(other)
+        if self.pytype != other_builder.pytype:
+            return bool_eval_to_constant(value=result_if_types_differ, location=location)
 
         def compare_at_index(idx: int) -> Expression:
-            left = get_index(self.expr, idx)
-            right = get_index(other_expr, idx)
+            idx_lit = Literal(value=idx, source_location=location)
+            left = self.index(idx_lit, location)
+            right = other_builder.index(idx_lit, location)
             return left.compare(right, op=op, location=location).rvalue()
 
         result = compare_at_index(0)
-        for i in range(1, len(self.wtype.types)):
+        for i in range(1, len(self.pytype.items)):
             result = BooleanBinaryOperation(
                 left=result,
                 right=compare_at_index(i),

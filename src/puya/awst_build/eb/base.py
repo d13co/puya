@@ -157,64 +157,64 @@ class InstanceBuilder(ExpressionBuilder, abc.ABC):
         """Handle del operator statement"""
 
     @abc.abstractmethod
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         """Handle boolean-ness evaluation, possibly inverted (ie "not" unary operator)"""
 
     @abc.abstractmethod
-    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
+    def unary_plus(self, location: SourceLocation) -> InstanceBuilder:
         """Handle +self"""
 
     @abc.abstractmethod
-    def unary_minus(self, location: SourceLocation) -> ExpressionBuilder:
+    def unary_minus(self, location: SourceLocation) -> InstanceBuilder:
         """Handle -self"""
 
     @abc.abstractmethod
-    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
+    def bitwise_invert(self, location: SourceLocation) -> InstanceBuilder:
         """Handle ~self"""
 
     @abc.abstractmethod
     def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, item: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
         """Handle `elem in self`"""
 
     @abc.abstractmethod
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         """handle self {comparison op} other"""
 
     @abc.abstractmethod
     def binary_op(
         self,
-        other: ExpressionBuilder | Literal,
+        other: InstanceBuilder | Literal,
         op: BuilderBinaryOp,
         location: SourceLocation,
         *,
         reverse: bool,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         """handle self {binary op} other"""
 
     @abc.abstractmethod
     def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
         """Handle self {binary op}= rhs"""
 
     @abc.abstractmethod
     def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, index: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
         """Handle self[index]"""
 
     @abc.abstractmethod
     def slice_index(  # TODO: roll into index, have a Slice EB
         self,
-        begin_index: ExpressionBuilder | Literal | None,
-        end_index: ExpressionBuilder | Literal | None,
-        stride: ExpressionBuilder | Literal | None,
+        begin_index: InstanceBuilder | Literal | None,
+        end_index: InstanceBuilder | Literal | None,
+        stride: InstanceBuilder | Literal | None,
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         """Handle self[begin_index:end_index:stride]"""
 
     @abc.abstractmethod
@@ -293,8 +293,8 @@ class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC)
 
     @typing.override
     def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, index: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
         raise CodeError(f"{self} does not support indexing", location)
 
     @typing.override
@@ -307,54 +307,54 @@ class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC)
         raise CodeError(f"{self} does not support iteration", self.source_location)
 
     @typing.override
-    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
+    def unary_plus(self, location: SourceLocation) -> InstanceBuilder:
         raise CodeError(f"{self} does not support unary plus operator", location)
 
     @typing.override
-    def unary_minus(self, location: SourceLocation) -> ExpressionBuilder:
+    def unary_minus(self, location: SourceLocation) -> InstanceBuilder:
         raise CodeError(f"{self} does not support unary minus operator", location)
 
     @typing.override
-    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
+    def bitwise_invert(self, location: SourceLocation) -> InstanceBuilder:
         raise CodeError(f"{self} does not support bitwise inversion", location)
 
     @typing.override
     def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, item: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
         raise CodeError(f"{self} does not support in/not in checks", location)
 
     @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         return NotImplemented
 
     @typing.override
     def binary_op(
         self,
-        other: ExpressionBuilder | Literal,
+        other: InstanceBuilder | Literal,
         op: BuilderBinaryOp,
         location: SourceLocation,
         *,
         reverse: bool,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         return NotImplemented
 
     @typing.override
     def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
         raise CodeError(f"{self} does not support augmented assignment", location)
 
     @typing.override
     def slice_index(
         self,
-        begin_index: ExpressionBuilder | Literal | None,
-        end_index: ExpressionBuilder | Literal | None,
-        stride: ExpressionBuilder | Literal | None,
+        begin_index: InstanceBuilder | Literal | None,
+        end_index: InstanceBuilder | Literal | None,
+        stride: InstanceBuilder | Literal | None,
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         raise CodeError(f"{self} does not support slicing", location)
 
 

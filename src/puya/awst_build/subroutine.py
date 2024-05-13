@@ -58,6 +58,7 @@ from puya.awst_build.eb.arc4 import (
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
+    CallableBuilder,
     ExpressionBuilder,
     InstanceBuilder,
     StateProxyDefinitionBuilder,
@@ -83,6 +84,7 @@ from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.exceptions import TypeUnionError
 from puya.awst_build.utils import (
     bool_eval,
+    expect_instance_builder,
     expect_operand_wtype,
     extract_bytes_literal_from_mypy,
     fold_binary_expr,
@@ -94,7 +96,7 @@ from puya.awst_build.utils import (
     require_expression_builder,
     require_instance_builder,
 )
-from puya.errors import CodeError, InternalError, PuyaError
+from puya.errors import CodeError, InternalError
 from puya.models import ARC4MethodConfig
 from puya.parse import SourceLocation
 from puya.utils import invert_ordered_binary_op, lazy_setdefault
@@ -363,7 +365,7 @@ class FunctionASTConverter(
     def _handle_proxy_assignment(
         self,
         lvalue: mypy.nodes.MemberExpr,
-        rvalue: ExpressionBuilder,
+        rvalue: InstanceBuilder,
         rvalue_pytyp: pytypes.PyType,
         stmt_loc: SourceLocation,
     ) -> Sequence[Statement]:
@@ -446,7 +448,7 @@ class FunctionASTConverter(
 
     def resolve_lvalue(self, lvalue: mypy.nodes.Expression) -> Lvalue:
         builder_or_literal = lvalue.accept(self)
-        builder = require_expression_builder(builder_or_literal)
+        builder = require_instance_builder(builder_or_literal)
         return builder.lvalue()
 
     def empty_statement(self, _tmt: mypy.nodes.Statement) -> None:
@@ -454,7 +456,7 @@ class FunctionASTConverter(
 
     def visit_operator_assignment_stmt(self, stmt: mypy.nodes.OperatorAssignmentStmt) -> Statement:
         stmt_loc = self._location(stmt)
-        builder = require_expression_builder(stmt.lvalue.accept(self))
+        builder = require_instance_builder(stmt.lvalue.accept(self))
         rhs = stmt.rvalue.accept(self)
         try:
             op = BuilderBinaryOp(stmt.op)
@@ -507,7 +509,7 @@ class FunctionASTConverter(
         stmt_loc = self._location(stmt)
         if stmt.else_body is not None:
             self._error("else clause on for loop not supported", stmt_loc)
-        sequence_builder = require_expression_builder(stmt.expr.accept(self))
+        sequence_builder = require_instance_builder(stmt.expr.accept(self))
         sequence = sequence_builder.iterate()
         items = self.resolve_lvalue(stmt.index)
         loop_body = self.visit_block(stmt.body)
@@ -542,7 +544,7 @@ class FunctionASTConverter(
 
     def visit_del_stmt(self, stmt: mypy.nodes.DelStmt) -> Statement:
         stmt_expr = stmt.expr.accept(self)
-        del_item = require_expression_builder(stmt_expr)
+        del_item = require_instance_builder(stmt_expr)
         return del_item.delete(self._location(stmt))
 
     def visit_return_stmt(self, stmt: mypy.nodes.ReturnStmt) -> ReturnStatement | None:
@@ -555,7 +557,7 @@ class FunctionASTConverter(
                 )
             return ReturnStatement(source_location=loc, value=None)
 
-        returning = require_expression_builder(return_expr.accept(self)).rvalue()
+        returning = require_instance_builder(return_expr.accept(self)).rvalue()
         # TODO: compare pytypes instead
         if returning.wtype != self._return_type.wtype:
             self._error(
@@ -567,7 +569,7 @@ class FunctionASTConverter(
     def visit_match_stmt(self, stmt: mypy.nodes.MatchStmt) -> Switch | None:
         loc = self._location(stmt)
         # TODO: PyType from EB
-        subject = require_expression_builder(
+        subject = require_instance_builder(
             temporary_assignment_if_required(stmt.subject.accept(self))
         ).rvalue()
         case_block_map = dict[Expression, Block]()
@@ -576,7 +578,7 @@ class FunctionASTConverter(
             match pattern, guard:
                 case mypy.patterns.ValuePattern(expr=case_expr), None:
                     case_value_builder_or_literal = case_expr.accept(self)
-                    case_value = require_expression_builder(case_value_builder_or_literal).rvalue()
+                    case_value = require_instance_builder(case_value_builder_or_literal).rvalue()
                     case_block = self.visit_block(block)
                     case_block_map[case_value] = case_block
                 case mypy.patterns.SingletonPattern(value=bool() as bool_literal), None:
@@ -903,8 +905,11 @@ class FunctionASTConverter(
         if call.analyzed is not None:
             return self._visit_special_call_expr(call, analyzed=call.analyzed)
 
+        expr_loc = self._location(call)
         callee = call.callee.accept(self)
         callee_builder = require_expression_builder(callee)
+        if not isinstance(callee_builder, CallableBuilder):
+            raise CodeError("expression is not callable", expr_loc)
 
         if isinstance(callee_builder, BoolClassExpressionBuilder | ARC4BoolClassExpressionBuilder):
             args_context: typing.Any = self._enter_bool_context
@@ -918,7 +923,7 @@ class FunctionASTConverter(
             arg_typs=arg_types,
             arg_kinds=call.arg_kinds,
             arg_names=call.arg_names,
-            location=self._location(call),
+            location=expr_loc,
         )
 
     def _visit_special_call_expr(
@@ -942,12 +947,7 @@ class FunctionASTConverter(
                 if isinstance(result, Literal):
                     self.context.info(f"algopy node is literal of {result.value!r}", call)
                 else:
-                    try:
-                        the_value = result.rvalue()
-                    except PuyaError:
-                        self.context.info(f"algopy node is {result!r}", call)
-                    else:
-                        self.context.info(f'algopy type is "{the_value.wtype.name}"', call)
+                    self.context.info(f'algopy type is "{result.pytype}"', call)
                 return result
             case _:
                 raise CodeError(
@@ -962,15 +962,16 @@ class FunctionASTConverter(
         if isinstance(builder_or_literal, Literal):
             folded_result = fold_unary_expr(expr_loc, node.op, builder_or_literal.value)
             return Literal(value=folded_result, source_location=expr_loc)
+        builder = expect_instance_builder(builder_or_literal)
         match node.op:
             case "not":
-                return builder_or_literal.bool_eval(expr_loc, negate=True)
+                return builder.bool_eval(expr_loc, negate=True)
             case "+":
-                return builder_or_literal.unary_plus(expr_loc)
+                return builder.unary_plus(expr_loc)
             case "-":
-                return builder_or_literal.unary_minus(expr_loc)
+                return builder.unary_minus(expr_loc)
             case "~":
-                return builder_or_literal.bitwise_invert(expr_loc)
+                return builder.bitwise_invert(expr_loc)
             case _:
                 # guard against future python unary operators
                 raise InternalError(f"Unable to interpret unary operator '{node.op}'", expr_loc)
@@ -1008,9 +1009,13 @@ class FunctionASTConverter(
 
         result: ExpressionBuilder = NotImplemented
         if isinstance(lhs, ExpressionBuilder):
-            result = lhs.binary_op(other=rhs, op=op, location=node_loc, reverse=False)
+            result = expect_instance_builder(lhs).binary_op(
+                other=rhs, op=op, location=node_loc, reverse=False
+            )
         if result is NotImplemented and isinstance(rhs, ExpressionBuilder):
-            result = rhs.binary_op(other=lhs, op=op, location=node_loc, reverse=True)
+            result = expect_instance_builder(rhs).binary_op(
+                other=lhs, op=op, location=node_loc, reverse=True
+            )
         if result is NotImplemented:
             raise CodeError(f"Unsupported operation {op.value} between types", node_loc)
         return result
@@ -1111,28 +1116,26 @@ class FunctionASTConverter(
                 "Python literals cannot be indexed or sliced", base_expr.source_location
             )
 
+        base_builder = expect_instance_builder(base_expr)
         match expr.index:
             # special case handling of SliceExpr, so we don't need to handle slice Literal's
             # or some such everywhere
             case mypy.nodes.SliceExpr(begin_index=begin, end_index=end, stride=stride):
-                return base_expr.slice_index(
+                return base_builder.slice_index(
                     # my kingdom for a ?. operator...
                     begin_index=begin.accept(self) if begin else None,
                     end_index=end.accept(self) if end else None,
                     stride=stride.accept(self) if stride else None,
                     location=expr_location,
                 )
-            case mypy.nodes.TupleExpr(items=items):
-                args = [item.accept(self) for item in items]
-                return base_expr.index_multiple(indexes=args, location=expr_location)
 
         index_expr_or_literal = expr.index.accept(self)
-        return base_expr.index(index=index_expr_or_literal, location=expr_location)
+        return base_builder.index(index=index_expr_or_literal, location=expr_location)
 
     def visit_conditional_expr(self, expr: mypy.nodes.ConditionalExpr) -> ExpressionBuilder:
         condition = self._eval_condition(expr.cond)
-        true_expr = require_expression_builder(expr.if_expr.accept(self)).rvalue()
-        false_expr = require_expression_builder(expr.else_expr.accept(self)).rvalue()
+        true_expr = require_instance_builder(expr.if_expr.accept(self)).rvalue()
+        false_expr = require_instance_builder(expr.else_expr.accept(self)).rvalue()
         # TODO: use PyType, and that type can be used to get result EB
         expr_wtype = self.context.mypy_expr_node_type(expr).wtype
         if expr_wtype != true_expr.wtype:
@@ -1210,17 +1213,17 @@ class FunctionASTConverter(
                 is_in_expr = self._build_compare("in", lhs=lhs, rhs=rhs)
                 return Not(is_in_expr.source_location, is_in_expr)
             case "in":
-                container_builder = require_expression_builder(rhs)
+                container_builder = require_instance_builder(rhs)
                 contains_builder = container_builder.contains(lhs, cmp_loc)
                 return contains_builder.rvalue()
 
-        result: ExpressionBuilder = NotImplemented
+        result: InstanceBuilder = NotImplemented
         if isinstance(lhs, ExpressionBuilder):
             op = BuilderComparisonOp(operator)
-            result = lhs.compare(other=rhs, op=op, location=cmp_loc)
+            result = expect_instance_builder(lhs).compare(other=rhs, op=op, location=cmp_loc)
         if result is NotImplemented and isinstance(rhs, ExpressionBuilder):
             op = BuilderComparisonOp(invert_ordered_binary_op(operator))
-            result = rhs.compare(other=lhs, op=op, location=cmp_loc)
+            result = expect_instance_builder(rhs).compare(other=lhs, op=op, location=cmp_loc)
         if result is NotImplemented:
             raise CodeError(f"Unsupported comparison {operator!r} between types", cmp_loc)
         return result.rvalue()
@@ -1239,7 +1242,7 @@ class FunctionASTConverter(
         from puya.awst_build.eb.tuple import TupleExpressionBuilder
 
         items = [
-            require_expression_builder(
+            require_instance_builder(
                 mypy_item.accept(self),
                 msg="Python literals (other than True/False) are not valid as tuple elements",
                 # TODO: grab item types from EB
@@ -1267,7 +1270,7 @@ class FunctionASTConverter(
         )
         # TODO: test if self. assignment?
         with self._leave_bool_context():
-            source = require_expression_builder(expr.value.accept(self))
+            source = require_instance_builder(expr.value.accept(self))
         value = source.rvalue()
         target = self.resolve_lvalue(expr.target)
         result = AssignmentExpression(source_location=expr_loc, value=value, target=target)
@@ -1354,23 +1357,25 @@ def temporary_assignment_if_required(operand: Literal) -> Literal: ...
 
 
 @typing.overload
-def temporary_assignment_if_required(operand: Expression) -> ExpressionBuilder: ...
+def temporary_assignment_if_required(operand: Expression) -> InstanceBuilder: ...
 
 
 @typing.overload
 def temporary_assignment_if_required(
     operand: ExpressionBuilder,
-) -> ExpressionBuilder: ...
+) -> InstanceBuilder: ...
 
 
 def temporary_assignment_if_required(
     operand: ExpressionBuilder | Expression | Literal,
-) -> ExpressionBuilder | Literal:
+) -> InstanceBuilder | Literal:
     if isinstance(operand, Literal):
         return operand
 
     if isinstance(operand, Expression):
         expr = operand
+    elif not isinstance(operand, InstanceBuilder):
+        raise CodeError("expression is not a value", operand.source_location)
     else:
         expr = operand.rvalue()
     # TODO: optimise the below checks so we don't create unnecessary temporaries,

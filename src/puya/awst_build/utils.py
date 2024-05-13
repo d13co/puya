@@ -180,6 +180,10 @@ def require_instance_builder(
     msg: str = "A Python literal is not valid at this location",
 ) -> InstanceBuilder:
     eb = require_expression_builder(builder_or_literal, msg=msg)
+    return expect_instance_builder(eb)
+
+
+def expect_instance_builder(eb: ExpressionBuilder) -> InstanceBuilder:
     if not isinstance(eb, InstanceBuilder):
         raise CodeError("expression is not a value", eb.source_location)
     return eb
@@ -201,9 +205,7 @@ def expect_operand_wtype(
     literal_or_expr: Literal | Expression | ExpressionBuilder, target_wtype: wtypes.WType
 ) -> Expression:
     if isinstance(literal_or_expr, ExpressionBuilder):
-        if not isinstance(literal_or_expr, InstanceBuilder):
-            raise CodeError("expression is not a value", literal_or_expr.source_location)
-        literal_or_expr = literal_or_expr.rvalue()
+        literal_or_expr = expect_instance_builder(literal_or_expr).rvalue()
 
     if isinstance(literal_or_expr, Expression):
         if literal_or_expr.wtype != target_wtype:
@@ -273,21 +275,18 @@ def convert_literal_to_expr(
 ) -> Expression:
     expr_or_builder = convert_literal(literal_or_expr, target_wtype)
     if isinstance(expr_or_builder, ExpressionBuilder):
-        if not isinstance(expr_or_builder, InstanceBuilder):
-            raise CodeError("expression is not a value", expr_or_builder.source_location)
-        return expr_or_builder.rvalue()  # TODO: move away from rvalue/lvaue in utility functions
+        # TODO: move away from rvalue/lvaue in utility functions
+        return expect_instance_builder(expr_or_builder).rvalue()
     return expr_or_builder
 
 
 def bool_eval(
     builder_or_literal: ExpressionBuilder | Literal, loc: SourceLocation, *, negate: bool = False
-) -> ExpressionBuilder:
+) -> InstanceBuilder:
     from puya.awst_build.eb.bool import BoolExpressionBuilder
 
     if isinstance(builder_or_literal, ExpressionBuilder):
-        if not isinstance(builder_or_literal, InstanceBuilder):
-            raise CodeError("expression is not a value", builder_or_literal.source_location)
-        return builder_or_literal.bool_eval(location=loc, negate=negate)
+        return expect_instance_builder(builder_or_literal).bool_eval(location=loc, negate=negate)
     constant_value = bool(builder_or_literal.value)
     if negate:
         constant_value = not constant_value
