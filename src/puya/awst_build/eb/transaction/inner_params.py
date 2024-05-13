@@ -18,7 +18,7 @@ from puya.awst.nodes import (
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.transaction import get_field_python_name
@@ -83,7 +83,7 @@ def _maybe_transform_program_field_expr(
     return field, expr
 
 
-class InnerTxnParamsClassExpressionBuilder(TypeClassExpressionBuilder):
+class InnerTxnParamsClassExpressionBuilder(TypeBuilder):
     def __init__(self, source_location: SourceLocation, wtype: wtypes.WInnerTransactionFields):
         super().__init__(source_location)
         self.wtype = wtype

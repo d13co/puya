@@ -13,7 +13,7 @@ from puya.awst.nodes import (
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
 )
 from puya.awst_build.eb.transaction.base import (
     BaseTransactionExpressionBuilder,
@@ -85,7 +85,7 @@ class InnerTransactionExpressionBuilder(BaseTransactionExpressionBuilder):
         return InnerTransactionArrayExpressionBuilder(self.expr, field, location)
 
 
-class InnerTransactionClassExpressionBuilder(TypeClassExpressionBuilder):
+class InnerTransactionClassExpressionBuilder(TypeBuilder):
     def __init__(self, location: SourceLocation, wtype: wtypes.WInnerTransaction):
         super().__init__(location)
         self.wtype = wtype

@@ -31,7 +31,7 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import constants, intrinsic_factory
 from puya.awst_build.context import ASTConversionModuleContext
-from puya.awst_build.eb.base import ExpressionBuilder, TypeClassExpressionBuilder
+from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
 from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
 
@@ -178,9 +178,9 @@ def require_type_class_eb(
     builder_or_literal: ExpressionBuilder | Literal,
     *,
     msg: str = "A Python type is required at this location",
-) -> TypeClassExpressionBuilder:
+) -> TypeBuilder:
     match builder_or_literal:
-        case TypeClassExpressionBuilder() as type_eb:
+        case TypeBuilder() as type_eb:
             return type_eb
         case _:
             raise CodeError(msg, builder_or_literal.source_location)

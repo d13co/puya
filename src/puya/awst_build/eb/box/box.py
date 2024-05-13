@@ -20,7 +20,7 @@ from puya.awst_build.eb._utils import get_bytes_expr
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     GenericClassExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -37,7 +37,7 @@ from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
 
 
-class BoxClassExpressionBuilder(GenericClassExpressionBuilder, TypeClassExpressionBuilder):
+class BoxClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
     def produces(self) -> wtypes.WType:
         if self.wtype:
             return self.wtype
@@ -52,9 +52,9 @@ class BoxClassExpressionBuilder(GenericClassExpressionBuilder, TypeClassExpressi
 
     def index_multiple(
         self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> TypeClassExpressionBuilder:
+    ) -> TypeBuilder:
         match indexes:
-            case [TypeClassExpressionBuilder() as eb]:
+            case [TypeBuilder() as eb]:
                 content_wtype = eb.produces()
                 self.wtype = wtypes.WBoxProxy.from_content_type(content_wtype)
             case _:

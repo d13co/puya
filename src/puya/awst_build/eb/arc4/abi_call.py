@@ -40,7 +40,7 @@ from puya.awst_build.eb.base import (
     ExpressionBuilder,
     GenericClassExpressionBuilder,
     IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
 )
 from puya.awst_build.eb.subroutine import BaseClassSubroutineInvokerExpressionBuilder
 from puya.awst_build.eb.transaction.fields import get_field_python_name
@@ -101,13 +101,13 @@ class ABICallGenericClassExpressionBuilder(GenericClassExpressionBuilder):
 
     def index_multiple(
         self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> TypeClassExpressionBuilder:
+    ) -> TypeBuilder:
         try:
             (index,) = indexes
         except ValueError as ex:
             raise CodeError("Expected a single type arg", location) from ex
         match index:
-            case TypeClassExpressionBuilder() as type_class:
+            case TypeBuilder() as type_class:
                 wtype = type_class.produces()
             case _:
                 raise CodeError("Invalid type parameter", index.source_location)
@@ -155,7 +155,7 @@ class ARC4ClientMethodExpressionBuilder(IntermediateExpressionBuilder):
         )
 
 
-class ABICallClassExpressionBuilder(TypeClassExpressionBuilder):
+class ABICallClassExpressionBuilder(TypeBuilder):
     def __init__(self, result_wtype: wtypes.WType | None, source_location: SourceLocation) -> None:
         super().__init__(source_location)
         self.result_wtype = result_wtype

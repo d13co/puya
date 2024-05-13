@@ -2,13 +2,13 @@ import enum
 
 from puya.awst import wtypes
 from puya.awst.nodes import UInt64Constant
-from puya.awst_build.eb.base import ExpressionBuilder, TypeClassExpressionBuilder
+from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
 from puya.awst_build.eb.uint64 import UInt64ExpressionBuilder
 from puya.errors import CodeError
 from puya.parse import SourceLocation
 
 
-class NamedIntegerConstsTypeBuilder(TypeClassExpressionBuilder):
+class NamedIntegerConstsTypeBuilder(TypeBuilder):
     def __init__(self, location: SourceLocation, *, enum_name: str, data: dict[str, enum.IntEnum]):
         super().__init__(location=location)
         self.enum_name = enum_name

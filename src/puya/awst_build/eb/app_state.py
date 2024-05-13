@@ -26,7 +26,7 @@ from puya.awst_build.eb.base import (
     IntermediateExpressionBuilder,
     StateProxyDefinitionBuilder,
     StateProxyMemberBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.tuple import TupleExpressionBuilder
@@ -55,7 +55,7 @@ class AppStateClassExpressionBuilder(GenericClassExpressionBuilder):
         if self._storage is not None:
             raise InternalError("Multiple indexing of GlobalState?", location)
         match indexes:
-            case [TypeClassExpressionBuilder() as typ_class_eb]:
+            case [TypeBuilder() as typ_class_eb]:
                 self.source_location += location
                 self._storage = typ_class_eb.produces()
                 return self
@@ -92,7 +92,7 @@ class AppStateClassExpressionBuilder(GenericClassExpressionBuilder):
             )
 
         match first_arg:
-            case TypeClassExpressionBuilder() as typ_class_eb:
+            case TypeBuilder() as typ_class_eb:
                 storage_wtype = typ_class_eb.produces()
                 initial_value = None
             case ExpressionBuilder(value_type=wtypes.WType() as storage_wtype) as value_eb:

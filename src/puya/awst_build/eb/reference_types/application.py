@@ -7,7 +7,7 @@ from immutabledict import immutabledict
 from puya import log
 from puya.awst import wtypes
 from puya.awst.nodes import Expression, Literal, UInt64Constant, ReinterpretCast
-from puya.awst_build.eb.base import ExpressionBuilder, TypeClassExpressionBuilder
+from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
 from puya.awst_build.eb.reference_types.base import UInt64BackedReferenceValueExpressionBuilder
 from puya.awst_build.utils import expect_operand_wtype
 
@@ -23,7 +23,7 @@ if typing.TYPE_CHECKING:
 logger = log.get_logger(__name__)
 
 
-class ApplicationClassExpressionBuilder(TypeClassExpressionBuilder):
+class ApplicationClassExpressionBuilder(TypeBuilder):
     def produces(self) -> wtypes.WType:
         return wtypes.application_wtype
 

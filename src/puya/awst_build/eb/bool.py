@@ -5,18 +5,19 @@ import typing
 import mypy.nodes
 
 from puya import log
-from puya.awst import wtypes
 from puya.awst.nodes import (
     BoolConstant,
+    Expression,
     Literal,
     Not,
     NumericComparison,
     NumericComparisonExpression,
 )
+from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     ExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.utils import bool_eval, convert_literal_to_expr
@@ -27,16 +28,13 @@ if typing.TYPE_CHECKING:
 
     import mypy.types
 
-    from puya.awst_build import pytypes
     from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
 
 
-class BoolClassExpressionBuilder(TypeClassExpressionBuilder):
-    def produces(self) -> wtypes.WType:
-        return wtypes.bool_wtype
-
+class BoolClassExpressionBuilder(TypeBuilder):
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -56,7 +54,8 @@ class BoolClassExpressionBuilder(TypeClassExpressionBuilder):
 
 
 class BoolExpressionBuilder(ValueExpressionBuilder):
-    wtype = wtypes.bool_wtype
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.BoolType, expr)
 
     def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
         if not negate:
@@ -66,8 +65,9 @@ class BoolExpressionBuilder(ValueExpressionBuilder):
     def compare(
         self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
     ) -> ExpressionBuilder:
-        other_expr = convert_literal_to_expr(other, self.wtype)
-        if other_expr.wtype == self.wtype:
+        wtype = self.pytype.wtype
+        other_expr = convert_literal_to_expr(other, wtype)
+        if other_expr.wtype == wtype:
             pass
         else:
             return NotImplemented

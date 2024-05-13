@@ -4,6 +4,8 @@ import abc
 import enum
 import typing
 
+import typing_extensions
+
 from puya.awst.nodes import (
     BytesConstant,
     ContractReference,
@@ -18,6 +20,7 @@ from puya.awst.nodes import (
     TupleExpression,
     TupleItemExpression,
 )
+from puya.awst_build import pytypes
 from puya.awst_build.contract_data import AppStorageDeclaration
 from puya.errors import CodeError, InternalError
 
@@ -28,7 +31,6 @@ if typing.TYPE_CHECKING:
     import mypy.types
 
     from puya.awst import wtypes
-    from puya.awst_build import pytypes
     from puya.parse import SourceLocation
 
 __all__ = [
@@ -36,11 +38,12 @@ __all__ = [
     "BuilderComparisonOp",
     "BuilderBinaryOp",
     "ExpressionBuilder",
+    "CallableBuilder",
+    "FunctionBuilder",
+    "TypeBuilder",
+    "GenericTypeBuilder",
+    "InstanceBuilder",
     "StateProxyDefinitionBuilder",
-    "StateProxyMemberBuilder",
-    "IntermediateExpressionBuilder",
-    "TypeClassExpressionBuilder",
-    "GenericClassExpressionBuilder",
     "ValueExpressionBuilder",
 ]
 
@@ -78,6 +81,69 @@ class ExpressionBuilder(abc.ABC):
     def __init__(self, location: SourceLocation):
         self.source_location = location
 
+    @property
+    @abc.abstractmethod
+    def pytype(self) -> pytypes.PyType: ...
+
+    def __str__(self) -> str:
+        return str(self.pytype)
+
+    @abc.abstractmethod
+    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+        """Handle self.name"""
+        raise CodeError(f"{self} does not support member access {name}", location)
+
+
+class CallableBuilder(ExpressionBuilder, abc.ABC):
+    @abc.abstractmethod
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_typs: Sequence[pytypes.PyType],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+    ) -> ExpressionBuilder:
+        """Handle self(args...)"""
+
+
+class FunctionBuilder(CallableBuilder, abc.ABC):
+    def __init__(self, typ: pytypes.FuncType, location: SourceLocation):
+        super().__init__(location)
+        self._pytype = typ
+
+    @property
+    def pytype(self) -> pytypes.FuncType:
+        return self._pytype
+
+    @typing.override
+    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+        raise CodeError(f"{self} is a function and does not support member access", location)
+
+
+class TypeBuilder(CallableBuilder, abc.ABC):
+    def __init__(self, typ: pytypes.TypeType, location: SourceLocation):
+        super().__init__(location)
+        self._pytype = typ
+
+    @typing.override
+    @property
+    def pytype(self) -> pytypes.TypeType:
+        return self._pytype
+
+    @typing.override
+    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+        """Handle self.name"""
+        raise CodeError(f"{self.pytype.typ} does not support static member access", location)
+
+
+class GenericTypeBuilder(TypeBuilder, abc.ABC):
+    @typing.override
+    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+        raise CodeError("Generic type usage requires parameters", location)
+
+
+class InstanceBuilder(ExpressionBuilder, abc.ABC):
     @abc.abstractmethod
     def rvalue(self) -> Expression:
         """Produce an expression for use as an intermediary"""
@@ -89,47 +155,36 @@ class ExpressionBuilder(abc.ABC):
     @abc.abstractmethod
     def delete(self, location: SourceLocation) -> Statement:
         """Handle del operator statement"""
-        # TODO: consider making a DeleteStatement which e.g. handles AppAccountStateExpression
 
     @abc.abstractmethod
     def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
         """Handle boolean-ness evaluation, possibly inverted (ie "not" unary operator)"""
 
     @abc.abstractmethod
-    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder: ...
+    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
+        """Handle +self"""
 
     @abc.abstractmethod
-    def unary_minus(self, location: SourceLocation) -> ExpressionBuilder: ...
+    def unary_minus(self, location: SourceLocation) -> ExpressionBuilder:
+        """Handle -self"""
 
     @abc.abstractmethod
-    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder: ...
+    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
+        """Handle ~self"""
 
     @abc.abstractmethod
     def contains(
         self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder: ...
+    ) -> ExpressionBuilder:
+        """Handle `elem in self`"""
 
-    @property
-    def value_type(self) -> wtypes.WType | None:
-        return None
-
-    @property
-    def _type_description(self) -> str:
-        if self.value_type is None:
-            return type(self).__name__
-        return self.value_type.stub_name
-
+    @abc.abstractmethod
     def compare(
         self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
     ) -> ExpressionBuilder:
-        """handle self {op} other"""
-        if self.value_type is None:
-            raise CodeError(
-                f"expression is not a value type, so comparison with {op.value} is not supported",
-                location,
-            )
-        return NotImplemented
+        """handle self {comparison op} other"""
 
+    @abc.abstractmethod
     def binary_op(
         self,
         other: ExpressionBuilder | Literal,
@@ -138,41 +193,22 @@ class ExpressionBuilder(abc.ABC):
         *,
         reverse: bool,
     ) -> ExpressionBuilder:
-        """handle self {op} other"""
-        if self.value_type is None:
-            raise CodeError(
-                f"expression is not a value type,"
-                f" so operations such as {op.value} are not supported",
-                location,
-            )
-        return NotImplemented
+        """handle self {binary op} other"""
 
+    @abc.abstractmethod
     def augmented_assignment(
         self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
     ) -> Statement:
-        if self.value_type is None:
-            raise CodeError(
-                f"expression is not a value type,"
-                f" so operations such as {op.value}= are not supported",
-                location,
-            )
-        raise CodeError(
-            f"{self._type_description} does not support augmented assignment", location
-        )
+        """Handle self {binary op}= rhs"""
 
+    @abc.abstractmethod
     def index(
         self, index: ExpressionBuilder | Literal, location: SourceLocation
     ) -> ExpressionBuilder:
         """Handle self[index]"""
-        raise CodeError(f"{self._type_description} does not support indexing", location)
 
-    def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
-        """Handle self[index]"""
-        raise CodeError(f"{self._type_description} does not support multiple indexing", location)
-
-    def slice_index(
+    @abc.abstractmethod
+    def slice_index(  # TODO: roll into index, have a Slice EB
         self,
         begin_index: ExpressionBuilder | Literal | None,
         end_index: ExpressionBuilder | Literal | None,
@@ -180,78 +216,13 @@ class ExpressionBuilder(abc.ABC):
         location: SourceLocation,
     ) -> ExpressionBuilder:
         """Handle self[begin_index:end_index:stride]"""
-        raise CodeError(f"{self._type_description} does not support slicing", location)
 
-    def call(
-        self,
-        args: Sequence[ExpressionBuilder | Literal],
-        arg_typs: Sequence[pytypes.PyType],
-        arg_kinds: list[mypy.nodes.ArgKind],
-        arg_names: list[str | None],
-        location: SourceLocation,
-    ) -> ExpressionBuilder:
-        """Handle self(args...)"""
-        raise CodeError(f"{self._type_description} does not support calling", location)
-
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
-        """Handle self.name"""
-        raise CodeError(
-            f"{self._type_description} does not support member access {name}", location
-        )
-
+    @abc.abstractmethod
     def iterate(self) -> Iteration:
-        """Produce target of ForInLoop"""
-        raise CodeError(
-            f"{self._type_description} does not support iteration", self.source_location
-        )
+        """handle for ... in self"""
 
 
-class IntermediateExpressionBuilder(ExpressionBuilder):
-    """Never valid as an assignment source OR target"""
-
-    def rvalue(self) -> Expression:
-        raise CodeError(
-            f"{self._type_description} is not valid as an rvalue", self.source_location
-        )
-
-    def lvalue(self) -> Lvalue:
-        raise CodeError(
-            f"{self._type_description} is not valid as an lvalue", self.source_location
-        )
-
-    def delete(self, location: SourceLocation) -> Statement:
-        raise CodeError(
-            f"{self._type_description} is not valid as del target", self.source_location
-        )
-
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
-        return self._not_a_value(location)
-
-    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
-        return self._not_a_value(location)
-
-    def unary_minus(self, location: SourceLocation) -> ExpressionBuilder:
-        return self._not_a_value(location)
-
-    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
-        return self._not_a_value(location)
-
-    def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
-        return self._not_a_value(location)
-
-    def _not_a_value(self, location: SourceLocation) -> typing.Never:
-        raise CodeError(f"{self._type_description} is not a value", location)
-
-
-class StateProxyMemberBuilder(IntermediateExpressionBuilder):
-    state_decl: AppStorageDeclaration
-
-
-class StateProxyDefinitionBuilder(ExpressionBuilder, abc.ABC):
-    python_name: str
-
+class StateProxyDefinitionBuilder(InstanceBuilder, abc.ABC):
     def __init__(
         self,
         location: SourceLocation,
@@ -282,146 +253,109 @@ class StateProxyDefinitionBuilder(ExpressionBuilder, abc.ABC):
             defined_in=defined_in,
         )
 
-    def rvalue(self) -> Expression:
-        return self._assign_first(self.source_location)
 
-    def lvalue(self) -> Lvalue:
-        raise CodeError(
-            f"{self.python_name} is not valid as an assignment target", self.source_location
-        )
-
-    def delete(self, location: SourceLocation) -> Statement:
-        raise self._assign_first(location)
-
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
-        return self._assign_first(location)
-
-    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
-        return self._assign_first(location)
-
-    def unary_minus(self, location: SourceLocation) -> ExpressionBuilder:
-        return self._assign_first(location)
-
-    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
-        return self._assign_first(location)
-
-    def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
-        return self._assign_first(location)
-
-    def _assign_first(self, location: SourceLocation) -> typing.Never:
-        raise CodeError(
-            f"{self.python_name} should be assigned to an instance variable before being used",
-            location,
-        )
+_TPyType = typing_extensions.TypeVar("_TPyType", bound=pytypes.PyType, default=pytypes.PyType)
 
 
-class TypeClassExpressionBuilder(IntermediateExpressionBuilder, abc.ABC):
-    # TODO: better error messages for rvalue/lvalue/delete
+class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC):
 
-    @abc.abstractmethod
-    def produces(self) -> wtypes.WType: ...
-
-
-class GenericClassExpressionBuilder(IntermediateExpressionBuilder, abc.ABC):
-    @typing.final
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
-        return self.index_multiple([index], location)
-
-    @abc.abstractmethod
-    def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder: ...
-
-    @abc.abstractmethod
-    def call(
-        self,
-        args: Sequence[ExpressionBuilder | Literal],
-        arg_typs: Sequence[pytypes.PyType],
-        arg_kinds: list[mypy.nodes.ArgKind],
-        arg_names: list[str | None],
-        location: SourceLocation,
-    ) -> ExpressionBuilder: ...
-
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
-        raise CodeError(
-            f"Cannot access member {name} without specifying class type parameters first",
-            location,
-        )
-
-
-class ValueExpressionBuilder(ExpressionBuilder):
-    wtype: wtypes.WType
-
-    def __init__(self, expr: Expression):
-        super().__init__(expr.source_location)
-        self.__expr = expr
-        if expr.wtype != self.wtype:
+    def __init__(self, typ: _TPyType, expr: Expression):
+        if expr.wtype != typ.wtype:
             raise InternalError(
-                f"Invalid type of expression for {self.wtype}: {expr.wtype}",
+                f"Invalid type of expression for {typ}: {expr.wtype}",
                 expr.source_location,
             )
+        super().__init__(expr.source_location)
+        self._pytype = typ
+        self.__expr = expr
 
     @property
     def expr(self) -> Expression:
         return self.__expr
 
+    @typing.override
+    @property
+    def pytype(self) -> _TPyType:
+        return self._pytype
+
+    @typing.override
     def lvalue(self) -> Lvalue:
         resolved = self.rvalue()
         return _validate_lvalue(resolved)
 
+    @typing.override
     def rvalue(self) -> Expression:
         return self.expr
 
-    @property
-    def value_type(self) -> wtypes.WType:
-        return self.wtype
-
+    @typing.override
     def delete(self, location: SourceLocation) -> Statement:
-        raise CodeError(f"{self.wtype} is not valid as del target", location)
+        raise CodeError(f"{self} is not valid as del target", location)
 
+    @typing.override
     def index(
         self, index: ExpressionBuilder | Literal, location: SourceLocation
     ) -> ExpressionBuilder:
-        raise CodeError(f"{self.wtype} does not support indexing", location)
+        raise CodeError(f"{self} does not support indexing", location)
 
-    def call(
-        self,
-        args: Sequence[ExpressionBuilder | Literal],
-        arg_typs: Sequence[pytypes.PyType],
-        arg_kinds: list[mypy.nodes.ArgKind],
-        arg_names: list[str | None],
-        location: SourceLocation,
-    ) -> ExpressionBuilder:
-        raise CodeError(f"{self.wtype} does not support calling", location)
-
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
-        raise CodeError(f"Unrecognised member of {self.wtype}: {name}", location)
+        raise CodeError(f"Unrecognised member of {self}: {name}", location)
 
+    @typing.override
     def iterate(self) -> Iteration:
         """Produce target of ForInLoop"""
-        raise CodeError(f"{self.wtype} does not support iteration", self.source_location)
+        raise CodeError(f"{self} does not support iteration", self.source_location)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
-        # TODO: this should be abstract, we always want to consider this for types
-        raise CodeError(f"{self.wtype} does not support boolean evaluation", location)
-
+    @typing.override
     def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
-        raise CodeError(f"{self.wtype} does not support unary plus operator", location)
+        raise CodeError(f"{self} does not support unary plus operator", location)
 
+    @typing.override
     def unary_minus(self, location: SourceLocation) -> ExpressionBuilder:
-        raise CodeError(f"{self.wtype} does not support unary minus operator", location)
+        raise CodeError(f"{self} does not support unary minus operator", location)
 
+    @typing.override
     def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
-        raise CodeError(f"{self.wtype} does not support bitwise inversion", location)
+        raise CodeError(f"{self} does not support bitwise inversion", location)
 
+    @typing.override
     def contains(
         self, item: ExpressionBuilder | Literal, location: SourceLocation
     ) -> ExpressionBuilder:
-        raise CodeError(f"{self.wtype} does not support in/not in checks", location)
+        raise CodeError(f"{self} does not support in/not in checks", location)
+
+    @typing.override
+    def compare(
+        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> ExpressionBuilder:
+        return NotImplemented
+
+    @typing.override
+    def binary_op(
+        self,
+        other: ExpressionBuilder | Literal,
+        op: BuilderBinaryOp,
+        location: SourceLocation,
+        *,
+        reverse: bool,
+    ) -> ExpressionBuilder:
+        return NotImplemented
+
+    @typing.override
+    def augmented_assignment(
+        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+    ) -> Statement:
+        raise CodeError(f"{self} does not support augmented assignment", location)
+
+    @typing.override
+    def slice_index(
+        self,
+        begin_index: ExpressionBuilder | Literal | None,
+        end_index: ExpressionBuilder | Literal | None,
+        stride: ExpressionBuilder | Literal | None,
+        location: SourceLocation,
+    ) -> ExpressionBuilder:
+        raise CodeError(f"{self} does not support slicing", location)
 
 
 def _validate_lvalue(resolved: Expression) -> Lvalue:

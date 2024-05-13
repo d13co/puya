@@ -17,7 +17,7 @@ from puya.awst.nodes import (
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
 )
 from puya.awst_build.eb.reference_types.base import UInt64BackedReferenceValueExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
@@ -36,7 +36,7 @@ if typing.TYPE_CHECKING:
 logger = log.get_logger(__name__)
 
 
-class AssetClassExpressionBuilder(TypeClassExpressionBuilder):
+class AssetClassExpressionBuilder(TypeBuilder):
     def produces(self) -> wtypes.WType:
         return wtypes.asset_wtype
 

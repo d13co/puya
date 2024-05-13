@@ -8,7 +8,7 @@ from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     GenericClassExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.utils import get_arg_mapping
@@ -21,7 +21,7 @@ class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
         self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
     ) -> ExpressionBuilder:
         match indexes:
-            case [TypeClassExpressionBuilder() as eb]:
+            case [TypeBuilder() as eb]:
                 wtype = eb.produces()
             case _:
                 raise CodeError("Invalid/unhandled arguments", location)
@@ -38,7 +38,7 @@ class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
         raise CodeError("TemplateVar usage requires type parameter", location)
 
 
-class TemplateVariableExpressionBuilder(TypeClassExpressionBuilder):
+class TemplateVariableExpressionBuilder(TypeBuilder):
     def __init__(self, location: SourceLocation, wtype: wtypes.WType):
         super().__init__(location)
         self.wtype = wtype

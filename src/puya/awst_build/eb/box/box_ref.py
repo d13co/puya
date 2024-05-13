@@ -17,7 +17,7 @@ from puya.awst_build import constants, pytypes
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -33,7 +33,7 @@ from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
 
 
-class BoxRefClassExpressionBuilder(TypeClassExpressionBuilder):
+class BoxRefClassExpressionBuilder(TypeBuilder):
     def produces(self) -> wtypes.WType:
         return self.wtype
 

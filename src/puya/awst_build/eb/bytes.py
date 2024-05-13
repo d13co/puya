@@ -37,7 +37,7 @@ from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
     Iteration,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -60,7 +60,7 @@ if typing.TYPE_CHECKING:
 logger = log.get_logger(__name__)
 
 
-class BytesClassExpressionBuilder(TypeClassExpressionBuilder):
+class BytesClassExpressionBuilder(TypeBuilder):
     def produces(self) -> wtypes.WType:
         return wtypes.bytes_wtype
 

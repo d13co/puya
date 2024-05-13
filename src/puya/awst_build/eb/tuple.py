@@ -24,7 +24,7 @@ from puya.awst_build.eb.base import (
     ExpressionBuilder,
     GenericClassExpressionBuilder,
     Iteration,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -37,7 +37,7 @@ from puya.utils import clamp, positive_index
 logger = log.get_logger(__name__)
 
 
-class TupleTypeExpressionBuilder(GenericClassExpressionBuilder, TypeClassExpressionBuilder):
+class TupleTypeExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
     def produces(self) -> wtypes.WType:
         try:
             return self.wtype
@@ -48,11 +48,11 @@ class TupleTypeExpressionBuilder(GenericClassExpressionBuilder, TypeClassExpress
 
     def index_multiple(
         self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> TypeClassExpressionBuilder:
+    ) -> TypeBuilder:
         tuple_item_types = list[wtypes.WType]()
         for index in indexes:
             match index:
-                case TypeClassExpressionBuilder() as type_class:
+                case TypeBuilder() as type_class:
                     wtype = type_class.produces()
                     if wtype is wtypes.void_wtype:
                         raise CodeError("Tuples cannot contain None values", location)

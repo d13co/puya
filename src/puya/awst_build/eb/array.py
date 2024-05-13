@@ -11,7 +11,7 @@ from puya.awst_build.eb.base import (
     GenericClassExpressionBuilder,
     IntermediateExpressionBuilder,
     Iteration,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -24,9 +24,7 @@ from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
 
 
-class ArrayGenericClassExpressionBuilder(
-    GenericClassExpressionBuilder, TypeClassExpressionBuilder
-):
+class ArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
     def __init__(self, location: SourceLocation):
         super().__init__(location=location)
         self._storage: wtypes.WType | None = None
@@ -42,7 +40,7 @@ class ArrayGenericClassExpressionBuilder(
         if self._storage is not None:
             raise InternalError("Multiple indexing of Array?", location)
         match indexes:
-            case [TypeClassExpressionBuilder() as typ_class_eb]:
+            case [TypeBuilder() as typ_class_eb]:
                 self.source_location += location
                 self._storage = typ_class_eb.produces()
                 return self

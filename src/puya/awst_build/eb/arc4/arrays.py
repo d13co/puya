@@ -45,7 +45,7 @@ from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
     Iteration,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -89,7 +89,7 @@ class DynamicArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
         self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
     ) -> ExpressionBuilder:
         match indexes:
-            case [TypeClassExpressionBuilder() as eb]:
+            case [TypeBuilder() as eb]:
                 element_wtype = eb.produces()
                 self.wtype = arc4_util.make_dynamic_array_wtype(element_wtype, location)
                 return self
@@ -152,7 +152,7 @@ class StaticArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
         self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
     ) -> ExpressionBuilder:
         match indexes:
-            case [TypeClassExpressionBuilder() as item_type, array_size]:
+            case [TypeBuilder() as item_type, array_size]:
                 array_size_ = get_integer_literal_value(array_size, "Array size")
                 element_wtype = item_type.produces()
                 self.wtype = arc4_util.make_static_array_wtype(

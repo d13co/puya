@@ -15,7 +15,7 @@ from puya.awst.nodes import (
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
 )
 from puya.awst_build.eb.void import VoidExpressionBuilder
 from puya.awst_build.utils import expect_operand_wtype, get_arg_mapping
@@ -88,7 +88,7 @@ class EnsureBudgetBuilder(IntermediateExpressionBuilder):
         return VoidExpressionBuilder(call_expr)
 
 
-class OpUpFeeSourceClassBuilder(TypeClassExpressionBuilder):
+class OpUpFeeSourceClassBuilder(TypeBuilder):
     def produces(self) -> wtypes.WType:
         return wtypes.uint64_wtype
 

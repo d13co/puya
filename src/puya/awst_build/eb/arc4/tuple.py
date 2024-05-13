@@ -12,7 +12,7 @@ from puya.awst.nodes import (
 )
 from puya.awst_build.eb._utils import bool_eval_to_constant
 from puya.awst_build.eb.arc4.base import ARC4ClassExpressionBuilder, ARC4EncodedExpressionBuilder
-from puya.awst_build.eb.base import ExpressionBuilder, TypeClassExpressionBuilder
+from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
 from puya.awst_build.eb.var_factory import var_expression
 from puya.errors import CodeError
 
@@ -48,11 +48,11 @@ class ARC4TupleClassExpressionBuilder(ARC4ClassExpressionBuilder):
         self,
         indexes: Sequence[ExpressionBuilder | Literal],
         location: SourceLocation,
-    ) -> TypeClassExpressionBuilder:
+    ) -> TypeBuilder:
         tuple_item_types = list[wtypes.ARC4Type]()
         for index in indexes:
             match index:
-                case TypeClassExpressionBuilder() as type_class:
+                case TypeBuilder() as type_class:
                     wtype = type_class.produces()
                     if not wtypes.is_arc4_encoded_type(wtype):
                         raise CodeError(

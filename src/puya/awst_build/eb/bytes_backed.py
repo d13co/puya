@@ -9,7 +9,7 @@ from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
 from puya.errors import CodeError
@@ -43,7 +43,7 @@ class FromBytesBuilder(IntermediateExpressionBuilder):
         )
 
 
-class BytesBackedClassExpressionBuilder(TypeClassExpressionBuilder, abc.ABC):
+class BytesBackedClassExpressionBuilder(TypeBuilder, abc.ABC):
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         wtype = self.produces()
         match name:

@@ -8,7 +8,7 @@ from puya.awst.nodes import Expression, FieldExpression, Literal
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
-    TypeClassExpressionBuilder,
+    TypeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
@@ -16,7 +16,7 @@ from puya.errors import CodeError
 from puya.parse import SourceLocation
 
 
-class StructSubclassExpressionBuilder(TypeClassExpressionBuilder):
+class StructSubclassExpressionBuilder(TypeBuilder):
     def __init__(self, wtype: wtypes.WStructType, location: SourceLocation):
         super().__init__(location=location)
         self.wtype = wtype
