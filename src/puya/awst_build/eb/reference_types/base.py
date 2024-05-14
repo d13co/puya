@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import typing
 
 from puya.awst import wtypes
@@ -13,9 +14,11 @@ from puya.awst.nodes import (
     NumericComparisonExpression,
     ReinterpretCast,
 )
+from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     ExpressionBuilder,
+    InstanceBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -28,17 +31,18 @@ if typing.TYPE_CHECKING:
     from puya.parse import SourceLocation
 
 
-class ReferenceValueExpressionBuilder(ValueExpressionBuilder):
-    native_wtype: wtypes.WType
+class ReferenceValueExpressionBuilder(ValueExpressionBuilder, abc.ABC):
+    native_type: pytypes.PyType
     native_access_member: str
     field_mapping: immutabledict[str, tuple[str, wtypes.WType]]
     field_op_code: str
     field_bool_comment: str
 
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         if name == self.native_access_member:
             native_cast = ReinterpretCast(
-                source_location=location, wtype=self.native_wtype, expr=self.expr
+                source_location=location, wtype=self.native_type.wtype, expr=self.expr
             )
             return var_expression(native_cast)
         if name in self.field_mapping:
@@ -56,9 +60,10 @@ class ReferenceValueExpressionBuilder(ValueExpressionBuilder):
 
 
 class UInt64BackedReferenceValueExpressionBuilder(ReferenceValueExpressionBuilder):
-    native_wtype = wtypes.uint64_wtype
+    native_type = pytypes.UInt64Type
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         as_bool = ReinterpretCast(
             expr=self.expr,
             wtype=wtypes.bool_wtype,
@@ -70,9 +75,10 @@ class UInt64BackedReferenceValueExpressionBuilder(ReferenceValueExpressionBuilde
             expr = as_bool
         return BoolExpressionBuilder(expr)
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         other_expr = convert_literal_to_expr(other, self.wtype)
         if not (
             other_expr.wtype == self.wtype  # can only compare with other of same type?

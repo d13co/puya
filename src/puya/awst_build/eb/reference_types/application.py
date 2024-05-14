@@ -6,7 +6,8 @@ from immutabledict import immutabledict
 
 from puya import log
 from puya.awst import wtypes
-from puya.awst.nodes import Expression, Literal, UInt64Constant, ReinterpretCast
+from puya.awst.nodes import Expression, Literal, ReinterpretCast, UInt64Constant
+from puya.awst_build import pytypes
 from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
 from puya.awst_build.eb.reference_types.base import UInt64BackedReferenceValueExpressionBuilder
 from puya.awst_build.utils import expect_operand_wtype
@@ -16,7 +17,6 @@ if typing.TYPE_CHECKING:
 
     import mypy.nodes
 
-    from puya.awst_build import pytypes
     from puya.parse import SourceLocation
 
 
@@ -24,9 +24,7 @@ logger = log.get_logger(__name__)
 
 
 class ApplicationClassExpressionBuilder(TypeBuilder):
-    def produces(self) -> wtypes.WType:
-        return wtypes.application_wtype
-
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -53,7 +51,6 @@ class ApplicationClassExpressionBuilder(TypeBuilder):
 
 
 class ApplicationExpressionBuilder(UInt64BackedReferenceValueExpressionBuilder):
-    wtype = wtypes.application_wtype
     native_access_member = "id"
     field_mapping = immutabledict(
         {
@@ -70,3 +67,6 @@ class ApplicationExpressionBuilder(UInt64BackedReferenceValueExpressionBuilder):
     )
     field_op_code = "app_params_get"
     field_bool_comment = "application exists"
+
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.ApplicationType, expr)

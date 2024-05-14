@@ -11,12 +11,13 @@ from puya.awst.nodes import (
     Expression,
     IntrinsicCall,
     Literal,
-    UInt64Constant,
     ReinterpretCast,
+    UInt64Constant,
 )
+from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
+    FunctionBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.reference_types.base import UInt64BackedReferenceValueExpressionBuilder
@@ -29,7 +30,6 @@ if typing.TYPE_CHECKING:
 
     import mypy.nodes
 
-    from puya.awst_build import pytypes
     from puya.parse import SourceLocation
 
 
@@ -37,9 +37,7 @@ logger = log.get_logger(__name__)
 
 
 class AssetClassExpressionBuilder(TypeBuilder):
-    def produces(self) -> wtypes.WType:
-        return wtypes.asset_wtype
-
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -71,12 +69,13 @@ ASSET_HOLDING_FIELD_MAPPING: typing.Final = {
 }
 
 
-class AssetHoldingExpressionBuilder(IntermediateExpressionBuilder):
+class AssetHoldingExpressionBuilder(FunctionBuilder):
     def __init__(self, asset: Expression, holding_field: str, location: SourceLocation):
         self.asset = asset
         self.holding_field = holding_field
         super().__init__(location)
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -104,7 +103,6 @@ class AssetHoldingExpressionBuilder(IntermediateExpressionBuilder):
 
 
 class AssetExpressionBuilder(UInt64BackedReferenceValueExpressionBuilder):
-    wtype = wtypes.asset_wtype
     native_access_member = "id"
     field_mapping = immutabledict(
         {
@@ -125,6 +123,10 @@ class AssetExpressionBuilder(UInt64BackedReferenceValueExpressionBuilder):
     field_op_code = "asset_params_get"
     field_bool_comment = "asset exists"
 
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.AssetType, expr)
+
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         if name in ASSET_HOLDING_FIELD_MAPPING:
             return AssetHoldingExpressionBuilder(self.expr, name, location)

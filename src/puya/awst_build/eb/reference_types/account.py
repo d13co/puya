@@ -26,7 +26,8 @@ from puya.awst_build import intrinsic_factory, pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
+    FunctionBuilder,
+    InstanceBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.bytes_backed import BytesBackedClassExpressionBuilder
@@ -46,9 +47,7 @@ logger = log.get_logger(__name__)
 
 
 class AccountClassExpressionBuilder(BytesBackedClassExpressionBuilder):
-    def produces(self) -> wtypes.WType:
-        return wtypes.account_wtype
-
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -93,11 +92,12 @@ class AccountClassExpressionBuilder(BytesBackedClassExpressionBuilder):
         return AccountExpressionBuilder(value)
 
 
-class AccountOptedInExpressionBuilder(IntermediateExpressionBuilder):
+class AccountOptedInExpressionBuilder(FunctionBuilder):
     def __init__(self, expr: Expression, source_location: SourceLocation):
         super().__init__(source_location)
         self.expr = expr
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -107,7 +107,7 @@ class AccountOptedInExpressionBuilder(IntermediateExpressionBuilder):
         location: SourceLocation,
     ) -> ExpressionBuilder:
         match args:
-            case [ExpressionBuilder(value_type=wtypes.asset_wtype) as asset]:
+            case [InstanceBuilder(pytype=pytypes.AssetType) as asset]:
                 return BoolExpressionBuilder(
                     TupleItemExpression(
                         base=IntrinsicCall(
@@ -123,7 +123,7 @@ class AccountOptedInExpressionBuilder(IntermediateExpressionBuilder):
                         source_location=location,
                     )
                 )
-            case [ExpressionBuilder(value_type=wtypes.application_wtype) as app]:
+            case [InstanceBuilder(pytype=pytypes.ApplicationType) as app]:
                 return BoolExpressionBuilder(
                     IntrinsicCall(
                         op_code="app_opted_in",
@@ -136,7 +136,7 @@ class AccountOptedInExpressionBuilder(IntermediateExpressionBuilder):
 
 
 class AccountExpressionBuilder(ReferenceValueExpressionBuilder):
-    wtype = wtypes.account_wtype
+    native_type = pytypes.StringType
     native_wtype = wtypes.bytes_wtype
     native_access_member = "bytes"
     field_mapping = immutabledict(
@@ -158,12 +158,17 @@ class AccountExpressionBuilder(ReferenceValueExpressionBuilder):
     field_op_code = "acct_params_get"
     field_bool_comment = "account funded"
 
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.AccountType, expr)
+
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         if name == "is_opted_in":
             return AccountOptedInExpressionBuilder(self.expr, location)
         return super().member_access(name, location)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         cmp_with_zero_expr = BytesComparisonExpression(
             source_location=location,
             lhs=self.expr,
@@ -173,9 +178,10 @@ class AccountExpressionBuilder(ReferenceValueExpressionBuilder):
 
         return BoolExpressionBuilder(cmp_with_zero_expr)
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         other_expr = convert_literal_to_expr(other, self.wtype)
         if not (
             other_expr.wtype == self.wtype  # can only compare with other Accounts?
