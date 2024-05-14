@@ -17,8 +17,9 @@ from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     ExpressionBuilder,
+    InstanceBuilder,
     TypeBuilder,
-    ValueExpressionBuilder, InstanceBuilder,
+    ValueExpressionBuilder,
 )
 from puya.awst_build.utils import bool_eval, convert_literal_to_expr
 from puya.errors import CodeError

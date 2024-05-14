@@ -189,6 +189,14 @@ def expect_instance_builder(eb: ExpressionBuilder) -> InstanceBuilder:
     return eb
 
 
+def expect_instance_builder_or_literal(
+    eb_or_literal: ExpressionBuilder | Literal,
+) -> InstanceBuilder | Literal:
+    if not isinstance(eb_or_literal, InstanceBuilder | Literal):
+        raise CodeError("expression is not a value", eb_or_literal.source_location)
+    return eb_or_literal
+
+
 def require_type_class_eb(
     builder_or_literal: ExpressionBuilder | Literal,
     *,

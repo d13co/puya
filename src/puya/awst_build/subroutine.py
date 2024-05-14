@@ -85,6 +85,7 @@ from puya.awst_build.exceptions import TypeUnionError
 from puya.awst_build.utils import (
     bool_eval,
     expect_instance_builder,
+    expect_instance_builder_or_literal,
     expect_operand_wtype,
     extract_bytes_literal_from_mypy,
     fold_binary_expr,
@@ -457,7 +458,7 @@ class FunctionASTConverter(
     def visit_operator_assignment_stmt(self, stmt: mypy.nodes.OperatorAssignmentStmt) -> Statement:
         stmt_loc = self._location(stmt)
         builder = require_instance_builder(stmt.lvalue.accept(self))
-        rhs = stmt.rvalue.accept(self)
+        rhs = expect_instance_builder_or_literal(stmt.rvalue.accept(self))
         try:
             op = BuilderBinaryOp(stmt.op)
         except ValueError as ex:
@@ -569,8 +570,8 @@ class FunctionASTConverter(
     def visit_match_stmt(self, stmt: mypy.nodes.MatchStmt) -> Switch | None:
         loc = self._location(stmt)
         # TODO: PyType from EB
-        subject = require_instance_builder(
-            temporary_assignment_if_required(stmt.subject.accept(self))
+        subject = temporary_assignment_if_required(
+            require_instance_builder(stmt.subject.accept(self))
         ).rvalue()
         case_block_map = dict[Expression, Block]()
         default_block: Block | None = None
@@ -978,8 +979,8 @@ class FunctionASTConverter(
 
     def visit_op_expr(self, node: mypy.nodes.OpExpr) -> Literal | ExpressionBuilder:
         node_loc = self._location(node)
-        lhs = node.left.accept(self)
-        rhs = node.right.accept(self)
+        lhs = expect_instance_builder_or_literal(node.left.accept(self))
+        rhs = expect_instance_builder_or_literal(node.right.accept(self))
 
         # constant fold if both literals
         if isinstance(lhs, Literal) and isinstance(rhs, Literal):
@@ -1007,15 +1008,11 @@ class FunctionASTConverter(
         except ValueError as ex:
             raise InternalError(f"Unknown binary operator: {node.op}") from ex
 
-        result: ExpressionBuilder = NotImplemented
+        result: InstanceBuilder = NotImplemented
         if isinstance(lhs, ExpressionBuilder):
-            result = expect_instance_builder(lhs).binary_op(
-                other=rhs, op=op, location=node_loc, reverse=False
-            )
+            result = lhs.binary_op(other=rhs, op=op, location=node_loc, reverse=False)
         if result is NotImplemented and isinstance(rhs, ExpressionBuilder):
-            result = expect_instance_builder(rhs).binary_op(
-                other=lhs, op=op, location=node_loc, reverse=True
-            )
+            result = rhs.binary_op(other=lhs, op=op, location=node_loc, reverse=True)
         if result is NotImplemented:
             raise CodeError(f"Unsupported operation {op.value} between types", node_loc)
         return result
@@ -1024,8 +1021,8 @@ class FunctionASTConverter(
         self,
         op: BinaryBooleanOperator,
         result_pytypes: Sequence[pytypes.PyType],
-        lhs: ExpressionBuilder | Literal,
-        rhs: ExpressionBuilder | Literal,
+        lhs: InstanceBuilder | Literal,
+        rhs: InstanceBuilder | Literal,
         location: SourceLocation,
     ) -> Expression:
         # when in a boolean evaluation context, we can side step issues of type unions
@@ -1120,16 +1117,31 @@ class FunctionASTConverter(
         match expr.index:
             # special case handling of SliceExpr, so we don't need to handle slice Literal's
             # or some such everywhere
-            case mypy.nodes.SliceExpr(begin_index=begin, end_index=end, stride=stride):
+            case mypy.nodes.SliceExpr(
+                begin_index=begin_expr, end_index=end_expr, stride=strid_expr
+            ):
+                begin = (
+                    expect_instance_builder_or_literal(begin_expr.accept(self))
+                    if begin_expr
+                    else None
+                )
+                end = (
+                    expect_instance_builder_or_literal(end_expr.accept(self)) if end_expr else None
+                )
+                stride = (
+                    expect_instance_builder_or_literal(strid_expr.accept(self))
+                    if strid_expr
+                    else None
+                )
                 return base_builder.slice_index(
-                    # my kingdom for a ?. operator...
-                    begin_index=begin.accept(self) if begin else None,
-                    end_index=end.accept(self) if end else None,
-                    stride=stride.accept(self) if stride else None,
+                    begin_index=begin,
+                    end_index=end,
+                    stride=stride,
                     location=expr_location,
                 )
 
-        index_expr_or_literal = expr.index.accept(self)
+        # TODO: need to handle abi_call and TemplateVar
+        index_expr_or_literal = expect_instance_builder_or_literal(expr.index.accept(self))
         return base_builder.index(index=index_expr_or_literal, location=expr_location)
 
     def visit_conditional_expr(self, expr: mypy.nodes.ConditionalExpr) -> ExpressionBuilder:
@@ -1174,7 +1186,7 @@ class FunctionASTConverter(
         #       type signatures that should be possible, and we can always know it's value at
         #       compile time, but it would always result in a constant ...
 
-        operands = [o.accept(self) for o in expr.operands]
+        operands = [expect_instance_builder_or_literal(o.accept(self)) for o in expr.operands]
         # TODO: operands are Literal or EB, so can get PyType
         operands[1:-1] = [temporary_assignment_if_required(operand) for operand in operands[1:-1]]
 
@@ -1198,8 +1210,8 @@ class FunctionASTConverter(
     def _build_compare(
         self,
         operator: str,
-        lhs: ExpressionBuilder | Literal,
-        rhs: ExpressionBuilder | Literal,
+        lhs: InstanceBuilder | Literal,
+        rhs: InstanceBuilder | Literal,
     ) -> Expression:
         cmp_loc = lhs.source_location + rhs.source_location
         if isinstance(lhs, Literal) and isinstance(rhs, Literal):
@@ -1354,28 +1366,20 @@ def is_self_member(
 
 @typing.overload
 def temporary_assignment_if_required(operand: Literal) -> Literal: ...
-
-
 @typing.overload
 def temporary_assignment_if_required(operand: Expression) -> InstanceBuilder: ...
-
-
 @typing.overload
-def temporary_assignment_if_required(
-    operand: ExpressionBuilder,
-) -> InstanceBuilder: ...
+def temporary_assignment_if_required(operand: InstanceBuilder) -> InstanceBuilder: ...
 
 
 def temporary_assignment_if_required(
-    operand: ExpressionBuilder | Expression | Literal,
+    operand: InstanceBuilder | Expression | Literal,
 ) -> InstanceBuilder | Literal:
     if isinstance(operand, Literal):
         return operand
 
     if isinstance(operand, Expression):
         expr = operand
-    elif not isinstance(operand, InstanceBuilder):
-        raise CodeError("expression is not a value", operand.source_location)
     else:
         expr = operand.rvalue()
     # TODO: optimise the below checks so we don't create unnecessary temporaries,
