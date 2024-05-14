@@ -17,13 +17,12 @@ from puya.awst.nodes import (
 )
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
+    FunctionBuilder,
+    InstanceBuilder,
     Iteration,
+    TypeBuilder,
 )
-from puya.awst_build.utils import (
-    expect_operand_wtype,
-    require_expression_builder,
-)
+from puya.awst_build.utils import expect_operand_wtype, require_instance_builder
 from puya.errors import CodeError
 
 if typing.TYPE_CHECKING:
@@ -37,7 +36,8 @@ if typing.TYPE_CHECKING:
 logger = log.get_logger(__name__)
 
 
-class UnsignedRangeBuilder(IntermediateExpressionBuilder):
+class UnsignedRangeBuilder(TypeBuilder):
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -73,16 +73,18 @@ class UnsignedRangeBuilder(IntermediateExpressionBuilder):
         return UnsignedRange(sequence)
 
 
-class UnsignedRange(IntermediateExpressionBuilder):
+class UnsignedRange(InstanceBuilder):
     def __init__(self, sequence: Range):
         super().__init__(location=sequence.source_location)
         self.sequence = sequence
 
+    @typing.override
     def iterate(self) -> Iteration:
         return self.sequence
 
 
-class UnsignedEnumerateBuilder(IntermediateExpressionBuilder):
+class UnsignedEnumerateBuilder(TypeBuilder):
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -101,15 +103,16 @@ class UnsignedEnumerateBuilder(IntermediateExpressionBuilder):
                 "(ie, start must always be zero)",
                 location,
             ) from ex
-        sequence = require_expression_builder(arg).iterate()
+        sequence = require_instance_builder(arg).iterate()
         return UnsignedEnumerate(sequence, location)
 
 
-class UnsignedEnumerate(IntermediateExpressionBuilder):
+class UnsignedEnumerate(InstanceBuilder):
     def __init__(self, sequence: Expression | Range, location: SourceLocation):
         super().__init__(location)
         self._sequence = sequence
 
+    @typing.override
     def iterate(self) -> Iteration:
         return Enumeration(
             expr=self._sequence,
@@ -117,7 +120,8 @@ class UnsignedEnumerate(IntermediateExpressionBuilder):
         )
 
 
-class ReversedFunctionExpressionBuilder(IntermediateExpressionBuilder):
+class ReversedFunctionExpressionBuilder(FunctionBuilder):
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -135,15 +139,16 @@ class ReversedFunctionExpressionBuilder(IntermediateExpressionBuilder):
                 "reversed expects a single argument",
                 location,
             ) from ex
-        sequence = require_expression_builder(arg).iterate()
+        sequence = require_instance_builder(arg).iterate()
         return ReversedExpressionBuilder(sequence, location)
 
 
-class ReversedExpressionBuilder(IntermediateExpressionBuilder):
+class ReversedExpressionBuilder(InstanceBuilder):
     def __init__(self, sequence: Expression | Range, location: SourceLocation):
         super().__init__(location)
         self._sequence = sequence
 
+    @typing.override
     def iterate(self) -> Iteration:
         return Reversed(
             expr=self._sequence,

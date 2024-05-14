@@ -184,12 +184,6 @@ class InstanceBuilder(ExpressionBuilder, abc.ABC):
         """Handle ~self"""
 
     @abc.abstractmethod
-    def contains(
-        self, item: InstanceBuilder | Literal, location: SourceLocation
-    ) -> InstanceBuilder:
-        """Handle `elem in self`"""
-
-    @abc.abstractmethod
     def compare(
         self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
     ) -> InstanceBuilder:
@@ -225,6 +219,12 @@ class InstanceBuilder(ExpressionBuilder, abc.ABC):
         location: SourceLocation,
     ) -> InstanceBuilder:
         """Handle self[begin_index:end_index:stride]"""
+
+    @abc.abstractmethod
+    def contains(
+        self, item: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
+        """Handle `elem in self`"""
 
     @abc.abstractmethod
     def iterate(self) -> Iteration:

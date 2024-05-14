@@ -22,10 +22,12 @@ from puya.awst.nodes import (
     UInt64UnaryOperation,
     UInt64UnaryOperator,
 )
+from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     ExpressionBuilder,
+    InstanceBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -38,7 +40,6 @@ if typing.TYPE_CHECKING:
 
     import mypy.types
 
-    from puya.awst_build import pytypes
     from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
@@ -69,9 +70,12 @@ class UInt64ClassExpressionBuilder(TypeBuilder):
 
 
 class UInt64ExpressionBuilder(ValueExpressionBuilder):
-    wtype = wtypes.uint64_wtype
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.UInt64Type, expr)
+
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         as_bool = ReinterpretCast(
             expr=self.expr,
             wtype=wtypes.bool_wtype,
@@ -83,25 +87,27 @@ class UInt64ExpressionBuilder(ValueExpressionBuilder):
             expr = as_bool
         return BoolExpressionBuilder(expr)
 
-    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
+    @typing.override
+    def unary_plus(self, location: SourceLocation) -> InstanceBuilder:
         # unary + is allowed, but for the current types it has no real impact
         # so just expand the existing expression to include the unary operator
         return UInt64ExpressionBuilder(attrs.evolve(self.expr, source_location=location))
 
-    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
+    @typing.override
+    def bitwise_invert(self, location: SourceLocation) -> InstanceBuilder:
         return UInt64ExpressionBuilder(
             UInt64UnaryOperation(
-                expr=self.expr,
-                op=UInt64UnaryOperator.bit_invert,
-                source_location=location,
+                expr=self.expr, op=UInt64UnaryOperator.bit_invert, source_location=location
             )
         )
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
-        other_expr = convert_literal_to_expr(other, self.wtype)
-        if other_expr.wtype == self.wtype:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
+        wtype = self.pytype.wtype
+        other_expr = convert_literal_to_expr(other, wtype)
+        if other_expr.wtype == wtype:
             pass
         else:
             return NotImplemented
@@ -113,16 +119,18 @@ class UInt64ExpressionBuilder(ValueExpressionBuilder):
         )
         return BoolExpressionBuilder(cmp_expr)
 
+    @typing.override
     def binary_op(
         self,
-        other: ExpressionBuilder | Literal,
+        other: InstanceBuilder | Literal,
         op: BuilderBinaryOp,
         location: SourceLocation,
         *,
         reverse: bool,
-    ) -> ExpressionBuilder:
-        other_expr = convert_literal_to_expr(other, self.wtype)
-        if other_expr.wtype == self.wtype:
+    ) -> InstanceBuilder:
+        wtype = self.pytype.wtype
+        other_expr = convert_literal_to_expr(other, wtype)
+        if other_expr.wtype == wtype:
             pass
         else:
             return NotImplemented
@@ -136,15 +144,19 @@ class UInt64ExpressionBuilder(ValueExpressionBuilder):
         )
         return UInt64ExpressionBuilder(bin_op_expr)
 
+    @typing.override
     def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
-        value = convert_literal_to_expr(rhs, self.wtype)
-        if value.wtype == self.wtype:
+        wtype = self.pytype.wtype
+        rhs_type_name = str(rhs.pytype) if isinstance(rhs, InstanceBuilder) else type(rhs).__name__
+        value = convert_literal_to_expr(rhs, wtype)
+        if value.wtype == wtype:
             pass
         else:
             raise CodeError(
-                f"Invalid operand type {value.wtype} for {op.value}= with {self.wtype}", location
+                f"Invalid operand type {rhs_type_name} for {op.value}= with {self.pytype}",
+                location,
             )
         target = self.lvalue()
         uint64_op = _translate_uint64_math_operator(op, location)
