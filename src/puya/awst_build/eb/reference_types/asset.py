@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import mypy.nodes
 from immutabledict import immutabledict
 
 from puya import log
@@ -27,8 +28,6 @@ from puya.errors import CodeError
 
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
-
-    import mypy.nodes
 
     from puya.parse import SourceLocation
 
@@ -64,16 +63,33 @@ class AssetClassExpressionBuilder(TypeBuilder):
 
 
 ASSET_HOLDING_FIELD_MAPPING: typing.Final = {
-    "balance": ("AssetBalance", wtypes.uint64_wtype),
-    "frozen": ("AssetFrozen", wtypes.bool_wtype),
+    "balance": ("AssetBalance", pytypes.UInt64Type),
+    "frozen": ("AssetFrozen", pytypes.BoolType),
 }
 
 
 class AssetHoldingExpressionBuilder(FunctionBuilder):
-    def __init__(self, asset: Expression, holding_field: str, location: SourceLocation):
+    def __init__(
+        self,
+        asset: Expression,
+        location: SourceLocation,
+        *,
+        name: str,
+        immediate: str,
+        result_type: pytypes.PyType,
+    ):
+        self.immediate = immediate
+        func_type = pytypes.FuncType(
+            name=f"{pytypes.AssetType}.{name}",
+            bound_arg_types=[pytypes.AssetType],
+            args=[
+                pytypes.FuncArg(name="account", kind=mypy.nodes.ARG_POS, typ=pytypes.AccountType),
+            ],
+            ret_type=result_type,
+        )
         self.asset = asset
-        self.holding_field = holding_field
-        super().__init__(location)
+        self.holding_field = name
+        super().__init__(func_type, location)
 
     @typing.override
     def call(
@@ -87,12 +103,12 @@ class AssetHoldingExpressionBuilder(FunctionBuilder):
         match args:
             case [ExpressionBuilder() as eb]:
                 account_expr = expect_operand_wtype(eb, wtypes.account_wtype)
-                immediate, wtype = ASSET_HOLDING_FIELD_MAPPING[self.holding_field]
+
                 asset_params_get = IntrinsicCall(
                     source_location=location,
-                    wtype=wtypes.WTuple((wtype, wtypes.bool_wtype), location),
+                    wtype=wtypes.WTuple((self.pytype.ret_type.wtype, wtypes.bool_wtype), location),
                     op_code="asset_holding_get",
-                    immediates=[immediate],
+                    immediates=[self.immediate],
                     stack_args=[account_expr, self.asset],
                 )
                 return var_expression(
@@ -128,6 +144,8 @@ class AssetExpressionBuilder(UInt64BackedReferenceValueExpressionBuilder):
 
     @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
-        if name in ASSET_HOLDING_FIELD_MAPPING:
-            return AssetHoldingExpressionBuilder(self.expr, name, location)
+        if data := ASSET_HOLDING_FIELD_MAPPING.get(name):
+            return AssetHoldingExpressionBuilder(
+                self.expr, location, name=name, immediate=data[0], result_type=data[1]
+            )
         return super().member_access(name, location)
