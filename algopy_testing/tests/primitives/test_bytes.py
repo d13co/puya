@@ -6,7 +6,7 @@ import pytest
 from algopy._constants import MAX_BYTES_SIZE
 from algopy.primitives.bytes import Bytes
 
-from tests.primitives.conftest import AVMInvoker
+from tests.common import AVMInvoker
 
 
 @pytest.mark.parametrize(

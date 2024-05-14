@@ -6,7 +6,7 @@ import algokit_utils
 import pytest
 from algopy import UInt64
 
-from tests.primitives.conftest import AVMInvoker
+from tests.common import AVMInvoker
 
 MAX_UINT64 = 2**64 - 1
 MAX_UINT512 = 2**512 - 1
