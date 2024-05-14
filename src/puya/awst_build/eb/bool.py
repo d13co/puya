@@ -18,7 +18,7 @@ from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     ExpressionBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
+    ValueExpressionBuilder, InstanceBuilder,
 )
 from puya.awst_build.utils import bool_eval, convert_literal_to_expr
 from puya.errors import CodeError
@@ -60,14 +60,14 @@ class BoolExpressionBuilder(ValueExpressionBuilder):
     def __init__(self, expr: Expression):
         super().__init__(pytypes.BoolType, expr)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         if not negate:
             return self
         return BoolExpressionBuilder(Not(location, self.expr))
 
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         wtype = self.pytype.wtype
         other_expr = convert_literal_to_expr(other, wtype)
         if other_expr.wtype == wtype:
