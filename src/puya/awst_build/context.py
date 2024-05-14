@@ -198,6 +198,17 @@ class ASTConversionModuleContext(ASTConversionContext):
                 if result is None:
                     return recurse(mypy.types.get_proper_type(proper_type_or_alias))
                 return self._maybe_parameterise_pytype(result, args, loc)
+            # this is how variadic tuples are represented in mypy types...
+            case mypy.types.Instance(
+                type=mypy.nodes.TypeInfo(fullname="builtins.tuple"), args=args
+            ):
+                try:
+                    (arg,) = args
+                except ValueError:
+                    raise InternalError(
+                        f"mypy tuple type as instance had unrecognised args: {args}", loc
+                    ) from None
+                return pytypes.VariadicTupleType(items=recurse(arg))
             case mypy.types.Instance(args=args) as inst:
                 fullname = inst.type.fullname
                 result = self._pytypes.get(fullname)

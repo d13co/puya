@@ -972,3 +972,36 @@ def test_special_indexing() -> None:
     result = mypy_parse_and_type_check(test)
     tree = result.graph[TEST_MODULE].tree
     assert tree
+
+
+def test_tuple_types() -> None:
+    def test():
+        import typing
+
+        def empty_tuple() -> tuple[()]:
+            return ()
+
+        def single_element_tuple() -> tuple[str]:
+            return ("",)
+
+        def multi_element_tuple() -> tuple[str, str]:
+            return "", ""
+
+        def variadic_tuple() -> tuple[str, ...]:
+            return ("",)
+
+        typing.reveal_type(empty_tuple())
+        typing.reveal_type(single_element_tuple())
+        typing.reveal_type(multi_element_tuple())
+        typing.reveal_type(variadic_tuple())
+
+    result = mypy_parse_and_type_check(test)
+    tree = result.graph[TEST_MODULE].tree
+    assert tree
+    reveled_types = get_revealed_types(result, tree)
+    assert len(reveled_types) == 4
+    last = reveled_types.pop()
+    assert all(isinstance(t, mypy.types.TupleType) for t in reveled_types)
+    assert isinstance(last, mypy.types.Instance)
+    assert last.type.fullname == "builtins.tuple"
+    assert len(last.args) == 1

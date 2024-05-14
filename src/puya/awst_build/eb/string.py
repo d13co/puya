@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing
 
+import mypy.nodes
+
 from puya import log
 from puya.awst import wtypes
 from puya.awst.nodes import (
@@ -30,7 +32,9 @@ from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     ExpressionBuilder,
-    ValueExpressionBuilder, FunctionBuilder, InstanceBuilder,
+    FunctionBuilder,
+    InstanceBuilder,
+    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.bytes import BytesExpressionBuilder
@@ -41,8 +45,6 @@ from puya.errors import CodeError
 
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
-
-    import mypy.nodes
 
     from puya.parse import SourceLocation
 
@@ -181,7 +183,19 @@ class StringExpressionBuilder(ValueExpressionBuilder):
 
 class _StringStartsOrEndsWith(FunctionBuilder):
     def __init__(self, base: Expression, location: SourceLocation, *, at_start: bool):
-        super().__init__(location)
+        func_type = pytypes.FuncType(
+            name=f"{pytypes.StringType}.{'startswith' if at_start else 'endswith'}",
+            bound_arg_types=[pytypes.StringType],
+            args=[
+                pytypes.FuncArg(
+                    name="prefix" if at_start else "suffix",
+                    kind=mypy.nodes.ARG_POS,
+                    typ=pytypes.StringType,
+                ),
+            ],
+            ret_type=pytypes.BoolType,
+        )
+        super().__init__(func_type, location)
         self._base = base
         self._at_start = at_start
 
@@ -242,11 +256,15 @@ class _StringJoin(FunctionBuilder):
             name=f"{pytypes.StringType}.join",
             bound_arg_types=[pytypes.StringType],
             args=[
-                pytypes.TupleType()
+                pytypes.FuncArg(
+                    name="others",
+                    kind=mypy.nodes.ARG_POS,
+                    typ=pytypes.VariadicTupleType(items=pytypes.StringType),
+                ),
             ],
             ret_type=pytypes.StringType,
         )
-        super().__init__(location)
+        super().__init__(func_type, location)
         self._base = base
 
     @typing.override
@@ -259,9 +277,9 @@ class _StringJoin(FunctionBuilder):
         location: SourceLocation,
     ) -> ExpressionBuilder:
         match args:
-            case [
-                InstanceBuilder(pytype=pytypes.TupleType(items=tuple_item_types)) as eb
-            ] if all(tt == pytypes.StringType for tt in tuple_item_types):
+            case [InstanceBuilder(pytype=pytypes.TupleType(items=tuple_item_types)) as eb] if all(
+                tt == pytypes.StringType for tt in tuple_item_types
+            ):
                 tuple_arg = SingleEvaluation(eb.rvalue())
             case _:
                 raise CodeError("Invalid/unhandled arguments", location)

@@ -565,6 +565,25 @@ GenericARC4TupleType: typing.Final = _GenericType(
 )
 
 
+@typing.final
+@attrs.frozen
+class VariadicTupleType(PyType):
+    items: PyType
+    generic: _GenericType = attrs.field(default=GenericTupleType, init=False)
+    bases: Sequence[PyType] = attrs.field(default=(), init=False)
+    mro: Sequence[PyType] = attrs.field(default=(), init=False)
+    name: str = attrs.field(init=False)
+
+    @name.default
+    def _name_factory(self) -> str:
+        return f"{self.generic.name}[{self.items.name}, ...]"
+
+    @typing.override
+    @property
+    def wtype(self) -> typing.Never:
+        raise CodeError("variadic tuples cannot be used as runtime values")
+
+
 def _make_array_parameterise(
     typ: Callable[[wtypes.WType, SourceLocation | None], wtypes.WType]
 ) -> _Parameterise:
