@@ -3,12 +3,12 @@ from collections.abc import Sequence
 
 import mypy.nodes
 
-from puya.awst import wtypes
 from puya.awst.nodes import BytesConstant, BytesEncoding, Expression, Literal, ReinterpretCast
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
+    FunctionBuilder,
+    InstanceBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
@@ -16,10 +16,15 @@ from puya.errors import CodeError
 from puya.parse import SourceLocation
 
 
-class FromBytesBuilder(IntermediateExpressionBuilder):
-    def __init__(self, result_wtype: wtypes.WType, location: SourceLocation):
-        super().__init__(location)
-        self.result_wtype = result_wtype
+class FromBytesBuilder(FunctionBuilder):
+    def __init__(self, cls_type: pytypes.TypeType, location: SourceLocation):
+        func_typ = pytypes.FuncType(
+            name=f"{cls_type.typ}.from_bytes",
+            bound_arg_types=[cls_type],
+            args=[pytypes.FuncArg(name="value", typ=pytypes.BytesType, kind=mypy.nodes.ARG_POS)],
+            ret_type=cls_type.typ,
+        )
+        super().__init__(func_typ, location)
 
     def call(
         self,
@@ -34,23 +39,21 @@ class FromBytesBuilder(IntermediateExpressionBuilder):
                 arg: Expression = BytesConstant(
                     value=bytes_val, encoding=BytesEncoding.unknown, source_location=literal_loc
                 )
-            case [ExpressionBuilder(value_type=wtypes.bytes_wtype) as eb]:
+            case [InstanceBuilder(pytype=pytypes.BytesType) as eb]:
                 arg = eb.rvalue()
             case _:
                 raise CodeError("Invalid/unhandled arguments", location)
         return var_expression(
-            ReinterpretCast(source_location=location, wtype=self.result_wtype, expr=arg)
+            ReinterpretCast(source_location=location, wtype=self.pytype.ret_type.wtype, expr=arg)
         )
 
 
 class BytesBackedClassExpressionBuilder(TypeBuilder, abc.ABC):
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
-        wtype = self.produces()
         match name:
             case "from_bytes":
-                return FromBytesBuilder(wtype, location)
+                return FromBytesBuilder(self.pytype, location)
             case _:
                 raise CodeError(
-                    f"{name} is not a valid class or static method on {wtype}",
-                    location,
+                    f"{name} is not a valid class or static method on {self.pytype.typ}", location
                 )
