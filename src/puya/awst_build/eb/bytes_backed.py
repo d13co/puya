@@ -21,7 +21,9 @@ class FromBytesBuilder(FunctionBuilder):
         func_typ = pytypes.FuncType(
             name=f"{cls_type.typ}.from_bytes",
             bound_arg_types=[cls_type],
-            args=[pytypes.FuncArg(name="value", typ=pytypes.BytesType, kind=mypy.nodes.ARG_POS)],
+            args=[
+                pytypes.FuncArg(name="value", types=[pytypes.BytesType], kind=mypy.nodes.ARG_POS)
+            ],
             ret_type=cls_type.typ,
         )
         super().__init__(func_typ, location)

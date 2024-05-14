@@ -190,7 +190,7 @@ class _StringStartsOrEndsWith(FunctionBuilder):
                 pytypes.FuncArg(
                     name="prefix" if at_start else "suffix",
                     kind=mypy.nodes.ARG_POS,
-                    typ=pytypes.StringType,
+                    types=[pytypes.StringType],
                 ),
             ],
             ret_type=pytypes.BoolType,
@@ -259,7 +259,7 @@ class _StringJoin(FunctionBuilder):
                 pytypes.FuncArg(
                     name="others",
                     kind=mypy.nodes.ARG_POS,
-                    typ=pytypes.VariadicTupleType(items=pytypes.StringType),
+                    types=[pytypes.VariadicTupleType(items=pytypes.StringType)],
                 ),
             ],
             ret_type=pytypes.StringType,

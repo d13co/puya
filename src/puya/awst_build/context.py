@@ -279,7 +279,13 @@ class ASTConversionModuleContext(ASTConversionContext):
                     for at, name, kind in zip(
                         func_like.arg_types, func_like.arg_names, func_like.arg_kinds, strict=True
                     ):
-                        func_args.append(pytypes.FuncArg(typ=recurse(at), kind=kind, name=name))
+                        try:
+                            pt = recurse(at)
+                        except TypeUnionError as union:
+                            pts = union.types
+                        else:
+                            pts = [pt]
+                        func_args.append(pytypes.FuncArg(types=pts, kind=kind, name=name))
                     if None in func_like.bound_args:
                         logger.debug(
                             "None contained in bound args for function reference", location=loc

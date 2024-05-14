@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing
 
+import mypy.nodes
 from immutabledict import immutabledict
 
 from puya import log
@@ -37,8 +38,6 @@ from puya.errors import CodeError
 
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
-
-    import mypy.nodes
 
     from puya.parse import SourceLocation
 
@@ -93,9 +92,21 @@ class AccountClassExpressionBuilder(BytesBackedClassExpressionBuilder):
 
 
 class AccountOptedInExpressionBuilder(FunctionBuilder):
-    def __init__(self, expr: Expression, source_location: SourceLocation):
-        super().__init__(source_location)
-        self.expr = expr
+    def __init__(self, account: Expression, location: SourceLocation):
+        func_typ = pytypes.FuncType(
+            name=f"{pytypes.AccountType}.is_opted_in",
+            bound_arg_types=[pytypes.AccountType],
+            args=[
+                pytypes.FuncArg(
+                    name="asset_or_app",
+                    types=[pytypes.AssetType, pytypes.ApplicationType],
+                    kind=mypy.nodes.ARG_POS,
+                )
+            ],
+            ret_type=pytypes.BoolType,
+        )
+        super().__init__(func_typ, location)
+        self.expr = account
 
     @typing.override
     def call(

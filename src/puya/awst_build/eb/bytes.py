@@ -91,7 +91,9 @@ class BytesClassExpressionBuilder(TypeBuilder):
             name=f"{cls_type.typ}.{name}",
             bound_arg_types=[],
             args=[
-                pytypes.FuncArg(name="value", typ=pytypes.StrLiteralType, kind=mypy.nodes.ARG_POS)
+                pytypes.FuncArg(
+                    name="value", types=[pytypes.StrLiteralType], kind=mypy.nodes.ARG_POS
+                )
             ],
             ret_type=cls_type.typ,
         )

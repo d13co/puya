@@ -236,7 +236,9 @@ class StorageMapProxyType(PyType):
 @typing.final
 @attrs.frozen
 class FuncArg:
-    typ: PyType
+    types: Sequence[PyType] = attrs.field(
+        converter=tuple[PyType, ...], validator=attrs.validators.min_len(1)
+    )
     name: str | None
     kind: ArgKind
 

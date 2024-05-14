@@ -83,7 +83,9 @@ class AssetHoldingExpressionBuilder(FunctionBuilder):
             name=f"{pytypes.AssetType}.{name}",
             bound_arg_types=[pytypes.AssetType],
             args=[
-                pytypes.FuncArg(name="account", kind=mypy.nodes.ARG_POS, typ=pytypes.AccountType),
+                pytypes.FuncArg(
+                    name="account", kind=mypy.nodes.ARG_POS, types=[pytypes.AccountType]
+                ),
             ],
             ret_type=result_type,
         )
