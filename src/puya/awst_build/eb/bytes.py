@@ -4,6 +4,7 @@ import base64
 import typing
 
 import mypy.nodes
+import mypy.types
 
 from puya import log
 from puya.awst import wtypes
@@ -35,7 +36,8 @@ from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
+    FunctionBuilder,
+    InstanceBuilder,
     Iteration,
     TypeBuilder,
     ValueExpressionBuilder,
@@ -53,17 +55,16 @@ from puya.errors import CodeError, InternalError
 if typing.TYPE_CHECKING:
     from collections.abc import Sequence
 
-    import mypy.types
-
     from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
 
 
 class BytesClassExpressionBuilder(TypeBuilder):
-    def produces(self) -> wtypes.WType:
-        return wtypes.bytes_wtype
+    def __init__(self, location: SourceLocation):
+        super().__init__(pytypes.TypeType(pytypes.BytesType), location)
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -83,26 +84,38 @@ class BytesClassExpressionBuilder(TypeBuilder):
                 value = BytesConstant(value=b"", source_location=location)
         return BytesExpressionBuilder(value)
 
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
-        """Handle self.name"""
+        cls_type = self.pytype
+        func_typ = pytypes.FuncType(
+            name=f"{cls_type.typ}.{name}",
+            bound_arg_types=[],
+            args=[
+                pytypes.FuncArg(name="value", typ=pytypes.StrLiteralType, kind=mypy.nodes.ARG_POS)
+            ],
+            ret_type=cls_type.typ,
+        )
         match name:
             case "from_base32":
-                return BytesFromEncodedStrBuilder(location, BytesEncoding.base32)
+                return _BytesFromEncodedStrBuilder(func_typ, location, BytesEncoding.base32)
             case "from_base64":
-                return BytesFromEncodedStrBuilder(location, BytesEncoding.base64)
+                return _BytesFromEncodedStrBuilder(func_typ, location, BytesEncoding.base64)
             case "from_hex":
-                return BytesFromEncodedStrBuilder(location, BytesEncoding.base16)
+                return _BytesFromEncodedStrBuilder(func_typ, location, BytesEncoding.base16)
             case _:
                 raise CodeError(
                     f"{name} is not a valid class or static method on {CLS_BYTES_ALIAS}", location
                 )
 
 
-class BytesFromEncodedStrBuilder(IntermediateExpressionBuilder):
-    def __init__(self, location: SourceLocation, encoding: BytesEncoding):
-        super().__init__(location=location)
+class _BytesFromEncodedStrBuilder(FunctionBuilder):
+    def __init__(
+        self, func_type: pytypes.FuncType, location: SourceLocation, encoding: BytesEncoding
+    ):
+        super().__init__(func_type, location=location)
         self.encoding = encoding
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -144,8 +157,10 @@ class BytesFromEncodedStrBuilder(IntermediateExpressionBuilder):
 
 
 class BytesExpressionBuilder(ValueExpressionBuilder):
-    wtype = wtypes.bytes_wtype
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.BytesType, expr)
 
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         match name:
             case "length":
@@ -153,25 +168,26 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
                 return UInt64ExpressionBuilder(len_call)
         return super().member_access(name, location)
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    @typing.override
+    def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
         index_expr = expect_operand_wtype(index, wtypes.uint64_wtype)
+        wtype = self.pytype.wtype
         expr = IndexExpression(
             source_location=location,
             base=self.expr,
             index=index_expr,
-            wtype=self.wtype,
+            wtype=wtype,
         )
         return BytesExpressionBuilder(expr)
 
+    @typing.override
     def slice_index(
         self,
-        begin_index: ExpressionBuilder | Literal | None,
-        end_index: ExpressionBuilder | Literal | None,
-        stride: ExpressionBuilder | Literal | None,
+        begin_index: InstanceBuilder | Literal | None,
+        end_index: InstanceBuilder | Literal | None,
+        stride: InstanceBuilder | Literal | None,
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         if stride is not None:
             raise CodeError("Stride is not supported", location=stride.source_location)
 
@@ -198,24 +214,28 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
                 ),
                 loc=end_index_expr.source_location,
             )
+        wtype = self.pytype.wtype
         slice_expr: Expression = SliceExpression(
             base=base,
             begin_index=begin_index_expr,
             end_index=end_index_expr,
-            wtype=self.wtype,
+            wtype=wtype,
             source_location=location,
         )
         return BytesExpressionBuilder(slice_expr)
 
+    @typing.override
     def iterate(self) -> Iteration:
         return self.rvalue()
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         len_expr = intrinsic_factory.bytes_len(self.expr, location)
         len_builder = UInt64ExpressionBuilder(len_expr)
         return len_builder.bool_eval(location, negate=negate)
 
-    def bitwise_invert(self, location: SourceLocation) -> ExpressionBuilder:
+    @typing.override
+    def bitwise_invert(self, location: SourceLocation) -> InstanceBuilder:
         return BytesExpressionBuilder(
             BytesUnaryOperation(
                 expr=self.expr,
@@ -224,9 +244,10 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
             )
         )
 
+    @typing.override
     def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, item: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
         item_expr = expect_operand_wtype(item, wtypes.bytes_wtype)
         is_substring_expr = SubroutineCallExpression(
             target=FreeSubroutineTarget(module_name="algopy_lib_bytes", name="is_substring"),
@@ -236,11 +257,13 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
         )
         return BoolExpressionBuilder(is_substring_expr)
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
-        other_expr = convert_literal_to_expr(other, self.wtype)
-        if other_expr.wtype != self.wtype:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
+        wtype = self.pytype.wtype
+        other_expr = convert_literal_to_expr(other, wtype)
+        if other_expr.wtype != wtype:
             return NotImplemented
         cmp_expr = BytesComparisonExpression(
             source_location=location,
@@ -250,16 +273,19 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
         )
         return BoolExpressionBuilder(cmp_expr)
 
+    @typing.override
     def binary_op(
         self,
-        other: ExpressionBuilder | Literal,
+        other: InstanceBuilder | Literal,
         op: BuilderBinaryOp,
         location: SourceLocation,
         *,
         reverse: bool,
-    ) -> ExpressionBuilder:
-        other_expr = convert_literal_to_expr(other, self.wtype)
+    ) -> InstanceBuilder:
+        wtype = self.pytype.wtype
+        other_expr = convert_literal_to_expr(other, wtype)
         bytes_op = _translate_binary_bytes_operator(op, location)
+        # TODO: shouldn't this be returning NotImplemented based on rhs wtype?
         lhs = self.expr
         rhs = other_expr
         if reverse:
@@ -269,10 +295,12 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
         )
         return BytesExpressionBuilder(bin_op_expr)
 
+    @typing.override
     def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
-        value = convert_literal_to_expr(rhs, self.wtype)
+        wtype = self.pytype.wtype
+        value = convert_literal_to_expr(rhs, wtype)
         bytes_op = _translate_binary_bytes_operator(op, location)
         target = self.lvalue()
         return BytesAugmentedAssignment(

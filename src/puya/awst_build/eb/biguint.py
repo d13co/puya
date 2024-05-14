@@ -19,11 +19,13 @@ from puya.awst.nodes import (
     ReinterpretCast,
     Statement,
 )
+from puya.awst_build import pytypes
 from puya.awst_build.eb._utils import uint64_to_biguint
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     ExpressionBuilder,
+    InstanceBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -37,16 +39,16 @@ if typing.TYPE_CHECKING:
 
     import mypy.types
 
-    from puya.awst_build import pytypes
     from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
 
 
 class BigUIntClassExpressionBuilder(BytesBackedClassExpressionBuilder):
-    def produces(self) -> wtypes.WType:
-        return wtypes.biguint_wtype
+    def __init__(self, location: SourceLocation):
+        super().__init__(pytypes.TypeType(pytypes.BigUIntType), location)
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -70,8 +72,10 @@ class BigUIntClassExpressionBuilder(BytesBackedClassExpressionBuilder):
 
 
 class BigUIntExpressionBuilder(ValueExpressionBuilder):
-    wtype = wtypes.biguint_wtype
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.BigUIntType, expr)
 
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         match name:
             case "bytes":
@@ -82,7 +86,8 @@ class BigUIntExpressionBuilder(ValueExpressionBuilder):
                 )
         return super().member_access(name, location)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         cmp_expr = NumericComparisonExpression(
             lhs=self.expr,
             operator=NumericComparison.eq if negate else NumericComparison.ne,
@@ -92,16 +97,19 @@ class BigUIntExpressionBuilder(ValueExpressionBuilder):
         )
         return BoolExpressionBuilder(cmp_expr)
 
-    def unary_plus(self, location: SourceLocation) -> ExpressionBuilder:
+    @typing.override
+    def unary_plus(self, location: SourceLocation) -> InstanceBuilder:
         # unary + is allowed, but for the current types it has no real impact
         # so just expand the existing expression to include the unary operator
         return BigUIntExpressionBuilder(attrs.evolve(self.expr, source_location=location))
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
-        other_expr = convert_literal_to_expr(other, self.wtype)
-        if other_expr.wtype == self.wtype:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
+        wtype = self.pytype.wtype
+        other_expr = convert_literal_to_expr(other, wtype)
+        if other_expr.wtype == wtype:
             pass
         elif other_expr.wtype == wtypes.uint64_wtype:
             other_expr = uint64_to_biguint(other, location)
@@ -115,16 +123,18 @@ class BigUIntExpressionBuilder(ValueExpressionBuilder):
         )
         return BoolExpressionBuilder(cmp_expr)
 
+    @typing.override
     def binary_op(
         self,
-        other: ExpressionBuilder | Literal,
+        other: InstanceBuilder | Literal,
         op: BuilderBinaryOp,
         location: SourceLocation,
         *,
         reverse: bool,
-    ) -> ExpressionBuilder:
-        other_expr = convert_literal_to_expr(other, self.wtype)
-        if other_expr.wtype == self.wtype:
+    ) -> InstanceBuilder:
+        wtype = self.pytype.wtype
+        other_expr = convert_literal_to_expr(other, wtype)
+        if other_expr.wtype == wtype:
             pass
         elif other_expr.wtype == wtypes.uint64_wtype:
             other_expr = uint64_to_biguint(other, location)
@@ -140,17 +150,21 @@ class BigUIntExpressionBuilder(ValueExpressionBuilder):
         )
         return BigUIntExpressionBuilder(bin_op_expr)
 
+    @typing.override
     def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
-        value = convert_literal_to_expr(rhs, self.wtype)
-        if value.wtype == self.wtype:
+        wtype = self.pytype.wtype
+        value = convert_literal_to_expr(rhs, wtype)
+        rhs_type_name = str(rhs.pytype) if isinstance(rhs, InstanceBuilder) else type(rhs).__name__
+        if value.wtype == wtype:
             pass
         elif value.wtype == wtypes.uint64_wtype:
             value = uint64_to_biguint(rhs, location)
         else:
             raise CodeError(
-                f"Invalid operand type {value.wtype} for {op.value}= with {self.wtype}", location
+                f"Invalid operand type {rhs_type_name} for {op.value}= with {self.pytype}",
+                location,
             )
         target = self.lvalue()
         biguint_op = _translate_biguint_math_operator(op, location)
