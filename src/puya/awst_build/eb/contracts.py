@@ -1,3 +1,5 @@
+import typing
+
 import mypy.nodes
 import mypy.types
 
@@ -5,6 +7,7 @@ from puya import log
 from puya.awst import wtypes
 from puya.awst.nodes import (
     AppStateExpression,
+    BaseClassSubroutineTarget,
     BoxProxyField,
     InstanceSubroutineTarget,
 )
@@ -13,7 +16,7 @@ from puya.awst_build.context import ASTConversionModuleContext
 from puya.awst_build.contract_data import AppStorageDeclaration
 from puya.awst_build.eb.app_account_state import AppAccountStateExpressionBuilder
 from puya.awst_build.eb.app_state import AppStateExpressionBuilder
-from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBuilder
+from puya.awst_build.eb.base import ExpressionBuilder, InstanceBuilder, TypeBuilder
 from puya.awst_build.eb.box import (
     BoxMapProxyExpressionBuilder,
     BoxProxyExpressionBuilder,
@@ -31,24 +34,54 @@ from puya.parse import SourceLocation
 logger = log.get_logger(__name__)
 
 
-class ContractTypeExpressionBuilder(IntermediateExpressionBuilder):
+class ContractTypeExpressionBuilder(TypeBuilder):
     def __init__(
         self,
         context: ASTConversionModuleContext,
         type_info: mypy.nodes.TypeInfo,
         location: SourceLocation,
     ):
-        super().__init__(location)
+        typ = context.require_ptype(type_info.fullname, location)  # TODO: pass this in
+        typ_typ = pytypes.TypeType(typ)
+        super().__init__(typ_typ, location)
         self.context = context
         self._type_info = type_info
 
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
+        type_info = self._type_info
+        cref = qualified_class_name(type_info)
+        sym_node = type_info.names.get(name)
+        node = sym_node.node if sym_node else None
+        typing.assert_type(node, mypy.nodes.SymbolNode | None)
+
+        func_type: mypy.types.Type | None
+        match node:
+            case None:
+                raise CodeError(f"Unknown member {name!r} of {cref.full_name!r}", location)
+            case mypy.nodes.Decorator(type=func_type):
+                pass
+            case mypy.nodes.FuncBase(type=func_type):
+                pass
+            case _:
+                raise CodeError("Only methods can be accessed statically", location)
+
+        if func_type is None:
+            raise CodeError("", location)
+
+        func_pytyp = self.context.type_to_pytype(func_type, source_location=location)
+        if not isinstance(func_pytyp, pytypes.FuncType):
+            raise CodeError(f"Couldn't resolve signature of {name!r}", location)
+
+        target = BaseClassSubroutineTarget(cref, name)
         return BaseClassSubroutineInvokerExpressionBuilder(
-            context=self.context, type_info=self._type_info, name=name, location=location
+            context=self.context,
+            location=location,
+            target=target,
+            func_type=func_pytyp,
         )
 
 
-class ContractSelfExpressionBuilder(IntermediateExpressionBuilder):
+class ContractSelfExpressionBuilder(InstanceBuilder):
     def __init__(
         self,
         context: ASTConversionModuleContext,
@@ -69,16 +102,18 @@ class ContractSelfExpressionBuilder(IntermediateExpressionBuilder):
             raise CodeError(f"Unknown member: {name}", location)
         match sym_node.node:
             # matching types taken from mypy.nodes.TypeInfo.get_method
-            case mypy.nodes.FuncBase() | mypy.nodes.Decorator() as func_or_dec:
-                func_type = func_or_dec.type
-                if not isinstance(func_type, mypy.types.CallableType):
+            case mypy.nodes.FuncBase(type=func_type) | mypy.nodes.Decorator(
+                type=func_type
+            ) if func_type is not None:
+                func_pytype = self.context.type_to_pytype(func_type, source_location=location)
+                if not isinstance(func_pytype, pytypes.FuncType):
                     raise CodeError(f"Couldn't resolve signature of {name!r}", location)
 
                 return SubroutineInvokerExpressionBuilder(
                     context=self.context,
                     target=InstanceSubroutineTarget(name=name),
                     location=location,
-                    func_type=func_type,
+                    func_type=func_pytype,
                 )
             case _:
                 raise CodeError(

@@ -153,7 +153,7 @@ def get_arc4_signature(
     member_name: str,
     location: SourceLocation,
 ) -> ARC4Signature:
-    dec = type_info.get_method(member_name)
+    dec = type_info.get(member_name)
     if isinstance(dec, mypy.nodes.Decorator):
         decorators = get_decorators_by_fullname(context, dec)
         abimethod_dec = decorators.get(constants.ABIMETHOD_DECORATOR)

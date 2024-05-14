@@ -1,3 +1,4 @@
+import typing
 from collections.abc import Sequence
 
 import mypy.nodes
@@ -14,28 +15,32 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import pytypes
 from puya.awst_build.context import ASTConversionModuleContext
-from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBuilder
+from puya.awst_build.eb.base import (
+    ExpressionBuilder,
+    FunctionBuilder,
+)
 from puya.awst_build.eb.var_factory import var_expression
-from puya.awst_build.utils import qualified_class_name, require_expression_builder
+from puya.awst_build.utils import require_instance_builder
 from puya.errors import CodeError
 from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
 
 
-class SubroutineInvokerExpressionBuilder(IntermediateExpressionBuilder):
+class SubroutineInvokerExpressionBuilder(FunctionBuilder):
     def __init__(
         self,
         context: ASTConversionModuleContext,
         target: InstanceSubroutineTarget | BaseClassSubroutineTarget | FreeSubroutineTarget,
         location: SourceLocation,
-        func_type: mypy.types.CallableType,
+        func_type: pytypes.FuncType,
     ):
-        super().__init__(location)
+        super().__init__(func_type, location)
         self.context = context
         self.target = target
         self.func_type = func_type
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -50,20 +55,13 @@ class SubroutineInvokerExpressionBuilder(IntermediateExpressionBuilder):
                 raise CodeError(
                     "argument unpacking at call site not currently supported", arg.source_location
                 )
-            call_args.append(
-                CallArg(name=arg_name, value=require_expression_builder(arg).rvalue())
-            )
+            call_args.append(CallArg(name=arg_name, value=require_instance_builder(arg).rvalue()))
 
         func_type = self.func_type
-        # bit of a kludge, but it works for us for now
-        if isinstance(self.target, FreeSubroutineTarget):
-            expected_arg_types = func_type.arg_types
-        else:
-            expected_arg_types = func_type.arg_types[1:]
         # TODO: type check fully, not just num args... requires matching keyword positions
-        if len(args) != len(expected_arg_types):
+        if len(args) != len(func_type.args):
             logger.error("incorrect number of arguments to subroutine call", location=location)
-        result_pytyp = self.context.type_to_pytype(func_type.ret_type, source_location=location)
+        result_pytyp = func_type.ret_type
 
         call_expr = SubroutineCallExpression(
             source_location=location,
@@ -75,27 +73,6 @@ class SubroutineInvokerExpressionBuilder(IntermediateExpressionBuilder):
 
 
 class BaseClassSubroutineInvokerExpressionBuilder(SubroutineInvokerExpressionBuilder):
-    def __init__(
-        self,
-        context: ASTConversionModuleContext,
-        type_info: mypy.nodes.TypeInfo,
-        name: str,
-        location: SourceLocation,
-    ):
-        self.name = name
-        self.type_info = type_info
-        cref = qualified_class_name(type_info)
-
-        func_or_dec = type_info.get_method(name)
-        if func_or_dec is None:
-            raise CodeError(f"Unknown member: {name}", location)
-        func_type = func_or_dec.type
-        if not isinstance(func_type, mypy.types.CallableType):
-            raise CodeError(f"Couldn't resolve signature of {name!r}", location)
-
-        target = BaseClassSubroutineTarget(cref, name)
-        super().__init__(context, target, location, func_type)
-
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
