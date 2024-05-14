@@ -55,9 +55,7 @@ class TupleTypeExpressionBuilder(GenericTypeBuilder):
 
 class TupleExpressionBuilder(ValueExpressionBuilder[pytypes.TupleType]):
     @typing.override
-    def index(
-        self, index: InstanceBuilder | Literal, location: SourceLocation
-    ) -> InstanceBuilder:
+    def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
         # special handling of tuples, they can be indexed by int literal only,
         # mostly because they can be non-homogenous so we need to be able to resolve the
         # result type, but also we can statically validate that value
@@ -95,7 +93,9 @@ class TupleExpressionBuilder(ValueExpressionBuilder[pytypes.TupleType]):
 
         start_expr, start_idx = self._convert_index(begin_index)
         end_expr, end_idx = self._convert_index(end_index)
-        result_typ = pytypes.GenericTupleType.parameterise(self.pytype.items[start_idx:end_idx], location)
+        result_typ = pytypes.GenericTupleType.parameterise(
+            self.pytype.items[start_idx:end_idx], location
+        )
         if not result_typ:
             raise CodeError("Empty slices are not supported", location)
 
@@ -108,7 +108,7 @@ class TupleExpressionBuilder(ValueExpressionBuilder[pytypes.TupleType]):
                 begin_index=start_expr,
                 end_index=end_expr,
                 wtype=updated_wtype,
-            )
+            ),
         )
 
     def _convert_index(

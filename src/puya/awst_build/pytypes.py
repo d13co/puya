@@ -113,7 +113,7 @@ TypingLiteralValue: typing.TypeAlias = int | bytes | str | bool | None
 _TypeArgs: typing.TypeAlias = tuple[PyType, ...]
 _Parameterise = typing_extensions.TypeAliasType(
     "_Parameterise",
-    Callable[["_GenericType", _TypeArgs, SourceLocation | None], _TPyType],
+    Callable[["_GenericType[_TPyType]", _TypeArgs, SourceLocation | None], _TPyType],
     type_params=(_TPyType,),
 )
 
@@ -203,7 +203,7 @@ class TypingLiteralType(PyType):
 @typing.final
 @attrs.frozen
 class TupleType(PyType):
-    generic: _GenericType
+    generic: _GenericType[TupleType]
     items: tuple[PyType, ...] = attrs.field(validator=attrs.validators.min_len(1))
     wtype: wtypes.WType
 
@@ -540,7 +540,7 @@ def _make_tuple_parameterise(
     typ: Callable[[Iterable[wtypes.WType], SourceLocation | None], wtypes.WType]
 ) -> _Parameterise[TupleType]:
     def parameterise(
-        self: _GenericType, args: _TypeArgs, source_location: SourceLocation | None
+        self: _GenericType[TupleType], args: _TypeArgs, source_location: SourceLocation | None
     ) -> TupleType:
         item_wtypes = [arg.wtype for arg in args]
         name = f"{self.name}[{', '.join(pyt.name for pyt in args)}]"

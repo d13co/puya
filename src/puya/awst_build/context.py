@@ -256,8 +256,8 @@ class ASTConversionModuleContext(ASTConversionContext):
                     # note sure if this will always work for overloads, but the only overloaded
                     # constructor we have is arc4.StaticArray, so...
                     ret_type = func_like.items[0].ret_type
-                    typ_typ = recurse(ret_type)
-                    return pytypes.GenericTypeType.parameterise([typ_typ], loc)
+                    cls_typ = recurse(ret_type)
+                    return pytypes.TypeType(cls_typ)
                 else:
                     if not isinstance(func_like, mypy.types.CallableType):  # vs Overloaded
                         raise CodeError(

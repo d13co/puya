@@ -139,6 +139,17 @@ class TypeBuilder(CallableBuilder, abc.ABC):
 
 class GenericTypeBuilder(TypeBuilder, abc.ABC):
     @typing.override
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_typs: Sequence[pytypes.PyType],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+    ) -> ExpressionBuilder:
+        raise CodeError("Generic type usage requires parameters", location)
+
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         raise CodeError("Generic type usage requires parameters", location)
 
@@ -202,9 +213,7 @@ class InstanceBuilder(ExpressionBuilder, abc.ABC):
         """Handle self {binary op}= rhs"""
 
     @abc.abstractmethod
-    def index(
-        self, index: InstanceBuilder | Literal, location: SourceLocation
-    ) -> InstanceBuilder:
+    def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
         """Handle self[index]"""
 
     @abc.abstractmethod
@@ -292,9 +301,7 @@ class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC)
         raise CodeError(f"{self} is not valid as del target", location)
 
     @typing.override
-    def index(
-        self, index: InstanceBuilder | Literal, location: SourceLocation
-    ) -> InstanceBuilder:
+    def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
         raise CodeError(f"{self} does not support indexing", location)
 
     @typing.override
