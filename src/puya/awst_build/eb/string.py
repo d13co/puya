@@ -30,8 +30,7 @@ from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
-    ValueExpressionBuilder,
+    ValueExpressionBuilder, FunctionBuilder, InstanceBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.bytes import BytesExpressionBuilder
@@ -51,9 +50,10 @@ logger = log.get_logger(__name__)
 
 
 class StringClassExpressionBuilder(BytesBackedClassExpressionBuilder):
-    def produces(self) -> wtypes.WType:
-        return wtypes.string_wtype
+    def __init__(self, location: SourceLocation):
+        super().__init__(pytypes.TypeType(pytypes.StringType), location)
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -76,8 +76,10 @@ class StringClassExpressionBuilder(BytesBackedClassExpressionBuilder):
 
 
 class StringExpressionBuilder(ValueExpressionBuilder):
-    wtype = wtypes.string_wtype
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.StringType, expr)
 
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         match name:
             case "bytes":
@@ -91,8 +93,9 @@ class StringExpressionBuilder(ValueExpressionBuilder):
             case _:
                 raise CodeError(f"Unrecognised member of {self.wtype}: {name}", location)
 
+    @typing.override
     def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
         match op:
             case BuilderBinaryOp.add:
@@ -108,14 +111,15 @@ class StringExpressionBuilder(ValueExpressionBuilder):
                     location,
                 )
 
+    @typing.override
     def binary_op(
         self,
-        other: ExpressionBuilder | Literal,
+        other: InstanceBuilder | Literal,
         op: BuilderBinaryOp,
         location: SourceLocation,
         *,
         reverse: bool,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         match op:
             case BuilderBinaryOp.add:
                 lhs = self.expr
@@ -133,9 +137,10 @@ class StringExpressionBuilder(ValueExpressionBuilder):
             case _:
                 return NotImplemented
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         other_expr = convert_literal_to_expr(other, self.wtype)
         if other_expr.wtype == self.wtype:
             pass
@@ -149,15 +154,17 @@ class StringExpressionBuilder(ValueExpressionBuilder):
         )
         return BoolExpressionBuilder(cmp)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         bytes_expr = get_bytes_expr(self.expr)
         len_expr = intrinsic_factory.bytes_len(bytes_expr, location)
         len_builder = UInt64ExpressionBuilder(len_expr)
         return len_builder.bool_eval(location, negate=negate)
 
+    @typing.override
     def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, item: InstanceBuilder | Literal, location: SourceLocation
+    ) -> InstanceBuilder:
         item_expr = get_bytes_expr(expect_operand_wtype(item, wtypes.string_wtype))
         this_expr = get_bytes_expr(self.expr)
         is_substring_expr = SubroutineCallExpression(
@@ -172,12 +179,13 @@ class StringExpressionBuilder(ValueExpressionBuilder):
         return BoolExpressionBuilder(is_substring_expr)
 
 
-class _StringStartsOrEndsWith(IntermediateExpressionBuilder):
+class _StringStartsOrEndsWith(FunctionBuilder):
     def __init__(self, base: Expression, location: SourceLocation, *, at_start: bool):
         super().__init__(location)
         self._base = base
         self._at_start = at_start
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -194,9 +202,9 @@ class _StringStartsOrEndsWith(IntermediateExpressionBuilder):
         this = get_bytes_expr_builder(SingleEvaluation(self._base))
 
         this_length = this.member_access("length", location)
-        assert isinstance(this_length, ExpressionBuilder)
+        assert isinstance(this_length, InstanceBuilder)
         arg_length = arg.member_access("length", location)
-        assert isinstance(arg_length, ExpressionBuilder)
+        assert isinstance(arg_length, InstanceBuilder)
 
         arg_length_gt_this_length = arg_length.compare(
             this_length, op=BuilderComparisonOp.gt, location=location
@@ -228,11 +236,20 @@ class _StringStartsOrEndsWith(IntermediateExpressionBuilder):
         return BoolExpressionBuilder(cond)
 
 
-class _StringJoin(IntermediateExpressionBuilder):
+class _StringJoin(FunctionBuilder):
     def __init__(self, base: Expression, location: SourceLocation):
+        func_type = pytypes.FuncType(
+            name=f"{pytypes.StringType}.join",
+            bound_arg_types=[pytypes.StringType],
+            args=[
+                pytypes.TupleType()
+            ],
+            ret_type=pytypes.StringType,
+        )
         super().__init__(location)
         self._base = base
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -243,8 +260,8 @@ class _StringJoin(IntermediateExpressionBuilder):
     ) -> ExpressionBuilder:
         match args:
             case [
-                ExpressionBuilder(value_type=wtypes.WTuple(types=tuple_item_types)) as eb
-            ] if all(tt == wtypes.string_wtype for tt in tuple_item_types):
+                InstanceBuilder(pytype=pytypes.TupleType(items=tuple_item_types)) as eb
+            ] if all(tt == pytypes.StringType for tt in tuple_item_types):
                 tuple_arg = SingleEvaluation(eb.rvalue())
             case _:
                 raise CodeError("Invalid/unhandled arguments", location)

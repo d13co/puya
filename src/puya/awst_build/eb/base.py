@@ -287,6 +287,10 @@ class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC)
     def pytype(self) -> _TPyType:
         return self._pytype
 
+    @property
+    def wtype(self) -> wtypes.WType: # TODO: YEET ME
+        return self.pytype.wtype
+
     @typing.override
     def lvalue(self) -> Lvalue:
         resolved = self.rvalue()
