@@ -3,7 +3,7 @@ from hashlib import sha256
 
 import algokit_utils
 import pytest
-from algopy._constants import MAX_BYTES_SIZE
+from algopy.constants import MAX_BYTES_SIZE
 from algopy.primitives.bytes import Bytes
 
 from tests.common import AVMInvoker
@@ -224,17 +224,18 @@ def test_bytes_from_encoded_string() -> None:
 @pytest.mark.parametrize("value", [b"hello, world", b"", b"0110", b"0" * MAX_BYTES_SIZE])
 def test_bytes_len(value: bytes) -> None:
     assert len(Bytes(value)) == len(value)
+    assert Bytes(value).length == len(value)
 
 
 @pytest.mark.parametrize("value", [b"hello, world", b"", b"0110", b"0" * MAX_BYTES_SIZE])
 def test_bytes_iter(value: bytes) -> None:
-    for x1, x2 in zip(iter(Bytes(value)), iter(value), strict=False):
+    for x1, x2 in zip(iter(Bytes(value)), iter(value), strict=True):
         assert x1 == _int_to_bytes(x2)
 
 
 @pytest.mark.parametrize("value", [b"hello, world", b"", b"0110", b"0" * MAX_BYTES_SIZE])
 def test_bytes_reversed(value: bytes) -> None:
-    for x1, x2 in zip(reversed(Bytes(value)), reversed(value), strict=False):
+    for x1, x2 in zip(reversed(Bytes(value)), reversed(value), strict=True):
         assert x1 == _int_to_bytes(x2)
 
 
@@ -244,7 +245,8 @@ def test_bytes_reversed(value: bytes) -> None:
         0,
         slice(0, 2),
         11,
-        slice(11, 1),
+        slice(11, 12),
+        slice(10, 13),
     ],
 )
 def test_bytes_index(index: int | slice) -> None:
