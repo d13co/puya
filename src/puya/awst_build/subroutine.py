@@ -1346,6 +1346,8 @@ def builder_for_type(inner_typ: pytypes.PyType, expr_loc: SourceLocation) -> Exp
         return tb(expr_loc)
     if tb := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
         return tb(expr_loc)
+    if tb := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ):
+        return tb(expr_loc)
     t_wtype = inner_typ.wtype
     try:
         tb2 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
