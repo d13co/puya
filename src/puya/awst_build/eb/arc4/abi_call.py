@@ -38,9 +38,8 @@ from puya.awst_build.eb.arc4._utils import (
 from puya.awst_build.eb.arc4.base import ARC4FromLogBuilder
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
-    GenericClassExpressionBuilder,
+    FunctionBuilder,
     InstanceBuilder,
-    IntermediateExpressionBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.subroutine import BaseClassSubroutineInvokerExpressionBuilder
@@ -88,7 +87,8 @@ class _ABICallExpr:
     abi_arg_typs: Sequence[pytypes.PyType]
 
 
-class ABICallGenericClassExpressionBuilder(GenericClassExpressionBuilder):
+class ABICallGenericClassExpressionBuilder(InstanceBuilder, FunctionBuilder):
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -101,6 +101,7 @@ class ABICallGenericClassExpressionBuilder(GenericClassExpressionBuilder):
             args, arg_typs, arg_kinds, arg_names, location
         )
 
+    @typing.override
     def index_multiple(
         self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
     ) -> TypeBuilder:
@@ -249,7 +250,7 @@ def _is_typed(wtype: wtypes.WType | None) -> typing.TypeGuard[wtypes.WType]:
 def _create_abi_call_expr(
     signature: ARC4Signature,
     abi_args: Sequence[Expression],
-    transaction_kwargs: dict[str, ExpressionBuilder | Literal],
+    transaction_kwargs: dict[str, InstanceBuilder | Literal],
     location: SourceLocation,
     *,
     return_inner_txn_only: bool,
