@@ -26,8 +26,8 @@ from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
-    ExpressionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -51,12 +51,12 @@ class UInt64ClassExpressionBuilder(TypeBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 const = UInt64Constant(value=0, source_location=location)

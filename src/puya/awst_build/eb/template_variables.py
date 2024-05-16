@@ -6,8 +6,8 @@ from puya.awst import wtypes
 from puya.awst.nodes import Literal, TemplateVar
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     GenericClassExpressionBuilder,
+    NodeBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
@@ -18,8 +18,8 @@ from puya.parse import SourceLocation
 
 class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    ) -> NodeBuilder:
         match indexes:
             case [TypeBuilder() as eb]:
                 wtype = eb.produces()
@@ -29,12 +29,12 @@ class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         raise CodeError("TemplateVar usage requires type parameter", location)
 
 
@@ -48,12 +48,12 @@ class TemplateVariableExpressionBuilder(TypeBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         var_name_arg_name = "variable_name"
         arg_mapping = get_arg_mapping(
             positional_arg_names=[var_name_arg_name],

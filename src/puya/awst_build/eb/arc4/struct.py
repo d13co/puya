@@ -25,7 +25,7 @@ if typing.TYPE_CHECKING:
 
     from puya.awst_build import pytypes
     from puya.awst_build.eb.base import (
-        ExpressionBuilder,
+        NodeBuilder,
     )
     from puya.parse import SourceLocation
 
@@ -47,12 +47,12 @@ class ARC4StructClassExpressionBuilder(BytesBackedClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         ordered_field_names = self.wtype.names
         field_mapping = get_arg_mapping(
             positional_arg_names=ordered_field_names,
@@ -83,7 +83,7 @@ class ARC4StructExpressionBuilder(ValueExpressionBuilder):
         self.wtype: wtypes.ARC4Struct = expr.wtype
         super().__init__(expr)
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case field_name if field_name in self.wtype.fields:
                 # TODO: use pytype
@@ -103,9 +103,9 @@ class ARC4StructExpressionBuilder(ValueExpressionBuilder):
                 return super().member_access(name, location)
 
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: NodeBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> NodeBuilder:
         return arc4_compare_bytes(self, op, other, location)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         return bool_eval_to_constant(value=True, location=location, negate=negate)

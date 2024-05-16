@@ -35,10 +35,10 @@ from puya.awst_build.constants import CLS_BYTES_ALIAS
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
-    ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
     Iteration,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -67,12 +67,12 @@ class BytesClassExpressionBuilder(TypeBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 value: Expression = BytesConstant(value=b"", source_location=location)
@@ -85,7 +85,7 @@ class BytesClassExpressionBuilder(TypeBuilder):
         return BytesExpressionBuilder(value)
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder:
         cls_type = self.pytype
         func_typ = pytypes.FuncType(
             name=f"{cls_type.typ}.{name}",
@@ -120,12 +120,12 @@ class _BytesFromEncodedStrBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case [Literal(value=str(encoded_value))]:
                 pass
@@ -163,7 +163,7 @@ class BytesExpressionBuilder(ValueExpressionBuilder):
         super().__init__(pytypes.BytesType, expr)
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "length":
                 len_call = intrinsic_factory.bytes_len(expr=self.expr, loc=location)

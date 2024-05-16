@@ -16,8 +16,8 @@ from puya.awst.nodes import (
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
-    ExpressionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -41,12 +41,12 @@ class BoolClassExpressionBuilder(TypeBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 false = BoolConstant(value=False, source_location=location)

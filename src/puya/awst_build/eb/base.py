@@ -37,7 +37,7 @@ __all__ = [
     "Iteration",
     "BuilderComparisonOp",
     "BuilderBinaryOp",
-    "ExpressionBuilder",
+    "NodeBuilder",
     "CallableBuilder",
     "FunctionBuilder",
     "TypeBuilder",
@@ -82,7 +82,7 @@ _TPyType = typing_extensions.TypeVar(
 )
 
 
-class ExpressionBuilder(typing.Generic[_TPyType], abc.ABC):
+class NodeBuilder(typing.Generic[_TPyType], abc.ABC):
     def __init__(self, typ: _TPyType, location: SourceLocation):
         self._pytype = typ
         self._source_location = location
@@ -101,7 +101,7 @@ class ExpressionBuilder(typing.Generic[_TPyType], abc.ABC):
         return str(self.pytype)
 
     @abc.abstractmethod
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         """Handle self.name"""
 
     @abc.abstractmethod
@@ -109,22 +109,22 @@ class ExpressionBuilder(typing.Generic[_TPyType], abc.ABC):
         """Handle boolean-ness evaluation, possibly inverted (ie "not" unary operator)"""
 
 
-class CallableBuilder(ExpressionBuilder[_TPyType], abc.ABC):
+class CallableBuilder(NodeBuilder[_TPyType], abc.ABC):
     @abc.abstractmethod
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         """Handle self(args...)"""
 
 
 class FunctionBuilder(CallableBuilder[pytypes.FuncType], abc.ABC):
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         raise CodeError(f"{self} is a function and does not support member access", location)
 
     def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
@@ -135,7 +135,7 @@ class FunctionBuilder(CallableBuilder[pytypes.FuncType], abc.ABC):
 
 class TypeBuilder(CallableBuilder[pytypes.TypeType], abc.ABC):
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         """Handle self.name"""
         raise CodeError(f"{self.pytype.typ} does not support static member access", location)
 
@@ -149,20 +149,20 @@ class GenericTypeBuilder(TypeBuilder, abc.ABC):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         raise CodeError("Generic type usage requires parameters", location)
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         raise CodeError("Generic type usage requires parameters", location)
 
 
-class InstanceBuilder(ExpressionBuilder[_TPyType], abc.ABC):
+class InstanceBuilder(NodeBuilder[_TPyType], abc.ABC):
     @abc.abstractmethod
     def rvalue(self) -> Expression:
         """Produce an expression for use as an intermediary"""
@@ -175,7 +175,7 @@ class InstanceBuilder(ExpressionBuilder[_TPyType], abc.ABC):
         raise CodeError(f"{self} is not valid as del target", location)
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         raise CodeError(f"Unrecognised member of {self}: {name}", location)
 
     def unary_plus(self, location: SourceLocation) -> InstanceBuilder:
@@ -238,7 +238,7 @@ class ContainerBuilder(InstanceBuilder[_TPyType], abc.ABC):
         raise CodeError(f"{self} does not support iteration", self.source_location)
 
 
-class StateProxyDefinitionBuilder(ExpressionBuilder[pytypes.StorageProxyType], abc.ABC):
+class StateProxyDefinitionBuilder(NodeBuilder[pytypes.StorageProxyType], abc.ABC):
     @abc.abstractmethod
     def build_definition(
         self,

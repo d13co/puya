@@ -26,9 +26,9 @@ from puya.awst.nodes import (
 from puya.awst_build import intrinsic_factory, pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
-    ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
+    NodeBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.bytes_backed import BytesBackedClassExpressionBuilder
@@ -49,12 +49,12 @@ class AccountClassExpressionBuilder(BytesBackedClassExpressionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 value: Expression = intrinsic_factory.zero_address(location)
@@ -66,7 +66,7 @@ class AccountClassExpressionBuilder(BytesBackedClassExpressionBuilder):
                         location,
                     )
                 value = AddressConstant(value=addr_value, source_location=location)
-            case [ExpressionBuilder() as eb]:
+            case [NodeBuilder() as eb]:
                 value = expect_operand_wtype(eb, wtypes.bytes_wtype)
                 address_bytes_temp = SingleEvaluation(value)
                 is_correct_length = NumericComparisonExpression(
@@ -111,12 +111,12 @@ class AccountOptedInExpressionBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case [InstanceBuilder(pytype=pytypes.AssetType) as asset]:
                 return BoolExpressionBuilder(
@@ -173,7 +173,7 @@ class AccountExpressionBuilder(ReferenceValueExpressionBuilder):
         super().__init__(pytypes.AccountType, expr)
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         if name == "is_opted_in":
             return AccountOptedInExpressionBuilder(self.expr, location)
         return super().member_access(name, location)

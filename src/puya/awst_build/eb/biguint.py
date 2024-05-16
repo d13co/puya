@@ -24,8 +24,8 @@ from puya.awst_build.eb._utils import uint64_to_biguint
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
-    ExpressionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -51,18 +51,18 @@ class BigUIntClassExpressionBuilder(BytesBackedClassExpressionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 value: Expression = BigUIntConstant(value=0, source_location=location)
             case [Literal(value=int(int_value))]:
                 value = BigUIntConstant(value=int_value, source_location=location)
-            case [ExpressionBuilder() as eb]:
+            case [NodeBuilder() as eb]:
                 value = uint64_to_biguint(eb, location)
             case _:
                 logger.error("Invalid/unhandled arguments", location=location)
@@ -76,7 +76,7 @@ class BigUIntExpressionBuilder(ValueExpressionBuilder):
         super().__init__(pytypes.BigUIntType, expr)
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "bytes":
                 return BytesExpressionBuilder(

@@ -8,7 +8,7 @@ import mypy.nodes
 from puya import log
 from puya.awst.nodes import Expression, IntrinsicCall, Literal, MethodConstant
 from puya.awst_build.constants import ARC4_SIGNATURE_ALIAS
-from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBuilder
+from puya.awst_build.eb.base import IntermediateExpressionBuilder, NodeBuilder
 from puya.awst_build.eb.bytes import BytesExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.intrinsic_models import FunctionOpMapping, PropertyOpMapping
@@ -28,12 +28,12 @@ logger = log.get_logger(__name__)
 class Arc4SignatureBuilder(IntermediateExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case [Literal(value=str(str_value))]:
                 pass
@@ -53,7 +53,7 @@ class _Namespace(IntermediateExpressionBuilder, abc.ABC):
         self.type_info = type_info
         super().__init__(location)
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         sym_entry = self.type_info.get(name)
         if sym_entry is None or sym_entry.node is None:
             raise InternalError(
@@ -64,7 +64,7 @@ class _Namespace(IntermediateExpressionBuilder, abc.ABC):
     @abc.abstractmethod
     def _member_access(
         self, name: str, node: mypy.nodes.SymbolNode, location: SourceLocation
-    ) -> ExpressionBuilder | Literal: ...
+    ) -> NodeBuilder | Literal: ...
 
 
 class IntrinsicEnumClassExpressionBuilder(_Namespace):
@@ -99,7 +99,7 @@ class IntrinsicNamespaceClassExpressionBuilder(_Namespace):
     @typing.override
     def _member_access(
         self, name: str, node: mypy.nodes.SymbolNode, location: SourceLocation
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         mapping = self._data.get(name)
         fullname = ".".join((self.type_info.fullname, name))
         if mapping is None:
@@ -147,14 +147,14 @@ class IntrinsicFunctionExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         resolved_args: list[Expression | Literal] = [
-            a.rvalue() if isinstance(a, ExpressionBuilder) else a for a in args
+            a.rvalue() if isinstance(a, NodeBuilder) else a for a in args
         ]
         arg_mapping = _get_arg_mapping_funcdef(self.func_def, resolved_args, location, arg_names)
         intrinsic_expr = _map_call(

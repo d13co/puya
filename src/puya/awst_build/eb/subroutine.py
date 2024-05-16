@@ -16,8 +16,8 @@ from puya.awst.nodes import (
 from puya.awst_build import pytypes
 from puya.awst_build.context import ASTConversionModuleContext
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     FunctionBuilder,
+    NodeBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.utils import require_instance_builder
@@ -43,12 +43,12 @@ class SubroutineInvokerExpressionBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         call_args = list[CallArg]()
         for arg, arg_name, arg_kind in zip(args, arg_names, arg_kinds, strict=True):
             if arg_kind.is_star():
@@ -75,12 +75,12 @@ class SubroutineInvokerExpressionBuilder(FunctionBuilder):
 class BaseClassSubroutineInvokerExpressionBuilder(SubroutineInvokerExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         from puya.awst_build.eb.contracts import ContractSelfExpressionBuilder
 
         if not args and isinstance(args[0], ContractSelfExpressionBuilder):

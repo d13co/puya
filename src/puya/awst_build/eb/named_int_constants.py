@@ -1,7 +1,7 @@
 import enum
 
 from puya.awst.nodes import UInt64Constant
-from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
+from puya.awst_build.eb.base import NodeBuilder, TypeBuilder
 from puya.awst_build.eb.uint64 import UInt64ExpressionBuilder
 from puya.errors import CodeError
 from puya.parse import SourceLocation
@@ -13,7 +13,7 @@ class NamedIntegerConstsTypeBuilder(TypeBuilder):
         self.enum_name = enum_name
         self.data = data
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder:
         try:
             int_enum = self.data[name]
         except KeyError as ex:

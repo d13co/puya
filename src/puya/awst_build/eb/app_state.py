@@ -21,9 +21,9 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import constants, pytypes
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     GenericClassExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
     StateProxyDefinitionBuilder,
     StateProxyMemberBuilder,
     TypeBuilder,
@@ -50,8 +50,8 @@ class AppStateClassExpressionBuilder(GenericClassExpressionBuilder):
         self._storage: wtypes.WType | None = None
 
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    ) -> NodeBuilder:
         if self._storage is not None:
             raise InternalError("Multiple indexing of GlobalState?", location)
         match indexes:
@@ -67,12 +67,12 @@ class AppStateClassExpressionBuilder(GenericClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         type_or_value_arg_name = "type_or_initial_value"
         arg_mapping = get_arg_mapping(
             positional_arg_names=[type_or_value_arg_name],
@@ -95,7 +95,7 @@ class AppStateClassExpressionBuilder(GenericClassExpressionBuilder):
             case TypeBuilder() as typ_class_eb:
                 storage_wtype = typ_class_eb.produces()
                 initial_value = None
-            case ExpressionBuilder(value_type=wtypes.WType() as storage_wtype) as value_eb:
+            case NodeBuilder(value_type=wtypes.WType() as storage_wtype) as value_eb:
                 initial_value = value_eb.rvalue()
             case Literal(value=bool(bool_value), source_location=source_location):
                 initial_value = BoolConstant(value=bool_value, source_location=source_location)
@@ -157,7 +157,7 @@ class AppStateExpressionBuilder(StateProxyMemberBuilder):
         self.state_decl = state_decl
         super().__init__(location)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         exists_expr = StateExists(field=self._build_field(location), source_location=location)
         if negate:
             expr: Expression = Not(location, exists_expr)
@@ -165,7 +165,7 @@ class AppStateExpressionBuilder(StateProxyMemberBuilder):
             expr = exists_expr
         return BoolExpressionBuilder(expr)
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         field = self._build_field(self.source_location)
         match name:
             case "value":
@@ -193,12 +193,12 @@ class AppStateMaybeExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if args:
             raise CodeError("Unexpected/unhandled arguments", location)
         expr = StateGetEx(field=self.field, source_location=location)
@@ -212,12 +212,12 @@ class AppStateGetExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if len(args) != 1:
             raise CodeError(f"Expected 1 argument, got {len(args)}", location)
         (default_arg,) = args

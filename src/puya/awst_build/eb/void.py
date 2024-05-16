@@ -7,8 +7,8 @@ from puya.awst.nodes import Literal
 from puya.awst_build import pytypes
 from puya.awst_build.eb._utils import bool_eval_to_constant
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -23,12 +23,12 @@ class VoidTypeExpressionBuilder(TypeBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         # shouldn't even be able to get here really
         raise CodeError("None is not usable as a value", location)
 

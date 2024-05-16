@@ -27,7 +27,7 @@ from puya.awst_build.eb import (
     unsigned_builtins,
     void,
 )
-from puya.awst_build.eb.base import ExpressionBuilder
+from puya.awst_build.eb.base import NodeBuilder
 from puya.awst_build.eb.reference_types import account, application, asset
 from puya.errors import InternalError
 from puya.parse import SourceLocation
@@ -37,8 +37,8 @@ __all__ = [
     "var_expression",
 ]
 
-ExpressionBuilderFromSourceFactory = Callable[[SourceLocation], ExpressionBuilder]
-ExpressionBuilderFromExpressionFactory = Callable[[Expression], ExpressionBuilder]
+ExpressionBuilderFromSourceFactory = Callable[[SourceLocation], NodeBuilder]
+ExpressionBuilderFromExpressionFactory = Callable[[Expression], NodeBuilder]
 CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
     "builtins.None": void.VoidTypeExpressionBuilder,
     "builtins.bool": bool_.BoolClassExpressionBuilder,
@@ -152,7 +152,7 @@ WTYPE_TO_BUILDER: dict[
 }
 
 
-def get_type_builder(python_type: str, source_location: SourceLocation) -> ExpressionBuilder:
+def get_type_builder(python_type: str, source_location: SourceLocation) -> NodeBuilder:
     try:
         type_class = CLS_NAME_TO_BUILDER[python_type]
     except KeyError as ex:
@@ -161,7 +161,7 @@ def get_type_builder(python_type: str, source_location: SourceLocation) -> Expre
         return type_class(source_location)
 
 
-def var_expression(expr: Expression) -> ExpressionBuilder:
+def var_expression(expr: Expression) -> NodeBuilder:
     try:
         builder = WTYPE_TO_BUILDER[expr.wtype]
     except KeyError:

@@ -13,8 +13,8 @@ from puya.awst.nodes import (
     UInt64Constant,
 )
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.void import VoidExpressionBuilder
@@ -33,12 +33,12 @@ if typing.TYPE_CHECKING:
 class EnsureBudgetBuilder(IntermediateExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         required_budget_arg_name = "required_budget"
         fee_source_arg_name = "fee_source"
         arg_mapping = get_arg_mapping(
@@ -92,7 +92,7 @@ class OpUpFeeSourceClassBuilder(TypeBuilder):
     def produces(self) -> wtypes.WType:
         return wtypes.uint64_wtype
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "GroupCredit":
                 return Literal(value=0, source_location=location)

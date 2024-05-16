@@ -37,9 +37,9 @@ from puya.awst_build.eb.arc4._utils import (
 from puya.awst_build.eb.arc4.base import ARC4FromLogBuilder
 from puya.awst_build.eb.base import (
     CallableBuilder,
-    ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.subroutine import BaseClassSubroutineInvokerExpressionBuilder
@@ -81,7 +81,7 @@ _APP_TRANSACTION_FIELDS = {
 
 @attrs.frozen
 class _ABICallExpr:
-    method: ExpressionBuilder | Literal
+    method: NodeBuilder | Literal
     abi_args: Sequence[InstanceBuilder | Literal]
     transaction_kwargs: dict[str, InstanceBuilder | Literal]
     abi_arg_typs: Sequence[pytypes.PyType]
@@ -91,12 +91,12 @@ class ABICallFuncBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         return _abi_call(args, arg_typs, arg_kinds, arg_names, location, return_type=None)
 
 
@@ -116,12 +116,12 @@ class ABICallInstanceBuilder(InstanceBuilder[pytypes.ABICallWithReturnType], Cal
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         return _abi_call(
             args=args,
             arg_typs=arg_typs,
@@ -133,14 +133,14 @@ class ABICallInstanceBuilder(InstanceBuilder[pytypes.ABICallWithReturnType], Cal
 
 
 def _abi_call(
-    args: Sequence[ExpressionBuilder | Literal],
+    args: Sequence[NodeBuilder | Literal],
     arg_typs: Sequence[pytypes.PyType],
     arg_kinds: list[mypy.nodes.ArgKind],
     arg_names: list[str | None],
     location: SourceLocation,
     *,
     return_type: pytypes.PyType | None,
-) -> ExpressionBuilder:
+) -> NodeBuilder:
     abi_call_expr = _extract_abi_call_args(args, arg_typs, arg_kinds, arg_names, location)
     method = abi_call_expr.method
 
@@ -326,13 +326,13 @@ def _combine_locs(exprs: Sequence[Expression]) -> SourceLocation:
 
 
 def _extract_abi_call_args(
-    args: Sequence[ExpressionBuilder | Literal],
+    args: Sequence[NodeBuilder | Literal],
     arg_typs: Sequence[pytypes.PyType],
     arg_kinds: list[mypy.nodes.ArgKind],
     arg_names: list[str | None],
     location: SourceLocation,
 ) -> _ABICallExpr:
-    method: ExpressionBuilder | Literal | None = None
+    method: NodeBuilder | Literal | None = None
     abi_args = list[InstanceBuilder | Literal]()
     kwargs = dict[str, InstanceBuilder | Literal]()
     abi_arg_typs = []
@@ -371,7 +371,7 @@ class ARC4ClientClassExpressionBuilder(TypeBuilder):
         self.context = context
         self.type_info = type_info
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         return ARC4ClientMethodExpressionBuilder(self.context, self.type_info, name, location)
 
 
@@ -390,12 +390,12 @@ class ARC4ClientMethodExpressionBuilder(FunctionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         raise CodeError(
             f"Can't invoke client methods directly, use {constants.CLS_ARC4_ABI_CALL}", location
         )

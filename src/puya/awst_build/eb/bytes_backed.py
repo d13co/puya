@@ -6,9 +6,9 @@ import mypy.nodes
 from puya.awst.nodes import BytesConstant, BytesEncoding, Expression, Literal, ReinterpretCast
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
@@ -30,12 +30,12 @@ class FromBytesBuilder(FunctionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case [Literal(value=bytes(bytes_val), source_location=literal_loc)]:
                 arg: Expression = BytesConstant(
@@ -51,7 +51,7 @@ class FromBytesBuilder(FunctionBuilder):
 
 
 class BytesBackedClassExpressionBuilder(TypeBuilder, abc.ABC):
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder:
         match name:
             case "from_bytes":
                 return FromBytesBuilder(self.pytype, location)

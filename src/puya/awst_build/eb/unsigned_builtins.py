@@ -16,10 +16,10 @@ from puya.awst.nodes import (
     UInt64Constant,
 )
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
     Iteration,
+    NodeBuilder,
     TypeBuilder,
 )
 from puya.awst_build.utils import expect_operand_wtype, require_instance_builder
@@ -40,12 +40,12 @@ class UnsignedRangeBuilder(TypeBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         uint64_args = [expect_operand_wtype(in_arg, wtypes.uint64_wtype) for in_arg in args]
         match uint64_args:
             case [range_start, range_stop, range_step]:
@@ -87,12 +87,12 @@ class UnsignedEnumerateBuilder(TypeBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if not args:
             raise CodeError("insufficient arguments", location)
         try:
@@ -124,12 +124,12 @@ class ReversedFunctionExpressionBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if not args:
             raise CodeError("insufficient arguments", location)
         try:

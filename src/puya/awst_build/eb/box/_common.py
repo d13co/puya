@@ -10,8 +10,8 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
 )
 from puya.awst_build.eb.tuple import TupleExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
@@ -31,12 +31,12 @@ class BoxKeyExpressionIntermediateExpressionBuilder(IntermediateExpressionBuilde
 class BoxGetExpressionBuilder(BoxKeyExpressionIntermediateExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if len(args) != 1:
             raise CodeError(f"Expected 1 argument, got {len(args)}", location)
         (default_arg,) = args
@@ -50,12 +50,12 @@ class BoxGetExpressionBuilder(BoxKeyExpressionIntermediateExpressionBuilder):
 class BoxMaybeExpressionBuilder(BoxKeyExpressionIntermediateExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if args:
             raise CodeError("Invalid/unexpected args", location)
 

@@ -17,8 +17,8 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     FunctionBuilder,
+    NodeBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.reference_types.base import UInt64BackedReferenceValueExpressionBuilder
@@ -39,18 +39,18 @@ class AssetClassExpressionBuilder(TypeBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 uint64_expr: Expression = UInt64Constant(value=0, source_location=location)
             case [Literal(value=int(int_value))]:
                 uint64_expr = UInt64Constant(value=int_value, source_location=location)
-            case [ExpressionBuilder() as eb]:
+            case [NodeBuilder() as eb]:
                 uint64_expr = expect_operand_wtype(eb, wtypes.uint64_wtype)
             case _:
                 logger.error("Invalid/unhandled arguments", location=location)
@@ -96,14 +96,14 @@ class AssetHoldingExpressionBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
-            case [ExpressionBuilder() as eb]:
+            case [NodeBuilder() as eb]:
                 account_expr = expect_operand_wtype(eb, wtypes.account_wtype)
 
                 asset_params_get = IntrinsicCall(
@@ -145,7 +145,7 @@ class AssetExpressionBuilder(UInt64BackedReferenceValueExpressionBuilder):
         super().__init__(pytypes.AssetType, expr)
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         if data := ASSET_HOLDING_FIELD_MAPPING.get(name):
             return AssetHoldingExpressionBuilder(
                 self.expr, location, name=name, immediate=data[0], result_type=data[1]

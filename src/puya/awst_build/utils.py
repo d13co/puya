@@ -31,7 +31,7 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import constants, intrinsic_factory
 from puya.awst_build.context import ASTConversionModuleContext
-from puya.awst_build.eb.base import ExpressionBuilder, InstanceBuilder, TypeBuilder
+from puya.awst_build.eb.base import InstanceBuilder, NodeBuilder, TypeBuilder
 from puya.errors import CodeError, InternalError
 from puya.parse import SourceLocation
 
@@ -154,10 +154,10 @@ def fold_binary_expr(
 
 
 def require_expression_builder(
-    builder_or_literal: ExpressionBuilder | Literal,
+    builder_or_literal: NodeBuilder | Literal,
     *,
     msg: str = "A Python literal is not valid at this location",
-) -> ExpressionBuilder:
+) -> NodeBuilder:
     from puya.awst_build.eb.bool import BoolExpressionBuilder
 
     match builder_or_literal:
@@ -168,14 +168,14 @@ def require_expression_builder(
             )
         case Literal(source_location=literal_location):
             raise CodeError(msg, literal_location)
-        case ExpressionBuilder() as builder:
+        case NodeBuilder() as builder:
             return builder
         case _:
             typing.assert_never(builder_or_literal)
 
 
 def require_instance_builder(
-    builder_or_literal: ExpressionBuilder | Literal,
+    builder_or_literal: NodeBuilder | Literal,
     *,
     msg: str = "A Python literal is not valid at this location",
 ) -> InstanceBuilder:
@@ -183,14 +183,14 @@ def require_instance_builder(
     return expect_instance_builder(eb)
 
 
-def expect_instance_builder(eb: ExpressionBuilder) -> InstanceBuilder:
+def expect_instance_builder(eb: NodeBuilder) -> InstanceBuilder:
     if not isinstance(eb, InstanceBuilder):
         raise CodeError("expression is not a value", eb.source_location)
     return eb
 
 
 def expect_instance_builder_or_literal(
-    eb_or_literal: ExpressionBuilder | Literal,
+    eb_or_literal: NodeBuilder | Literal,
 ) -> InstanceBuilder | Literal:
     if not isinstance(eb_or_literal, InstanceBuilder | Literal):
         raise CodeError("expression is not a value", eb_or_literal.source_location)
@@ -198,7 +198,7 @@ def expect_instance_builder_or_literal(
 
 
 def require_type_class_eb(
-    builder_or_literal: ExpressionBuilder | Literal,
+    builder_or_literal: NodeBuilder | Literal,
     *,
     msg: str = "A Python type is required at this location",
 ) -> TypeBuilder:
@@ -210,9 +210,9 @@ def require_type_class_eb(
 
 
 def expect_operand_wtype(
-    literal_or_expr: Literal | Expression | ExpressionBuilder, target_wtype: wtypes.WType
+    literal_or_expr: Literal | Expression | NodeBuilder, target_wtype: wtypes.WType
 ) -> Expression:
-    if isinstance(literal_or_expr, ExpressionBuilder):
+    if isinstance(literal_or_expr, NodeBuilder):
         literal_or_expr = expect_instance_builder(literal_or_expr).rvalue()
 
     if isinstance(literal_or_expr, Expression):
@@ -233,14 +233,12 @@ def convert_literal(
 
 
 @typing.overload
-def convert_literal(
-    literal_or_expr: ExpressionBuilder, target_wtype: wtypes.WType
-) -> ExpressionBuilder: ...
+def convert_literal(literal_or_expr: NodeBuilder, target_wtype: wtypes.WType) -> NodeBuilder: ...
 
 
 def convert_literal(
-    literal_or_expr: Literal | Expression | ExpressionBuilder, target_wtype: wtypes.WType
-) -> Expression | ExpressionBuilder:
+    literal_or_expr: Literal | Expression | NodeBuilder, target_wtype: wtypes.WType
+) -> Expression | NodeBuilder:
     if not isinstance(literal_or_expr, Literal):
         return literal_or_expr
 
@@ -279,21 +277,21 @@ def convert_literal(
 
 
 def convert_literal_to_expr(
-    literal_or_expr: Literal | Expression | ExpressionBuilder, target_wtype: wtypes.WType
+    literal_or_expr: Literal | Expression | NodeBuilder, target_wtype: wtypes.WType
 ) -> Expression:
     expr_or_builder = convert_literal(literal_or_expr, target_wtype)
-    if isinstance(expr_or_builder, ExpressionBuilder):
+    if isinstance(expr_or_builder, NodeBuilder):
         # TODO: move away from rvalue/lvaue in utility functions
         return expect_instance_builder(expr_or_builder).rvalue()
     return expr_or_builder
 
 
 def bool_eval(
-    builder_or_literal: ExpressionBuilder | Literal, loc: SourceLocation, *, negate: bool = False
+    builder_or_literal: NodeBuilder | Literal, loc: SourceLocation, *, negate: bool = False
 ) -> InstanceBuilder:
     from puya.awst_build.eb.bool import BoolExpressionBuilder
 
-    if isinstance(builder_or_literal, ExpressionBuilder):
+    if isinstance(builder_or_literal, NodeBuilder):
         return expect_instance_builder(builder_or_literal).bool_eval(location=loc, negate=negate)
     constant_value = bool(builder_or_literal.value)
     if negate:
@@ -371,12 +369,12 @@ def snake_case(s: str) -> str:
 
 
 def eval_slice_component(
-    len_expr: Expression, val: ExpressionBuilder | Literal | None, location: SourceLocation
+    len_expr: Expression, val: NodeBuilder | Literal | None, location: SourceLocation
 ) -> Expression | None:
     if val is None:
         return None
 
-    if isinstance(val, ExpressionBuilder):
+    if isinstance(val, NodeBuilder):
         # no negatives to deal with here, easy
         index_expr = expect_operand_wtype(val, wtypes.uint64_wtype)
         temp_index = SingleEvaluation(index_expr)

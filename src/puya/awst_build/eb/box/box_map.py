@@ -17,9 +17,9 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import constants, pytypes
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     GenericClassExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -52,7 +52,7 @@ class BoxMapClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
         self.wtype: wtypes.WBoxMapProxy | None = None
 
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
     ) -> TypeBuilder:
         match indexes:
             case [
@@ -70,12 +70,12 @@ class BoxMapClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         arg_map = get_arg_mapping(
             positional_arg_names=(
                 "key_type",
@@ -111,7 +111,7 @@ class BoxMapClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
 
 
 def _box_key_expr(
-    box_map_proxy: Expression, key: ExpressionBuilder | Literal, location: SourceLocation
+    box_map_proxy: Expression, key: NodeBuilder | Literal, location: SourceLocation
 ) -> BoxKeyExpression:
     if not isinstance(box_map_proxy.wtype, wtypes.WBoxMapProxy):
         raise InternalError(f"box_map_proxy must be wtype of {wtypes.WBoxMapProxy}", location)
@@ -121,7 +121,7 @@ def _box_key_expr(
 
 
 def _box_value_expr(
-    box_map_proxy: Expression, key: ExpressionBuilder | Literal, location: SourceLocation
+    box_map_proxy: Expression, key: NodeBuilder | Literal, location: SourceLocation
 ) -> BoxValueExpression:
     if not isinstance(box_map_proxy.wtype, wtypes.WBoxMapProxy):
         raise InternalError(f"box_map_proxy must be wtype of {wtypes.WBoxMapProxy}", location)
@@ -149,15 +149,13 @@ class BoxMapProxyExpressionBuilder(ValueExpressionBuilder):
         self.wtype = expr.wtype
         super().__init__(expr)
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         return BoxValueExpressionBuilder(
             box_value=_box_value_expr(self.expr, index, location),
             box_key=_box_key_expr(self.expr, index, location),
         )
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "length":
                 return BoxMapLengthMethodExpressionBuilder(location, box_map_expr=self.expr)
@@ -168,9 +166,7 @@ class BoxMapProxyExpressionBuilder(ValueExpressionBuilder):
             case _:
                 return super().member_access(name, location)
 
-    def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def contains(self, item: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         box_exists = StateExists(
             field=_box_key_expr(self.expr, item, location),
             source_location=location,
@@ -192,12 +188,12 @@ class BoxMapMethodExpressionBuilder(IntermediateExpressionBuilder):
 class BoxMapLengthMethodExpressionBuilder(BoxMapMethodExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         args_map = get_arg_mapping(("key",), zip(arg_names, args, strict=True), location)
         item_key = args_map.pop("key")
         if args_map:
@@ -213,12 +209,12 @@ class BoxMapLengthMethodExpressionBuilder(BoxMapMethodExpressionBuilder):
 class BoxMapGetMethodExpressionBuilder(BoxMapMethodExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         args_map = get_arg_mapping(("key", "default"), zip(arg_names, args, strict=True), location)
         item_key = args_map.pop("key")
         default_value = expect_operand_wtype(args_map.pop("default"), self.box_wtype.content_wtype)
@@ -237,12 +233,12 @@ class BoxMapGetMethodExpressionBuilder(BoxMapMethodExpressionBuilder):
 class BoxMapMaybeMethodExpressionBuilder(BoxMapMethodExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         args_map = get_arg_mapping(("key",), zip(arg_names, args, strict=True), location)
         item_key = args_map.pop("key")
         if args_map:

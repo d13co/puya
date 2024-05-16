@@ -11,7 +11,7 @@ from puya.awst_build.eb.bytes import BytesExpressionBuilder
 from puya.awst_build.utils import expect_operand_wtype
 
 if typing.TYPE_CHECKING:
-    from puya.awst_build.eb.base import ExpressionBuilder, InstanceBuilder
+    from puya.awst_build.eb.base import InstanceBuilder, NodeBuilder
     from puya.parse import SourceLocation
 
 logger = log.get_logger(__name__)
@@ -28,7 +28,7 @@ def bool_eval_to_constant(
 
 
 def uint64_to_biguint(
-    arg_in: ExpressionBuilder | Expression | Literal, location: SourceLocation
+    arg_in: NodeBuilder | Expression | Literal, location: SourceLocation
 ) -> Expression:
     arg = expect_operand_wtype(arg_in, wtypes.uint64_wtype)
 

@@ -15,8 +15,8 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import constants, pytypes
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -43,12 +43,12 @@ class BoxRefClassExpressionBuilder(TypeBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         arg_map = get_arg_mapping(
             positional_arg_names=(),
             args=zip(arg_names, args, strict=True),
@@ -83,7 +83,7 @@ class BoxRefProxyExpressionBuilder(ValueExpressionBuilder):
             source_location=location,
         )
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         box_exists = StateExists(
             field=self._box_key_expr(location),
             source_location=location,
@@ -92,7 +92,7 @@ class BoxRefProxyExpressionBuilder(ValueExpressionBuilder):
             Not(expr=box_exists, source_location=location) if negate else box_exists
         )
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "create":
                 return BoxRefCreateExpressionBuilder(location, box_proxy=self.expr)
@@ -169,12 +169,12 @@ class BoxRefIntrinsicMethodExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         args_map = get_arg_mapping(self.args, zip(arg_names, args, strict=True), location)
         try:
             stack_args = [
@@ -202,12 +202,12 @@ class BoxRefCreateExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         try:
             (arg,) = args
         except ValueError:
@@ -230,12 +230,12 @@ class BoxRefPutExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         try:
             (arg,) = args
         except ValueError:

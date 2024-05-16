@@ -42,10 +42,10 @@ from puya.awst_build.eb.arc4.base import (
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
-    ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
     Iteration,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -81,14 +81,12 @@ class DynamicArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
             )
         return self.wtype
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         return self.index_multiple([index], location)
 
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    ) -> NodeBuilder:
         match indexes:
             case [TypeBuilder() as eb]:
                 element_wtype = eb.produces()
@@ -99,12 +97,12 @@ class DynamicArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         non_literal_args = [
             require_expression_builder(a, msg="Array arguments must be non literals").rvalue()
             for a in args
@@ -144,14 +142,12 @@ class StaticArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
             )
         return self.wtype
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         return self.index_multiple([index], location)
 
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    ) -> NodeBuilder:
         match indexes:
             case [TypeBuilder() as item_type, array_size]:
                 array_size_ = get_integer_literal_value(array_size, "Array size")
@@ -169,12 +165,12 @@ class StaticArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         non_literal_args = [
             require_expression_builder(a, msg="Array arguments must be non literals").rvalue()
             for a in args
@@ -216,12 +212,12 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 const_op = intrinsic_factory.zero_address(location, as_type=self.wtype)
@@ -263,8 +259,8 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
         )
 
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    ) -> NodeBuilder:
         raise CodeError(
             "Address does not support type arguments",
             location,
@@ -287,9 +283,7 @@ class ARC4ArrayExpressionBuilder(ValueExpressionBuilder[pytypes.ArrayType], ABC)
         return self.rvalue()
 
     @typing.override
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         if isinstance(index, Literal) and isinstance(index.value, int) and index.value < 0:
             index_expr: Expression = UInt64BinaryOperation(
                 left=expect_operand_wtype(
@@ -313,7 +307,7 @@ class ARC4ArrayExpressionBuilder(ValueExpressionBuilder[pytypes.ArrayType], ABC)
         )
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "bytes":
                 return get_bytes_expr_builder(self.expr)
@@ -325,13 +319,13 @@ class ARC4ArrayExpressionBuilder(ValueExpressionBuilder[pytypes.ArrayType], ABC)
     @typing.override
     def compare(
         self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         return arc4_compare_bytes(self, op, other, location)
 
 
 class DynamicArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "length":
                 return UInt64ExpressionBuilder(
@@ -431,12 +425,12 @@ class AppendExpressionBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
 
         args_expr = [expect_arc4_operand_wtype(a, self.wtype.element_type) for a in args]
         args_tuple = TupleExpression.from_items(args_expr, location)
@@ -463,12 +457,12 @@ class PopExpressionBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 return var_expression(
@@ -493,12 +487,12 @@ class ExtendExpressionBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         other = match_array_concat_arg(
             args,
             self.wtype.element_type,
@@ -517,14 +511,14 @@ class ExtendExpressionBuilder(FunctionBuilder):
 
 
 def match_array_concat_arg(
-    args: Sequence[ExpressionBuilder | Literal],
+    args: Sequence[NodeBuilder | Literal],
     element_type: wtypes.WType,
     *,
     source_location: SourceLocation,
     msg: str,
 ) -> Expression:
     match args:
-        case (ExpressionBuilder() as eb,):
+        case (NodeBuilder() as eb,):
             expr = eb.rvalue()
             match expr:
                 case Expression(wtype=wtypes.ARC4Array() as array_wtype) as array_ex:
@@ -542,7 +536,7 @@ class StaticArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
         self.wtype: wtypes.ARC4StaticArray = expr.wtype
         super().__init__(expr)
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "length":
                 return UInt64ExpressionBuilder(
@@ -551,7 +545,7 @@ class StaticArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
             case _:
                 return super().member_access(name, location)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         if self.wtype.alias != "address":
             return bool_eval_to_constant(
                 value=self.wtype.array_size > 0, location=location, negate=negate
@@ -567,14 +561,14 @@ class StaticArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
             return BoolExpressionBuilder(cmp_with_zero_expr)
 
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: NodeBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> NodeBuilder:
         if self.wtype.alias != "address":
             return super().compare(other, op=op, location=location)
         match other:
             case Literal(value=str(str_value), source_location=literal_loc):
                 rhs = get_bytes_expr(AddressConstant(value=str_value, source_location=literal_loc))
-            case ExpressionBuilder(value_type=wtypes.account_wtype):
+            case NodeBuilder(value_type=wtypes.account_wtype):
                 rhs = get_bytes_expr(other.rvalue())
             case _:
                 return super().compare(other, op=op, location=location)
@@ -588,7 +582,7 @@ class StaticArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
 
 
 class AddressExpressionBuilder(StaticArrayExpressionBuilder):
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "native":
                 return AccountExpressionBuilder(

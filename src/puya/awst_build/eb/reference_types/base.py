@@ -17,8 +17,8 @@ from puya.awst.nodes import (
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
-    ExpressionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -39,7 +39,7 @@ class ReferenceValueExpressionBuilder(ValueExpressionBuilder, abc.ABC):
     field_bool_comment: str
 
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         if name == self.native_access_member:
             native_cast = ReinterpretCast(
                 source_location=location, wtype=self.native_type.wtype, expr=self.expr

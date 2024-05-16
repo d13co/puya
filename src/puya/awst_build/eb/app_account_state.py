@@ -20,9 +20,9 @@ from puya.awst.nodes import (
 from puya.awst_build import constants, pytypes
 from puya.awst_build.contract_data import AppStorageDeclaration
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     GenericClassExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
     StateProxyDefinitionBuilder,
     StateProxyMemberBuilder,
     TypeBuilder,
@@ -42,21 +42,17 @@ class AppAccountStateExpressionBuilder(StateProxyMemberBuilder):
         super().__init__(location)
         self.state_decl = state_decl
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         expr = _build_field(self.state_decl, index, location)
         return AppAccountStateForAccountExpressionBuilder(expr)
 
-    def contains(
-        self, item: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def contains(self, item: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         exists_expr = StateExists(
             field=_build_field(self.state_decl, item, location), source_location=location
         )
         return BoolExpressionBuilder(exists_expr)
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "get":
                 return AppAccountStateGetMethodBuilder(self.state_decl, location)
@@ -72,12 +68,12 @@ class AppAccountStateGetMethodBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if len(args) != 2:
             raise CodeError(f"Expected 2 arguments, got {len(args)}", location)
         if arg_names[0] == "default":
@@ -103,12 +99,12 @@ class AppAccountStateMaybeMethodBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case [item]:
                 field = _build_field(self.state_decl, item, location)
@@ -134,8 +130,8 @@ class AppAccountStateClassExpressionBuilder(GenericClassExpressionBuilder):
         self._storage: wtypes.WType | None = None
 
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    ) -> NodeBuilder:
         if self._storage is not None:
             raise InternalError("Multiple indexing of Local?", location)
         match indexes:
@@ -151,12 +147,12 @@ class AppAccountStateClassExpressionBuilder(GenericClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         type_arg_name = "type_"
         arg_mapping = get_arg_mapping(
             positional_arg_names=[type_arg_name],
@@ -227,7 +223,7 @@ class AppAccountStateProxyDefinitionBuilder(StateProxyDefinitionBuilder):
 
 
 def _build_field(
-    state_decl: AppStorageDeclaration, index: ExpressionBuilder | Literal, location: SourceLocation
+    state_decl: AppStorageDeclaration, index: NodeBuilder | Literal, location: SourceLocation
 ) -> AppAccountStateExpression:
     index_expr = convert_literal_to_expr(index, wtypes.uint64_wtype)
     match index_expr:

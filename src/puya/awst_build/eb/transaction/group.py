@@ -17,8 +17,8 @@ from puya.awst.nodes import (
     UInt64Constant,
 )
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
     TypeBuilder,
 )
 from puya.awst_build.eb.transaction.base import (
@@ -52,7 +52,7 @@ class GroupTransactionExpressionBuilder(BaseTransactionExpressionBuilder):
             stack_args=[self.expr],
         )
 
-    def get_array_member(self, field: TxnField, location: SourceLocation) -> ExpressionBuilder:
+    def get_array_member(self, field: TxnField, location: SourceLocation) -> NodeBuilder:
         return GroupTransactionArrayExpressionBuilder(self.expr, field, location)
 
 
@@ -69,12 +69,12 @@ class GroupTransactionArrayExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if len(args) != 1:
             raise CodeError(f"Expected 1 argument, got {len(args)}", location)
         (arg,) = args
@@ -134,14 +134,14 @@ class GroupTransactionClassExpressionBuilder(TypeBuilder, abc.ABC):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
-            case [ExpressionBuilder() as eb]:
+            case [NodeBuilder() as eb]:
                 group_index = expect_operand_wtype(eb, wtypes.uint64_wtype)
             case [Literal(value=int(int_value), source_location=loc)]:
                 group_index = UInt64Constant(value=int_value, source_location=loc)

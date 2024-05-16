@@ -16,8 +16,8 @@ from puya.awst_build.eb.arc4._utils import (
     get_arc4_args_and_signature,
 )
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
 )
 from puya.awst_build.eb.void import VoidExpressionBuilder
 from puya.errors import CodeError
@@ -33,16 +33,14 @@ if TYPE_CHECKING:
 class EmitBuilder(IntermediateExpressionBuilder):
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
-            case [
-                ExpressionBuilder(value_type=wtypes.ARC4Struct() as struct_type) as event_arg_eb
-            ]:
+            case [NodeBuilder(value_type=wtypes.ARC4Struct() as struct_type) as event_arg_eb]:
                 event_name = struct_type.stub_name.split(".")[-1]
                 event_arg = event_arg_eb.rvalue()
             case [Literal(value=str(event_str)), *event_args]:

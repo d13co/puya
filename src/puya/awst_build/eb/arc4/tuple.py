@@ -12,7 +12,7 @@ from puya.awst.nodes import (
 )
 from puya.awst_build.eb._utils import bool_eval_to_constant
 from puya.awst_build.eb.arc4.base import ARC4ClassExpressionBuilder, ARC4EncodedExpressionBuilder
-from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
+from puya.awst_build.eb.base import NodeBuilder, TypeBuilder
 from puya.awst_build.eb.var_factory import var_expression
 from puya.errors import CodeError
 
@@ -39,14 +39,12 @@ class ARC4TupleClassExpressionBuilder(ARC4ClassExpressionBuilder):
             )
         return self.wtype
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         return self.index_multiple((index,), location)
 
     def index_multiple(
         self,
-        indexes: Sequence[ExpressionBuilder | Literal],
+        indexes: Sequence[NodeBuilder | Literal],
         location: SourceLocation,
     ) -> TypeBuilder:
         tuple_item_types = list[wtypes.ARC4Type]()
@@ -66,15 +64,15 @@ class ARC4TupleClassExpressionBuilder(ARC4ClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         wtype = self.wtype
         match args:
-            case [ExpressionBuilder(value_type=wtypes.WTuple() as tuple_wtype) as eb]:
+            case [NodeBuilder(value_type=wtypes.WTuple() as tuple_wtype) as eb]:
                 tuple_ex = eb.rvalue()
 
                 if wtype is None:
@@ -100,9 +98,7 @@ class ARC4TupleExpressionBuilder(ARC4EncodedExpressionBuilder):
         self.wtype: wtypes.ARC4Tuple = expr.wtype
         super().__init__(expr)
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         index_expr_or_literal = index
         match index_expr_or_literal:
             case Literal(value=int(index_value)) as index_literal:
@@ -123,5 +119,5 @@ class ARC4TupleExpressionBuilder(ARC4EncodedExpressionBuilder):
             case _:
                 raise CodeError("arc4.Tuple can only be indexed by int constants")
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         return bool_eval_to_constant(value=True, location=location, negate=negate)

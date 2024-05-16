@@ -10,7 +10,7 @@ from puya.awst_build.eb.arc4.arrays import (
     DynamicArrayExpressionBuilder,
 )
 from puya.awst_build.eb.arc4.base import native_eb
-from puya.awst_build.eb.base import ExpressionBuilder
+from puya.awst_build.eb.base import NodeBuilder
 from puya.errors import CodeError
 
 if typing.TYPE_CHECKING:
@@ -30,18 +30,18 @@ class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case [Literal(value=bytes()) as literal]:
                 return DynamicBytesExpressionBuilder(
                     convert_arc4_literal(literal, self.wtype, location)
                 )
-            case [ExpressionBuilder(value_type=wtypes.bytes_wtype) as eb]:
+            case [NodeBuilder(value_type=wtypes.bytes_wtype) as eb]:
                 return DynamicBytesExpressionBuilder(
                     ARC4Encode(value=eb.rvalue(), source_location=location, wtype=self.produces())
                 )
@@ -55,13 +55,13 @@ class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
         )
 
 
-def _coerce_to_byte(arg: ExpressionBuilder | Literal) -> ExpressionBuilder:
+def _coerce_to_byte(arg: NodeBuilder | Literal) -> NodeBuilder:
     from puya.awst_build.eb.arc4 import UIntNExpressionBuilder
 
     match arg:
         case Literal(value=int()) as literal:
             return UIntNExpressionBuilder(convert_arc4_literal(literal, wtypes.arc4_byte_type))
-        case ExpressionBuilder(value_type=wtypes.ARC4UIntN(n=8) as wtype) as eb:
+        case NodeBuilder(value_type=wtypes.ARC4UIntN(n=8) as wtype) as eb:
             if wtype != wtypes.arc4_byte_type:
                 return UIntNExpressionBuilder(
                     ReinterpretCast(
@@ -78,7 +78,7 @@ def _coerce_to_byte(arg: ExpressionBuilder | Literal) -> ExpressionBuilder:
 class DynamicBytesExpressionBuilder(DynamicArrayExpressionBuilder):
     wtype = wtypes.arc4_dynamic_bytes
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "native":
                 return native_eb(self.expr, location)

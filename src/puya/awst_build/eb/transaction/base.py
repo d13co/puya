@@ -6,7 +6,7 @@ import typing
 from puya.awst import wtypes
 from puya.awst.nodes import TXN_FIELDS
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
+    NodeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.transaction.fields import get_field_python_name
@@ -25,9 +25,9 @@ class BaseTransactionExpressionBuilder(ValueExpressionBuilder, abc.ABC):
     def get_field_value(self, field: TxnField, location: SourceLocation) -> Expression: ...
 
     @abc.abstractmethod
-    def get_array_member(self, field: TxnField, location: SourceLocation) -> ExpressionBuilder: ...
+    def get_array_member(self, field: TxnField, location: SourceLocation) -> NodeBuilder: ...
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         try:
             field = _PYTHON_MEMBER_FIELD_MAP[name]
         except KeyError:

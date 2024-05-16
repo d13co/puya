@@ -23,9 +23,9 @@ from puya.awst_build import intrinsic_factory, pytypes
 from puya.awst_build.eb._utils import get_bytes_expr, get_bytes_expr_builder
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
-    ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
+    NodeBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -45,7 +45,7 @@ logger = log.get_logger(__name__)
 
 class ARC4ClassExpressionBuilder(BytesBackedClassExpressionBuilder, abc.ABC):
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder:
         match name:
             case "from_log":
                 return ARC4FromLogBuilder(location, self.produces())
@@ -53,7 +53,7 @@ class ARC4ClassExpressionBuilder(BytesBackedClassExpressionBuilder, abc.ABC):
                 return super().member_access(name, location)
 
 
-def get_integer_literal_value(eb_or_literal: ExpressionBuilder | Literal, purpose: str) -> int:
+def get_integer_literal_value(eb_or_literal: NodeBuilder | Literal, purpose: str) -> int:
     match eb_or_literal:
         case Literal(value=int(lit_value)):
             return lit_value
@@ -100,12 +100,12 @@ class ARC4FromLogBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case [InstanceBuilder() as eb]:
                 return var_expression(self.abi_expr_from_log(self.wtype, eb.rvalue(), location))
@@ -121,12 +121,12 @@ class CopyBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         match args:
             case []:
                 return var_expression(
@@ -135,7 +135,7 @@ class CopyBuilder(FunctionBuilder):
         raise CodeError("Invalid/Unexpected arguments", location)
 
 
-def native_eb(expr: Expression, location: SourceLocation) -> ExpressionBuilder:
+def native_eb(expr: Expression, location: SourceLocation) -> NodeBuilder:
     # TODO: could determine EB here instead of using var_expression
     match expr.wtype:
         case wtypes.arc4_string_wtype | wtypes.arc4_dynamic_bytes | wtypes.arc4_bool_wtype:
@@ -155,7 +155,7 @@ def native_eb(expr: Expression, location: SourceLocation) -> ExpressionBuilder:
 
 class ARC4EncodedExpressionBuilder(ValueExpressionBuilder, abc.ABC):
     @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder:
         match name:
             case "native":
                 return native_eb(self.expr, location)

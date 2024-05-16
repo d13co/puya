@@ -18,8 +18,8 @@ from puya.awst.nodes import (
 from puya.awst_build import constants, pytypes
 from puya.awst_build.eb._utils import get_bytes_expr
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     GenericClassExpressionBuilder,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -51,7 +51,7 @@ class BoxClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
         self.wtype: wtypes.WBoxProxy | None = None
 
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
     ) -> TypeBuilder:
         match indexes:
             case [TypeBuilder() as eb]:
@@ -63,12 +63,12 @@ class BoxClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         arg_map = get_arg_mapping(
             positional_arg_names=("_type",),
             args=zip(arg_names, args, strict=True),
@@ -115,7 +115,7 @@ class BoxProxyExpressionBuilder(ValueExpressionBuilder):
             source_location=location,
         )
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "value":
                 return BoxValueExpressionBuilder(
@@ -133,7 +133,7 @@ class BoxProxyExpressionBuilder(ValueExpressionBuilder):
 
         return super().member_access(name, location)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         box_exists = StateExists(
             field=self._box_key_expr(location),
             source_location=location,
@@ -153,7 +153,7 @@ class BoxValueExpressionBuilder(ValueProxyExpressionBuilder):
     def delete(self, location: SourceLocation) -> Statement:
         return StateDelete(field=self.box_key, source_location=location)
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "length":
                 return UInt64ExpressionBuilder(
@@ -166,20 +166,18 @@ class BoxValueExpressionBuilder(ValueProxyExpressionBuilder):
             case _:
                 return super().member_access(name, location)
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         if self.wtype != wtypes.bytes_wtype:
             return super().index(index, location)
         return index_box_bytes(self.box_key, index, location)
 
     def slice_index(
         self,
-        begin_index: ExpressionBuilder | Literal | None,
-        end_index: ExpressionBuilder | Literal | None,
-        stride: ExpressionBuilder | Literal | None,
+        begin_index: NodeBuilder | Literal | None,
+        end_index: NodeBuilder | Literal | None,
+        stride: NodeBuilder | Literal | None,
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if self.wtype != wtypes.bytes_wtype:
             return super().slice_index(begin_index, end_index, stride, location)
 
@@ -193,7 +191,7 @@ class BoxValueBytesExpressionBuilder(ValueProxyExpressionBuilder):
         self.box_key = box_key
         self.box_value = box_value
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         match name:
             case "length":
                 return UInt64ExpressionBuilder(
@@ -202,16 +200,14 @@ class BoxValueBytesExpressionBuilder(ValueProxyExpressionBuilder):
             case _:
                 return super().member_access(name, location)
 
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         return index_box_bytes(self.box_key, index, location)
 
     def slice_index(
         self,
-        begin_index: ExpressionBuilder | Literal | None,
-        end_index: ExpressionBuilder | Literal | None,
-        stride: ExpressionBuilder | Literal | None,
+        begin_index: NodeBuilder | Literal | None,
+        end_index: NodeBuilder | Literal | None,
+        stride: NodeBuilder | Literal | None,
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         return slice_box_bytes(self.box_key, begin_index, end_index, stride, location)

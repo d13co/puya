@@ -16,8 +16,8 @@ from puya.awst.nodes import (
     UpdateInnerTransaction,
 )
 from puya.awst_build.eb.base import (
-    ExpressionBuilder,
     IntermediateExpressionBuilder,
+    NodeBuilder,
     TypeBuilder,
     ValueExpressionBuilder,
 )
@@ -38,7 +38,7 @@ if typing.TYPE_CHECKING:
 _parameter_mapping: typing.Final = {get_field_python_name(f): f for f in INNER_PARAM_TXN_FIELDS}
 
 
-def get_field_expr(arg_name: str, arg: ExpressionBuilder | Literal) -> tuple[TxnField, Expression]:
+def get_field_expr(arg_name: str, arg: NodeBuilder | Literal) -> tuple[TxnField, Expression]:
     try:
         field = _parameter_mapping[arg_name]
     except KeyError as ex:
@@ -47,15 +47,13 @@ def get_field_expr(arg_name: str, arg: ExpressionBuilder | Literal) -> tuple[Txn
         return remapped_field
     elif field.is_array:
         match arg:
-            case ExpressionBuilder(
-                value_type=wtypes.WTuple(types=tuple_item_types) as wtype
-            ) if all(field.valid_type(t) for t in tuple_item_types):
+            case NodeBuilder(value_type=wtypes.WTuple(types=tuple_item_types) as wtype) if all(
+                field.valid_type(t) for t in tuple_item_types
+            ):
                 expr = expect_operand_wtype(arg, wtype)
                 return field, expr
         raise CodeError(f"{arg_name} should be of type tuple[{field.type_desc}, ...]")
-    elif (
-        isinstance(arg, ExpressionBuilder) and arg.value_type and field.valid_type(arg.value_type)
-    ):
+    elif isinstance(arg, NodeBuilder) and arg.value_type and field.valid_type(arg.value_type):
         field_expr = arg.rvalue()
     else:
         field_expr = expect_operand_wtype(arg, field.wtype)
@@ -63,7 +61,7 @@ def get_field_expr(arg_name: str, arg: ExpressionBuilder | Literal) -> tuple[Txn
 
 
 def _maybe_transform_program_field_expr(
-    field: TxnField, eb: ExpressionBuilder | Literal
+    field: TxnField, eb: NodeBuilder | Literal
 ) -> tuple[TxnField, Expression] | None:
     immediate = field.immediate
     if immediate not in ("ApprovalProgram", "ClearStateProgram"):
@@ -93,12 +91,12 @@ class InnerTxnParamsClassExpressionBuilder(TypeBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         transaction_fields: dict[TxnField, Expression] = {
             TxnFields.fee: UInt64Constant(
                 source_location=self.source_location,
@@ -136,12 +134,12 @@ class ParamsSubmitExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         from puya.awst_build.eb.transaction import InnerTransactionExpressionBuilder
 
         if args:
@@ -163,12 +161,12 @@ class CopyInnerTxnParamsExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if args:
             raise CodeError(f"Unexpected arguments for {self.expr}", location)
         return InnerTxnParamsExpressionBuilder(
@@ -187,12 +185,12 @@ class SetInnerTxnParamsExpressionBuilder(IntermediateExpressionBuilder):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         if None in arg_names:
             raise CodeError(
                 "Positional arguments are not supported when setting transaction parameters",
@@ -219,7 +217,7 @@ class InnerTxnParamsExpressionBuilder(ValueExpressionBuilder):
         self.wtype = expect_wtype(expr, wtypes.WInnerTransactionFields)
         super().__init__(expr)
 
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+    def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         if name == "submit":
             return ParamsSubmitExpressionBuilder(self.expr, location)
         elif name == "set":

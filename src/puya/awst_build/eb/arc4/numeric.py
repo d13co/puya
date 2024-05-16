@@ -22,7 +22,7 @@ from puya.awst_build.eb.arc4.base import (
     arc4_bool_bytes,
     get_integer_literal_value,
 )
-from puya.awst_build.eb.base import BuilderComparisonOp, ExpressionBuilder
+from puya.awst_build.eb.base import BuilderComparisonOp, NodeBuilder
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.errors import CodeError, InternalError
 
@@ -53,12 +53,12 @@ class NumericARC4ClassExpressionBuilder(ARC4ClassExpressionBuilder, abc.ABC):
 
     def call(
         self,
-        args: Sequence[ExpressionBuilder | Literal],
+        args: Sequence[NodeBuilder | Literal],
         arg_typs: Sequence[pytypes.PyType],
         arg_kinds: list[mypy.nodes.ArgKind],
         arg_names: list[str | None],
         location: SourceLocation,
-    ) -> ExpressionBuilder:
+    ) -> NodeBuilder:
         wtype = self.produces()
         match args:
             case []:
@@ -66,7 +66,7 @@ class NumericARC4ClassExpressionBuilder(ARC4ClassExpressionBuilder, abc.ABC):
                 expr = convert_arc4_literal(zero_literal, wtype, location)
             case [Literal() as lit]:
                 expr = convert_arc4_literal(lit, wtype, location)
-            case [ExpressionBuilder(value_type=wtypes.WType() as value_type) as eb]:
+            case [NodeBuilder(value_type=wtypes.WType() as value_type) as eb]:
                 value = eb.rvalue()
                 if value_type not in (
                     wtypes.bool_wtype,
@@ -110,9 +110,7 @@ class ByteClassExpressionBuilder(NumericARC4ClassExpressionBuilder):
 
 
 class _UIntNClassExpressionBuilder(NumericARC4ClassExpressionBuilder, abc.ABC):
-    def index(
-        self, index: ExpressionBuilder | Literal, location: SourceLocation
-    ) -> ExpressionBuilder:
+    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
         n = get_integer_literal_value(index, "UIntN scale")
         self.check_bitsize(n, location)
         self.wtype = wtypes.ARC4UIntN(n, location)
@@ -150,8 +148,8 @@ class BigUIntNClassExpressionBuilder(_UIntNClassExpressionBuilder):
 
 class _UFixedNxMClassExpressionBuilder(NumericARC4ClassExpressionBuilder):
     def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    ) -> NodeBuilder:
         try:
             scale_expr, precision_expr = indexes
         except ValueError as ex:
@@ -201,7 +199,7 @@ class UIntNExpressionBuilder(ARC4EncodedExpressionBuilder):
         self.wtype: wtypes.ARC4UIntN = expr.wtype
         super().__init__(expr)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         return arc4_bool_bytes(
             self.expr,
             false_bytes=b"\x00" * (self.wtype.n // 8),
@@ -210,8 +208,8 @@ class UIntNExpressionBuilder(ARC4EncodedExpressionBuilder):
         )
 
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: NodeBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> NodeBuilder:
         if isinstance(other, Literal):
             other_expr = convert_arc4_literal(other, self.wtype)
         else:
@@ -248,7 +246,7 @@ class UFixedNxMExpressionBuilder(ARC4EncodedExpressionBuilder):
         self.wtype: wtypes.ARC4UFixedNxM = expr.wtype
         super().__init__(expr)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> NodeBuilder:
         return arc4_bool_bytes(
             self.expr,
             false_bytes=b"\x00" * (self.wtype.n // 8),
