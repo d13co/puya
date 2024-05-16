@@ -4,7 +4,7 @@ from collections.abc import Callable
 import puya.awst_build.eb.arc4.dynamic_bytes
 from puya.awst import wtypes
 from puya.awst.nodes import Expression
-from puya.awst_build import constants
+from puya.awst_build import constants, pytypes
 from puya.awst_build.eb import (
     app_account_state,
     app_state,
@@ -116,6 +116,11 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
         )
         for enum_name, enum_data in constants.NAMED_INT_CONST_ENUM_DATA.items()
     },
+}
+PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
+    pytypes.uenumerateGenericType: unsigned_builtins.UnsignedEnumerateBuilder,
+    pytypes.urangeType: unsigned_builtins.UnsignedRangeBuilder,
+    pytypes.reversedGenericType: unsigned_builtins.ReversedFunctionExpressionBuilder,
 }
 WTYPE_TO_TYPE_BUILDER: dict[type[wtypes.WType], ExpressionBuilderFromTypeAndSourceFactory] = {
     wtypes.WTuple: tuple_.TupleTypeExpressionBuilder,

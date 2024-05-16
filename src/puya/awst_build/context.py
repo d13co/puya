@@ -314,6 +314,8 @@ class ASTConversionModuleContext(ASTConversionContext):
     ) -> pytypes.PyType:
         if not mypy_type_args:
             return maybe_generic
+        if all(isinstance(t, mypy.types.TypeVarType) for t in mypy_type_args):
+            return maybe_generic
         type_args_resolved = [
             self.type_to_pytype(mta, source_location=loc, in_type_args=True)
             for mta in mypy_type_args

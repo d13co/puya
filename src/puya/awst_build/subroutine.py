@@ -636,23 +636,23 @@ class FunctionASTConverter(
     def _visit_ref_expr(
         self, expr: mypy.nodes.MemberExpr | mypy.nodes.NameExpr
     ) -> ExpressionBuilder | Literal:
+        from puya.awst_build.eb import type_registry
+
         expr_loc = self._location(expr)
         py_typ = self.context.mypy_expr_node_type(expr)
         if isinstance(py_typ, pytypes.TypeType):
-            from puya.awst_build.eb import type_registry
-
-            try:
-                tb = type_registry.CLS_NAME_TO_BUILDER[py_typ.typ.name]
-            except KeyError:
-                pass
-            else:
-                return tb(expr_loc)
-            t_wtype = py_typ.typ.wtype
-            try:
-                tb2 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
-            except KeyError:
-                raise CodeError(f"TODO: builder for {t_wtype}", expr_loc) from None
-            return tb2(t_wtype, expr_loc)
+            inner_typ = py_typ.typ
+            if inner_typ not in pytypes.OpNamespaceTypes:
+                if tb := type_registry.CLS_NAME_TO_BUILDER.get(inner_typ.name):
+                    return tb(expr_loc)
+                if tb := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
+                    return tb(expr_loc)
+                t_wtype = inner_typ.wtype
+                try:
+                    tb2 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
+                except KeyError:
+                    raise CodeError(f"TODO: builder for {t_wtype}", expr_loc) from None
+                return tb2(t_wtype, expr_loc)
         builder_or_literal = self._visit_ref_expr_maybe_aliased(expr, expr_loc)
         return builder_or_literal
 
