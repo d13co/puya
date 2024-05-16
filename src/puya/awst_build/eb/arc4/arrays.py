@@ -199,12 +199,12 @@ class StaticArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder[wtypes
         )
 
 
-class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
-    wtype: wtypes.ARC4StaticArray
+class AddressClassExpressionBuilder(BytesBackedClassExpressionBuilder[wtypes.ARC4StaticArray]):
 
     def __init__(self, location: SourceLocation):
-        super().__init__(location=location, wtype=wtypes.arc4_address_type)
+        super().__init__(wtypes.arc4_address_type, location)
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -213,9 +213,10 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
         arg_names: list[str | None],
         location: SourceLocation,
     ) -> ExpressionBuilder:
+        wtype = self.produces()
         match args:
             case []:
-                const_op = intrinsic_factory.zero_address(location, as_type=self.wtype)
+                const_op = intrinsic_factory.zero_address(location, as_type=wtype)
                 return AddressExpressionBuilder(const_op)
             case [ExpressionBuilder(value_type=wtypes.account_wtype) as eb]:
                 address_bytes: Expression = get_bytes_expr(eb.rvalue())
@@ -248,17 +249,8 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
                     f" {wtypes.account_wtype} or {wtypes.bytes_wtype}, or a string literal",
                     location=location,
                 )
-        assert self.wtype, "wtype should not be None"
         return StaticArrayExpressionBuilder(
-            ReinterpretCast(expr=address_bytes, wtype=self.wtype, source_location=location)
-        )
-
-    def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
-        raise CodeError(
-            "Address does not support type arguments",
-            location,
+            ReinterpretCast(expr=address_bytes, wtype=wtype, source_location=location)
         )
 
 

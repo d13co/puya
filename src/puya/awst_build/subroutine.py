@@ -636,23 +636,12 @@ class FunctionASTConverter(
     def _visit_ref_expr(
         self, expr: mypy.nodes.MemberExpr | mypy.nodes.NameExpr
     ) -> ExpressionBuilder | Literal:
-        from puya.awst_build.eb import type_registry
-
         expr_loc = self._location(expr)
         py_typ = self.context.mypy_expr_node_type(expr)
         if isinstance(py_typ, pytypes.TypeType):
             inner_typ = py_typ.typ
             if inner_typ not in pytypes.OpNamespaceTypes:
-                if tb := type_registry.CLS_NAME_TO_BUILDER.get(inner_typ.name):
-                    return tb(expr_loc)
-                if tb := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
-                    return tb(expr_loc)
-                t_wtype = inner_typ.wtype
-                try:
-                    tb2 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
-                except KeyError:
-                    raise CodeError(f"TODO: builder for {t_wtype}", expr_loc) from None
-                return tb2(t_wtype, expr_loc)
+                return builder_for_type(inner_typ, expr_loc)
         builder_or_literal = self._visit_ref_expr_maybe_aliased(expr, expr_loc)
         return builder_or_literal
 
@@ -1053,26 +1042,20 @@ class FunctionASTConverter(
 
     def visit_index_expr(self, expr: mypy.nodes.IndexExpr) -> ExpressionBuilder | Literal:
         expr_location = self._location(expr)
-        # match expr.analyzed:
-        #     case None:
-        #         pass
-        #     case mypy.nodes.TypeAliasExpr():
-        #         raise CodeError("type aliases are not supported inside subroutines", expr_location)
-        #     case mypy.nodes.TypeApplication():
-        #         type_type = self.context.mypy_expr_node_type(expr)
-        #         if not isinstance(type_type, pytypes.TypeType):
-        #             raise InternalError(
-        #                 "expected resolved PyType of and IndexExpr where analyzed"
-        #                 " is a TypeApplication to be a TypeType",
-        #                 expr_location,
-        #             )
-        #         return builder_for_type(type_type.typ, expr_location)
-        # short-circuit in case of application of typing.Literal to just evaluate the args
-        if (
-            isinstance(expr.base, mypy.nodes.RefExpr)
-            and get_unaliased_fullname(expr.base) == "typing.Literal"
-        ):
-            return expr.index.accept(self)
+        match expr.analyzed:
+            case None:
+                pass
+            case mypy.nodes.TypeAliasExpr():
+                raise CodeError("type aliases are not supported inside subroutines", expr_location)
+            case mypy.nodes.TypeApplication():
+                type_type = self.context.mypy_expr_node_type(expr)
+                if not isinstance(type_type, pytypes.TypeType):
+                    raise InternalError(
+                        "expected resolved PyType of and IndexExpr where analyzed"
+                        " is a TypeApplication to be a TypeType",
+                        expr_location,
+                    )
+                return builder_for_type(type_type.typ, expr_location)
 
         base_expr = expr.base.accept(self)
         if isinstance(base_expr, Literal):
@@ -1350,3 +1333,18 @@ def temporary_assignment_if_required(
         return var_expression(operand)
     else:
         return operand
+
+
+def builder_for_type(inner_typ: pytypes.PyType, expr_loc: SourceLocation) -> ExpressionBuilder:
+    from puya.awst_build.eb import type_registry
+
+    if tb := type_registry.CLS_NAME_TO_BUILDER.get(inner_typ.name):
+        return tb(expr_loc)
+    if tb := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
+        return tb(expr_loc)
+    t_wtype = inner_typ.wtype
+    try:
+        tb2 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
+    except KeyError:
+        raise CodeError(f"TODO: builder for {t_wtype}", expr_loc) from None
+    return tb2(t_wtype, expr_loc)

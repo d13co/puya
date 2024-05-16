@@ -23,8 +23,6 @@ if typing.TYPE_CHECKING:
 
 
 class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
-    wtype: wtypes.ARC4DynamicArray
-
     def __init__(self, location: SourceLocation):
         super().__init__(location=location, wtype=wtypes.arc4_dynamic_bytes)
 
@@ -39,7 +37,7 @@ class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
         match args:
             case [Literal(value=bytes()) as literal]:
                 return DynamicBytesExpressionBuilder(
-                    convert_arc4_literal(literal, self.wtype, location)
+                    convert_arc4_literal(literal, self.produces(), location)
                 )
             case [ExpressionBuilder(value_type=wtypes.bytes_wtype) as eb]:
                 return DynamicBytesExpressionBuilder(

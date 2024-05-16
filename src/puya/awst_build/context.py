@@ -157,6 +157,13 @@ class ASTConversionModuleContext(ASTConversionContext):
 
     def mypy_expr_node_type(self, expr: mypy.nodes.Expression) -> pytypes.PyType:
         expr_loc = self.node_location(expr)
+        match expr:
+            # for some reason, mypy gives you back an unbound callable type when resolving
+            # an alias node...
+            case mypy.nodes.RefExpr(fullname=fullname) if (
+                known_typ := self._pytypes.get(fullname)
+            ):
+                return pytypes.TypeType(known_typ)
         mypy_type = self.parse_result.manager.all_types.get(expr)
         if mypy_type is not None:
             return self.type_to_pytype(mypy_type, source_location=expr_loc)
@@ -220,11 +227,10 @@ class ASTConversionModuleContext(ASTConversionContext):
                     raise CodeError(msg, loc)
                 return self._maybe_parameterise_pytype(result, args, loc)
             case mypy.types.TupleType(items=items, partial_fallback=true_type):
-                types = [recurse(it) for it in items]
                 generic = self._pytypes.get(true_type.type.fullname)
                 if generic is None:
                     raise CodeError(f"Unknown tuple base type: {true_type.type.fullname}", loc)
-                return generic.parameterise(types, loc)
+                return self._maybe_parameterise_pytype(generic, items, loc)
             case mypy.types.LiteralType(
                 fallback=fallback, value=literal_value
             ) as mypy_literal_type:
@@ -314,7 +320,9 @@ class ASTConversionModuleContext(ASTConversionContext):
     ) -> pytypes.PyType:
         if not mypy_type_args:
             return maybe_generic
-        if all(isinstance(t, mypy.types.TypeVarType) for t in mypy_type_args):
+        if all(
+            isinstance(t, mypy.types.TypeVarType | mypy.types.UnpackType) for t in mypy_type_args
+        ):
             return maybe_generic
         type_args_resolved = [
             self.type_to_pytype(mta, source_location=loc, in_type_args=True)
