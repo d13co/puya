@@ -1,14 +1,15 @@
+import typing
 from collections.abc import Sequence
 
 import mypy.nodes
 
-from puya.awst import wtypes
 from puya.awst.nodes import Literal, TemplateVar
 from puya.awst_build import pytypes
+from puya.awst_build.eb._utils import bool_eval_to_constant
 from puya.awst_build.eb.base import (
-    GenericClassExpressionBuilder,
+    CallableBuilder,
+    InstanceBuilder,
     NodeBuilder,
-    TypeBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.utils import get_arg_mapping
@@ -16,36 +17,22 @@ from puya.errors import CodeError
 from puya.parse import SourceLocation
 
 
-class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
-    def index_multiple(
-        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
-    ) -> NodeBuilder:
-        match indexes:
-            case [TypeBuilder() as eb]:
-                wtype = eb.produces()
-            case _:
-                raise CodeError("Invalid/unhandled arguments", location)
-        return TemplateVariableExpressionBuilder(location=location, wtype=wtype)
+class TemplateVariableExpressionBuilder(
+    InstanceBuilder[pytypes.PseudoGenericFunctionType], CallableBuilder
+):
+    def __init__(self, typ: pytypes.PyType, source_location: SourceLocation) -> None:
+        assert isinstance(typ, pytypes.PseudoGenericFunctionType)
+        super().__init__(typ, source_location)
 
-    def call(
-        self,
-        args: Sequence[NodeBuilder | Literal],
-        arg_typs: Sequence[pytypes.PyType],
-        arg_kinds: list[mypy.nodes.ArgKind],
-        arg_names: list[str | None],
-        location: SourceLocation,
-    ) -> NodeBuilder:
-        raise CodeError("TemplateVar usage requires type parameter", location)
+    @typing.override
+    def rvalue(self) -> typing.Never:
+        raise CodeError("TemplateVar acts as a function, not an instance")
 
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
+        return bool_eval_to_constant(value=True, location=location, negate=negate)
 
-class TemplateVariableExpressionBuilder(TypeBuilder):
-    def __init__(self, location: SourceLocation, wtype: wtypes.WType):
-        super().__init__(location)
-        self.wtype = wtype
-
-    def produces(self) -> wtypes.WType:
-        return self.wtype
-
+    @typing.override
     def call(
         self,
         args: Sequence[NodeBuilder | Literal],
@@ -83,7 +70,9 @@ class TemplateVariableExpressionBuilder(TypeBuilder):
             case Literal(value=str(str_value)):
                 return var_expression(
                     TemplateVar(
-                        name=prefix_value + str_value, source_location=location, wtype=self.wtype
+                        name=prefix_value + str_value,
+                        wtype=self.pytype.return_type.wtype,
+                        source_location=location,
                     )
                 )
             case _:

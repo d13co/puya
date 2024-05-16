@@ -27,6 +27,7 @@ from puya.awst.nodes import (
     UInt64Constant,
 )
 from puya.awst_build import constants, pytypes
+from puya.awst_build.eb._utils import bool_eval_to_constant
 from puya.awst_build.eb.arc4._utils import (
     ARC4Signature,
     arc4_tuple_from_items,
@@ -100,9 +101,10 @@ class ABICallFuncBuilder(FunctionBuilder):
         return _abi_call(args, arg_typs, arg_kinds, arg_names, location, return_type=None)
 
 
-class ABICallInstanceBuilder(InstanceBuilder[pytypes.ABICallWithReturnType], CallableBuilder):
+class ABICallInstanceBuilder(InstanceBuilder[pytypes.PseudoGenericFunctionType], CallableBuilder):
+
     def __init__(self, typ: pytypes.PyType, source_location: SourceLocation) -> None:
-        assert isinstance(typ, pytypes.ABICallWithReturnType)
+        assert isinstance(typ, pytypes.PseudoGenericFunctionType)
         super().__init__(typ, source_location)
         # self.result_wtype = result_wtype
         # app_itxn_wtype = wtypes.WInnerTransaction.from_type(TransactionType.appl)
@@ -112,6 +114,14 @@ class ABICallInstanceBuilder(InstanceBuilder[pytypes.ABICallWithReturnType], Cal
         #     )
         # else:
         #     self.wtype = app_itxn_wtype
+
+    @typing.override
+    def rvalue(self) -> typing.Never:
+        raise CodeError("abi_call acts as a function, not an instance")
+
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
+        return bool_eval_to_constant(value=True, location=location, negate=negate)
 
     @typing.override
     def call(
