@@ -640,7 +640,11 @@ class FunctionASTConverter(
         py_typ = self.context.mypy_expr_node_type(expr)
         if isinstance(py_typ, pytypes.TypeType):
             inner_typ = py_typ.typ
-            if inner_typ not in pytypes.OpNamespaceTypes:
+            if (
+                inner_typ not in pytypes.OpNamespaceTypes
+                and pytypes.ContractBaseType not in inner_typ.bases
+                and pytypes.ARC4ClientBaseType not in inner_typ.bases
+            ):
                 return builder_for_type(inner_typ, expr_loc)
         builder_or_literal = self._visit_ref_expr_maybe_aliased(expr, expr_loc)
         return builder_or_literal

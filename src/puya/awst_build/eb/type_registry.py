@@ -15,6 +15,7 @@ from puya.awst_build.eb import (
     box,
     bytes as bytes_,
     ensure_budget,
+contracts,
     intrinsics,
     log,
     named_int_constants,
@@ -119,6 +120,10 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
 }
 PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
     pytypes.uenumerateGenericType: unsigned_builtins.UnsignedEnumerateBuilder,
+    pytypes.urangeType: unsigned_builtins.UnsignedRangeBuilder,
+    pytypes.reversedGenericType: unsigned_builtins.ReversedFunctionExpressionBuilder,
+}
+PYTYPE_BASE_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
     pytypes.urangeType: unsigned_builtins.UnsignedRangeBuilder,
     pytypes.reversedGenericType: unsigned_builtins.ReversedFunctionExpressionBuilder,
 }
