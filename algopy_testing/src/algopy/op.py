@@ -1,10 +1,12 @@
 import hashlib
+import math
 from enum import Enum
 
 import algosdk
 import coincurve
 import nacl.exceptions
 import nacl.signing
+from algopy_testing.constants import MAX_UINT64
 from algopy_testing.context import get_active_context
 from Cryptodome.Hash import SHA512, keccak
 from ecdsa import (  # type: ignore  # noqa: PGH003
@@ -15,7 +17,7 @@ from ecdsa import (  # type: ignore  # noqa: PGH003
 )
 
 from algopy import Bytes, UInt64
-from algopy.utils import as_bytes
+from algopy.utils import as_bytes, as_int
 
 
 class ECDSA(Enum):
@@ -152,3 +154,34 @@ def ecdsa_pk_decompress(v: ECDSA, a: Bytes | bytes, /) -> tuple[Bytes, Bytes]:
         return Bytes(pubkey_x.to_bytes(32, byteorder="big")), Bytes(
             pubkey_y.to_bytes(32, byteorder="big")
         )
+
+
+def addw(a: UInt64 | int, b: UInt64 | int, /) -> tuple[UInt64, UInt64]:
+    a = as_int(a, max=MAX_UINT64)
+    b = as_int(b, max=MAX_UINT64)
+    result = a + b
+    cf, rest = result >> 64, result & MAX_UINT64
+    return (
+        UInt64(cf),
+        UInt64(rest),
+    )
+
+
+def bitlen(a: Bytes | UInt64 | bytes | int, /) -> UInt64:
+    int_value = (
+        int.from_bytes(as_bytes(a))
+        if (isinstance(a, Bytes | bytes))
+        else as_int(a, max=MAX_UINT64)
+    )
+    return UInt64(int_value.bit_length())
+
+
+def sqrt(a: UInt64 | int, /) -> UInt64:
+    a = as_int(a, max=MAX_UINT64)
+    return UInt64(math.isqrt(a))
+
+
+def concat(a: Bytes | bytes, b: Bytes | bytes, /) -> Bytes:
+    a = a if (isinstance(a, Bytes)) else Bytes(a)
+    b = b if (isinstance(b, Bytes)) else Bytes(b)
+    return a + b

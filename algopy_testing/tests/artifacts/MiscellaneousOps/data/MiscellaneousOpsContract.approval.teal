@@ -1,0 +1,262 @@
+#pragma version 10
+
+tests.artifacts.MiscellaneousOps.contract.MiscellaneousOpsContract.approval_program:
+    // tests/artifacts/MiscellaneousOps/contract.py:4
+    // class MiscellaneousOpsContract(ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@9
+    method "verify_addw(uint64,uint64)(uint64,uint64)"
+    method "verify_bytes_bitlen(byte[],uint64)uint64"
+    method "verify_uint64_bitlen(uint64)uint64"
+    method "verify_sqrt(uint64)uint64"
+    method "verify_concat(byte[],byte[],uint64,uint64)byte[]"
+    txna ApplicationArgs 0
+    match main_verify_addw_route@2 main_verify_bytes_bitlen_route@3 main_verify_uint64_bitlen_route@4 main_verify_sqrt_route@5 main_verify_concat_route@6
+    err // reject transaction
+
+main_verify_addw_route@2:
+    // tests/artifacts/MiscellaneousOps/contract.py:5
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // tests/artifacts/MiscellaneousOps/contract.py:4
+    // class MiscellaneousOpsContract(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    txna ApplicationArgs 2
+    btoi
+    // tests/artifacts/MiscellaneousOps/contract.py:5
+    // @arc4.abimethod()
+    callsub verify_addw
+    swap
+    itob
+    swap
+    itob
+    concat
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_verify_bytes_bitlen_route@3:
+    // tests/artifacts/MiscellaneousOps/contract.py:10
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // tests/artifacts/MiscellaneousOps/contract.py:4
+    // class MiscellaneousOpsContract(ARC4Contract):
+    txna ApplicationArgs 1
+    extract 2 0
+    txna ApplicationArgs 2
+    btoi
+    // tests/artifacts/MiscellaneousOps/contract.py:10
+    // @arc4.abimethod()
+    callsub verify_bytes_bitlen
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_verify_uint64_bitlen_route@4:
+    // tests/artifacts/MiscellaneousOps/contract.py:16
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // tests/artifacts/MiscellaneousOps/contract.py:4
+    // class MiscellaneousOpsContract(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    // tests/artifacts/MiscellaneousOps/contract.py:16
+    // @arc4.abimethod()
+    callsub verify_uint64_bitlen
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_verify_sqrt_route@5:
+    // tests/artifacts/MiscellaneousOps/contract.py:21
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // tests/artifacts/MiscellaneousOps/contract.py:4
+    // class MiscellaneousOpsContract(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    // tests/artifacts/MiscellaneousOps/contract.py:21
+    // @arc4.abimethod()
+    callsub verify_sqrt
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_verify_concat_route@6:
+    // tests/artifacts/MiscellaneousOps/contract.py:26
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    // tests/artifacts/MiscellaneousOps/contract.py:4
+    // class MiscellaneousOpsContract(ARC4Contract):
+    txna ApplicationArgs 1
+    extract 2 0
+    txna ApplicationArgs 2
+    extract 2 0
+    txna ApplicationArgs 3
+    btoi
+    txna ApplicationArgs 4
+    btoi
+    // tests/artifacts/MiscellaneousOps/contract.py:26
+    // @arc4.abimethod()
+    callsub verify_concat
+    dup
+    len
+    itob
+    substring 6 8
+    swap
+    concat
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_bare_routing@9:
+    // tests/artifacts/MiscellaneousOps/contract.py:4
+    // class MiscellaneousOpsContract(ARC4Contract):
+    txn OnCompletion
+    !
+    assert // reject transaction
+    txn ApplicationID
+    !
+    assert // is creating
+    int 1
+    return
+
+
+// tests.artifacts.MiscellaneousOps.contract.MiscellaneousOpsContract.verify_addw(a: uint64, b: uint64) -> uint64, uint64:
+verify_addw:
+    // tests/artifacts/MiscellaneousOps/contract.py:5-6
+    // @arc4.abimethod()
+    // def verify_addw(self, a: UInt64, b: UInt64) -> tuple[UInt64, UInt64]:
+    proto 2 2
+    // tests/artifacts/MiscellaneousOps/contract.py:7
+    // result = op.addw(a, b)
+    frame_dig -2
+    frame_dig -1
+    addw
+    // tests/artifacts/MiscellaneousOps/contract.py:8
+    // return result
+    retsub
+
+
+// tests.artifacts.MiscellaneousOps.contract.MiscellaneousOpsContract.verify_bytes_bitlen(a: bytes, pad_a_size: uint64) -> uint64:
+verify_bytes_bitlen:
+    // tests/artifacts/MiscellaneousOps/contract.py:10-11
+    // @arc4.abimethod()
+    // def verify_bytes_bitlen(self, a: Bytes, pad_a_size: UInt64) -> UInt64:
+    proto 2 1
+    // tests/artifacts/MiscellaneousOps/contract.py:12
+    // a = op.bzero(pad_a_size) + a
+    frame_dig -1
+    bzero
+    frame_dig -2
+    concat
+    dup
+    frame_bury -2
+    // tests/artifacts/MiscellaneousOps/contract.py:13
+    // result = op.bitlen(a)
+    bitlen
+    // tests/artifacts/MiscellaneousOps/contract.py:14
+    // return result
+    retsub
+
+
+// tests.artifacts.MiscellaneousOps.contract.MiscellaneousOpsContract.verify_uint64_bitlen(a: uint64) -> uint64:
+verify_uint64_bitlen:
+    // tests/artifacts/MiscellaneousOps/contract.py:16-17
+    // @arc4.abimethod()
+    // def verify_uint64_bitlen(self, a: UInt64) -> UInt64:
+    proto 1 1
+    // tests/artifacts/MiscellaneousOps/contract.py:18
+    // result = op.bitlen(a)
+    frame_dig -1
+    bitlen
+    // tests/artifacts/MiscellaneousOps/contract.py:19
+    // return result
+    retsub
+
+
+// tests.artifacts.MiscellaneousOps.contract.MiscellaneousOpsContract.verify_sqrt(a: uint64) -> uint64:
+verify_sqrt:
+    // tests/artifacts/MiscellaneousOps/contract.py:21-22
+    // @arc4.abimethod()
+    // def verify_sqrt(self, a: UInt64) -> UInt64:
+    proto 1 1
+    // tests/artifacts/MiscellaneousOps/contract.py:23
+    // result = op.sqrt(a)
+    frame_dig -1
+    sqrt
+    // tests/artifacts/MiscellaneousOps/contract.py:24
+    // return result
+    retsub
+
+
+// tests.artifacts.MiscellaneousOps.contract.MiscellaneousOpsContract.verify_concat(a: bytes, b: bytes, pad_a_size: uint64, pad_b_size: uint64) -> bytes:
+verify_concat:
+    // tests/artifacts/MiscellaneousOps/contract.py:26-27
+    // @arc4.abimethod()
+    // def verify_concat(self, a: Bytes, b: Bytes, pad_a_size: UInt64, pad_b_size: UInt64) -> Bytes:
+    proto 4 1
+    // tests/artifacts/MiscellaneousOps/contract.py:28
+    // a = op.bzero(pad_a_size) + a
+    frame_dig -2
+    bzero
+    frame_dig -4
+    concat
+    frame_bury -4
+    // tests/artifacts/MiscellaneousOps/contract.py:29
+    // b = op.bzero(pad_b_size) + b
+    frame_dig -1
+    bzero
+    frame_dig -3
+    concat
+    frame_bury -3
+    // tests/artifacts/MiscellaneousOps/contract.py:30
+    // result = a + b
+    frame_dig -4
+    frame_dig -3
+    concat
+    // tests/artifacts/MiscellaneousOps/contract.py:31
+    // result = op.sha256(result)
+    sha256
+    // tests/artifacts/MiscellaneousOps/contract.py:32
+    // return result
+    retsub
