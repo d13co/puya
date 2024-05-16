@@ -371,6 +371,7 @@ def _extract_abi_call_args(
 
 
 class ARC4ClientClassExpressionBuilder(TypeBuilder):
+
     def __init__(
         self,
         context: ASTConversionModuleContext,
@@ -381,6 +382,18 @@ class ARC4ClientClassExpressionBuilder(TypeBuilder):
         self.context = context
         self.type_info = type_info
 
+    @typing.override
+    def call(
+        self,
+        args: Sequence[NodeBuilder | Literal],
+        arg_typs: Sequence[pytypes.PyType],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+    ) -> typing.Never:
+        raise CodeError(f"Cannot instantiate {self.pytype}")
+
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> NodeBuilder | Literal:
         return ARC4ClientMethodExpressionBuilder(self.context, self.type_info, name, location)
 
@@ -398,6 +411,7 @@ class ARC4ClientMethodExpressionBuilder(FunctionBuilder):
         self.type_info = type_info
         self.name = name
 
+    @typing.override
     def call(
         self,
         args: Sequence[NodeBuilder | Literal],

@@ -1,4 +1,5 @@
 import abc
+import typing
 from collections.abc import Sequence
 
 import mypy.nodes
@@ -28,6 +29,7 @@ class FromBytesBuilder(FunctionBuilder):
         )
         super().__init__(func_typ, location)
 
+    @typing.override
     def call(
         self,
         args: Sequence[NodeBuilder | Literal],
@@ -51,6 +53,7 @@ class FromBytesBuilder(FunctionBuilder):
 
 
 class BytesBackedClassExpressionBuilder(TypeBuilder, abc.ABC):
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> NodeBuilder:
         match name:
             case "from_bytes":

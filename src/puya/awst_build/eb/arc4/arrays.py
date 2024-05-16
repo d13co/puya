@@ -43,6 +43,7 @@ from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     FunctionBuilder,
+    GenericTypeBuilder,
     InstanceBuilder,
     InstanceExpressionBuilder,
     Iteration,
@@ -55,7 +56,11 @@ from puya.awst_build.eb.reference_types.account import AccountExpressionBuilder
 from puya.awst_build.eb.uint64 import UInt64ExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.eb.void import VoidExpressionBuilder
-from puya.awst_build.utils import expect_operand_wtype, require_expression_builder
+from puya.awst_build.utils import (
+    expect_operand_wtype,
+    require_expression_builder,
+    require_instance_builder,
+)
 from puya.errors import CodeError, InternalError
 
 if typing.TYPE_CHECKING:
@@ -68,33 +73,51 @@ if typing.TYPE_CHECKING:
 logger = log.get_logger(__name__)
 
 
-class DynamicArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
-    def __init__(self, location: SourceLocation, wtype: wtypes.ARC4DynamicArray | None = None):
-        super().__init__(location)
-        self.wtype = wtype
+class DynamicArrayGenericTypeBuilder(GenericTypeBuilder):
+    def __init__(self, location: SourceLocation):
+        super().__init__(pytypes.TypeType(pytypes.GenericARC4DynamicArrayType), location)
 
-    def produces(self) -> wtypes.ARC4Type:
-        if not self.wtype:
-            raise InternalError(
-                "Cannot resolve wtype of generic EB until the index method is called with the "
-                "generic type parameter."
-            )
-        return self.wtype
-
-    def index(self, index: NodeBuilder | Literal, location: SourceLocation) -> NodeBuilder:
-        return self.index_multiple([index], location)
-
-    def index_multiple(
-        self, indexes: Sequence[NodeBuilder | Literal], location: SourceLocation
+    @typing.override
+    def call(
+        self,
+        args: Sequence[NodeBuilder | Literal],
+        arg_typs: Sequence[pytypes.PyType],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
     ) -> NodeBuilder:
-        match indexes:
-            case [TypeBuilder() as eb]:
-                element_wtype = eb.produces()
-                self.wtype = arc4_util.make_dynamic_array_wtype(element_wtype, location)
-                return self
-            case _:
-                raise CodeError("Invalid/unhandled arguments", location)
+        if not args:
+            raise CodeError("Empty arrays require a type annotation to be instantiated", location)
+        non_literal_args = [
+            require_instance_builder(a, msg="Array arguments must be non literals").rvalue()
+            for a in args
+        ]
+        element_typ = arg_typs[0]
+        for a in non_literal_args:
+            expect_operand_wtype(a, element_typ.wtype)
+        typ = pytypes.GenericARC4DynamicArrayType.parameterise([element_typ], location)
+        array_wtype = typ.wtype
+        assert isinstance(array_wtype, wtypes.ARC4DynamicArray)
+        return DynamicArrayExpressionBuilder(
+            typ,
+            NewArray(
+                values=tuple(non_literal_args),
+                wtype=array_wtype,
+                source_location=location,
+            ),
+        )
 
+
+class DynamicArrayTypeBuilder(BytesBackedClassExpressionBuilder):
+    def __init__(self, typ: pytypes.PyType, location: SourceLocation):
+        assert isinstance(typ, pytypes.TypeType)
+        assert isinstance(typ.typ, pytypes.ArrayType)
+        self._typ = typ.typ
+        assert typ.typ.generic == pytypes.GenericARC4DynamicArrayType
+        assert typ.typ.size is None
+        super().__init__(typ, location)
+
+    @typing.override
     def call(
         self,
         args: Sequence[NodeBuilder | Literal],
@@ -104,28 +127,22 @@ class DynamicArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder):
         location: SourceLocation,
     ) -> NodeBuilder:
         non_literal_args = [
-            require_expression_builder(a, msg="Array arguments must be non literals").rvalue()
+            require_instance_builder(a, msg="Array arguments must be non literals").rvalue()
             for a in args
         ]
-        wtype = self.wtype
-        if wtype is None:
-            if non_literal_args:
-                element_wtype = non_literal_args[0].wtype
-                wtype = arc4_util.make_dynamic_array_wtype(element_wtype, location)
-            else:
-                raise CodeError(
-                    "Empty arrays require a type annotation to be instantiated", location
-                )
+        element_typ = self._typ.items
 
         for a in non_literal_args:
-            expect_operand_wtype(a, wtype.element_type)
-
+            expect_operand_wtype(a, element_typ.wtype)
+        array_wtype = self._typ.wtype
+        assert isinstance(array_wtype, wtypes.ARC4DynamicArray)
         return DynamicArrayExpressionBuilder(
+            self._typ,
             NewArray(
-                source_location=location,
                 values=tuple(non_literal_args),
-                wtype=wtype,
-            )
+                wtype=array_wtype,
+                source_location=location,
+            ),
         )
 
 

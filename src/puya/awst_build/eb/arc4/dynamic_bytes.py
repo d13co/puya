@@ -6,11 +6,11 @@ from puya.awst import wtypes
 from puya.awst.nodes import ARC4Encode, Literal, ReinterpretCast
 from puya.awst_build.eb.arc4._utils import convert_arc4_literal
 from puya.awst_build.eb.arc4.arrays import (
-    DynamicArrayClassExpressionBuilder,
     DynamicArrayExpressionBuilder,
 )
 from puya.awst_build.eb.arc4.base import native_eb
 from puya.awst_build.eb.base import NodeBuilder
+from puya.awst_build.eb.bytes_backed import BytesBackedClassExpressionBuilder
 from puya.errors import CodeError
 
 if typing.TYPE_CHECKING:
@@ -22,7 +22,7 @@ if typing.TYPE_CHECKING:
     from puya.parse import SourceLocation
 
 
-class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
+class DynamicBytesClassExpressionBuilder(BytesBackedClassExpressionBuilder):
     wtype: wtypes.ARC4DynamicArray
 
     def __init__(self, location: SourceLocation):
