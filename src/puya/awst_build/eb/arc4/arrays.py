@@ -43,7 +43,8 @@ from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
+    FunctionBuilder,
+    InstanceBuilder,
     Iteration,
     TypeBuilder,
     ValueExpressionBuilder,
@@ -212,6 +213,7 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
     def __init__(self, location: SourceLocation):
         super().__init__(location=location, wtype=wtypes.arc4_address_type)
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -224,7 +226,7 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
             case []:
                 const_op = intrinsic_factory.zero_address(location, as_type=self.wtype)
                 return AddressExpressionBuilder(const_op)
-            case [ExpressionBuilder(value_type=wtypes.account_wtype) as eb]:
+            case [InstanceBuilder(pytype=pytypes.AccountType) as eb]:
                 address_bytes: Expression = get_bytes_expr(eb.rvalue())
             case [Literal(value=str(addr_value))]:
                 if not wtypes.valid_address(addr_value):
@@ -234,7 +236,7 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
                         location,
                     )
                 address_bytes = AddressConstant(value=addr_value, source_location=location)
-            case [ExpressionBuilder(value_type=wtypes.bytes_wtype) as eb]:
+            case [InstanceBuilder(pytype=pytypes.BytesType) as eb]:
                 value = eb.rvalue()
                 address_bytes_temp = SingleEvaluation(value)
                 is_correct_length = NumericComparisonExpression(
@@ -269,11 +271,14 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
         )
 
 
-class ARC4ArrayExpressionBuilder(ValueExpressionBuilder, ABC):
-    wtype: wtypes.ARC4DynamicArray | wtypes.ARC4StaticArray
+class ARC4ArrayExpressionBuilder(ValueExpressionBuilder[pytypes.ArrayType], ABC):
+    def __init__(self, typ: pytypes.PyType, expr: Expression):
+        assert isinstance(typ, pytypes.ArrayType)
+        super().__init__(typ, expr)
 
+    @typing.override
     def iterate(self) -> Iteration:
-        if not self.wtype.element_type.immutable:
+        if not self.pytype.wtype.element_type.immutable:
             logger.error(
                 "Cannot directly iterate an ARC4 array of mutable objects,"
                 " construct a for-loop over the indexes via urange(<array>.length) instead",
@@ -281,6 +286,7 @@ class ARC4ArrayExpressionBuilder(ValueExpressionBuilder, ABC):
             )
         return self.rvalue()
 
+    @typing.override
     def index(
         self, index: ExpressionBuilder | Literal, location: SourceLocation
     ) -> ExpressionBuilder:
@@ -306,6 +312,7 @@ class ARC4ArrayExpressionBuilder(ValueExpressionBuilder, ABC):
             )
         )
 
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         match name:
             case "bytes":
@@ -315,20 +322,16 @@ class ARC4ArrayExpressionBuilder(ValueExpressionBuilder, ABC):
             case _:
                 return super().member_access(name, location)
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
     ) -> ExpressionBuilder:
         return arc4_compare_bytes(self, op, other, location)
 
 
 class DynamicArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
-    def __init__(self, expr: Expression):
-        assert isinstance(expr.wtype, wtypes.ARC4DynamicArray)
-        self.wtype: wtypes.ARC4DynamicArray = expr.wtype
-        super().__init__(expr)
-
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
-
         match name:
             case "length":
                 return UInt64ExpressionBuilder(
@@ -348,8 +351,9 @@ class DynamicArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
             case _:
                 return super().member_access(name, location)
 
+    @typing.override
     def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: ExpressionBuilder | Literal, location: SourceLocation
+        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
         match op:
             case BuilderBinaryOp.add:
@@ -370,14 +374,15 @@ class DynamicArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
             case _:
                 return super().augmented_assignment(op, rhs, location)
 
+    @typing.override
     def binary_op(
         self,
-        other: ExpressionBuilder | Literal,
+        other: InstanceBuilder | Literal,
         op: BuilderBinaryOp,
         location: SourceLocation,
         *,
         reverse: bool,
-    ) -> ExpressionBuilder:
+    ) -> InstanceBuilder:
         match op:
             case BuilderBinaryOp.add:
                 lhs = self.expr
@@ -403,7 +408,8 @@ class DynamicArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
             case _:
                 return super().binary_op(other, op, location, reverse=reverse)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         return arc4_bool_bytes(
             expr=self.expr,
             false_bytes=b"\x00\x00",
@@ -412,7 +418,7 @@ class DynamicArrayExpressionBuilder(ARC4ArrayExpressionBuilder):
         )
 
 
-class AppendExpressionBuilder(IntermediateExpressionBuilder):
+class AppendExpressionBuilder(FunctionBuilder):
     def __init__(self, expr: Expression, location: SourceLocation):
         super().__init__(location)
         self.expr = expr
@@ -422,6 +428,7 @@ class AppendExpressionBuilder(IntermediateExpressionBuilder):
             )
         self.wtype: wtypes.ARC4DynamicArray = expr.wtype
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -443,7 +450,7 @@ class AppendExpressionBuilder(IntermediateExpressionBuilder):
         )
 
 
-class PopExpressionBuilder(IntermediateExpressionBuilder):
+class PopExpressionBuilder(FunctionBuilder):
     def __init__(self, expr: Expression, location: SourceLocation):
         super().__init__(location)
         self.expr = expr
@@ -453,6 +460,7 @@ class PopExpressionBuilder(IntermediateExpressionBuilder):
             )
         self.wtype: wtypes.ARC4DynamicArray = expr.wtype
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -472,7 +480,7 @@ class PopExpressionBuilder(IntermediateExpressionBuilder):
                 raise CodeError("Invalid/Unhandled arguments", location)
 
 
-class ExtendExpressionBuilder(IntermediateExpressionBuilder):
+class ExtendExpressionBuilder(FunctionBuilder):
     def __init__(self, expr: Expression, location: SourceLocation):
         super().__init__(location)
         self.expr = expr
@@ -482,6 +490,7 @@ class ExtendExpressionBuilder(IntermediateExpressionBuilder):
             )
         self.wtype: wtypes.ARC4DynamicArray = expr.wtype
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],

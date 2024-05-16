@@ -24,7 +24,8 @@ from puya.awst_build.eb._utils import get_bytes_expr, get_bytes_expr_builder
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     ExpressionBuilder,
-    IntermediateExpressionBuilder,
+    FunctionBuilder,
+    InstanceBuilder,
     ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
@@ -43,6 +44,7 @@ logger = log.get_logger(__name__)
 
 
 class ARC4ClassExpressionBuilder(BytesBackedClassExpressionBuilder, abc.ABC):
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         match name:
             case "from_log":
@@ -59,7 +61,7 @@ def get_integer_literal_value(eb_or_literal: ExpressionBuilder | Literal, purpos
             raise CodeError(f"{purpose} must be compile time constant")
 
 
-class ARC4FromLogBuilder(IntermediateExpressionBuilder):
+class ARC4FromLogBuilder(FunctionBuilder):
     def __init__(self, location: SourceLocation, wtype: wtypes.WType):
         super().__init__(location=location)
         self.wtype = wtype
@@ -95,6 +97,7 @@ class ARC4FromLogBuilder(IntermediateExpressionBuilder):
             wtype=wtype,
         )
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -104,17 +107,18 @@ class ARC4FromLogBuilder(IntermediateExpressionBuilder):
         location: SourceLocation,
     ) -> ExpressionBuilder:
         match args:
-            case [ExpressionBuilder() as eb]:
+            case [InstanceBuilder() as eb]:
                 return var_expression(self.abi_expr_from_log(self.wtype, eb.rvalue(), location))
             case _:
                 raise CodeError("Invalid/unhandled arguments", location)
 
 
-class CopyBuilder(IntermediateExpressionBuilder):
+class CopyBuilder(FunctionBuilder):
     def __init__(self, expr: Expression, location: SourceLocation):
         super().__init__(location)
         self.expr = expr
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -150,6 +154,7 @@ def native_eb(expr: Expression, location: SourceLocation) -> ExpressionBuilder:
 
 
 class ARC4EncodedExpressionBuilder(ValueExpressionBuilder, abc.ABC):
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         match name:
             case "native":
@@ -159,23 +164,19 @@ class ARC4EncodedExpressionBuilder(ValueExpressionBuilder, abc.ABC):
             case _:
                 raise CodeError(f"Unrecognised member of bytes: {name}", location)
 
+    @typing.override
     def compare(
-        self, other: ExpressionBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> ExpressionBuilder:
+        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
+    ) -> InstanceBuilder:
         return arc4_compare_bytes(self, op, other, location)
-
-    @abc.abstractmethod
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
-        # TODO: lift this up to ValueExpressionBuilder
-        raise NotImplementedError
 
 
 def arc4_compare_bytes(
-    lhs: ValueExpressionBuilder,
+    lhs: InstanceBuilder,
     op: BuilderComparisonOp,
-    rhs: ExpressionBuilder | Literal,
+    rhs: InstanceBuilder | Literal,
     location: SourceLocation,
-) -> ExpressionBuilder:
+) -> InstanceBuilder:
     if isinstance(rhs, Literal):
         raise CodeError(
             f"Cannot compare arc4 encoded value of {lhs.wtype} to a literal value", location
@@ -185,7 +186,7 @@ def arc4_compare_bytes(
         return NotImplemented
     cmp_expr = BytesComparisonExpression(
         source_location=location,
-        lhs=get_bytes_expr(lhs.expr),
+        lhs=get_bytes_expr(lhs.rvalue()),
         operator=EqualityComparison(op.value),
         rhs=get_bytes_expr(other_expr),
     )
@@ -194,7 +195,7 @@ def arc4_compare_bytes(
 
 def arc4_bool_bytes(
     expr: Expression, false_bytes: bytes, location: SourceLocation, *, negate: bool
-) -> ExpressionBuilder:
+) -> InstanceBuilder:
     return BoolExpressionBuilder(
         BytesComparisonExpression(
             operator=EqualityComparison.eq if negate else EqualityComparison.ne,

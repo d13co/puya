@@ -12,6 +12,9 @@ from puya.parse import SourceLocation
 
 
 class VoidTypeExpressionBuilder(TypeBuilder):
+    def __init__(self, location: SourceLocation):
+        super().__init__(pytypes.TypeType(pytypes.NoneType), location)
+
     @typing.override
     def call(
         self,
@@ -26,6 +29,9 @@ class VoidTypeExpressionBuilder(TypeBuilder):
 
 
 class VoidExpressionBuilder(ValueExpressionBuilder):
+    def __init__(self, expr: Expression):
+        super().__init__(pytypes.NoneType, expr)
+
     def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
         return bool_eval_to_constant(value=True, location=location, negate=negate)
 

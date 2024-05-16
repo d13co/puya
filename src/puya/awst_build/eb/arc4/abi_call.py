@@ -39,6 +39,7 @@ from puya.awst_build.eb.arc4.base import ARC4FromLogBuilder
 from puya.awst_build.eb.base import (
     ExpressionBuilder,
     GenericClassExpressionBuilder,
+    InstanceBuilder,
     IntermediateExpressionBuilder,
     TypeBuilder,
 )
@@ -46,6 +47,7 @@ from puya.awst_build.eb.subroutine import BaseClassSubroutineInvokerExpressionBu
 from puya.awst_build.eb.transaction.fields import get_field_python_name
 from puya.awst_build.eb.transaction.inner_params import get_field_expr
 from puya.awst_build.eb.var_factory import var_expression
+from puya.awst_build.utils import expect_instance_builder_or_literal
 from puya.errors import CodeError, InternalError
 
 if typing.TYPE_CHECKING:
@@ -81,8 +83,8 @@ _APP_TRANSACTION_FIELDS = {
 @attrs.frozen
 class _ABICallExpr:
     method: ExpressionBuilder | Literal
-    abi_args: Sequence[ExpressionBuilder | Literal]
-    transaction_kwargs: dict[str, ExpressionBuilder | Literal]
+    abi_args: Sequence[InstanceBuilder | Literal]
+    transaction_kwargs: dict[str, InstanceBuilder | Literal]
     abi_arg_typs: Sequence[pytypes.PyType]
 
 
@@ -378,23 +380,24 @@ def _extract_abi_call_args(
     location: SourceLocation,
 ) -> _ABICallExpr:
     method: ExpressionBuilder | Literal | None = None
-    abi_args = list[ExpressionBuilder | Literal]()
-    kwargs = dict[str, ExpressionBuilder | Literal]()
+    abi_args = list[InstanceBuilder | Literal]()
+    kwargs = dict[str, InstanceBuilder | Literal]()
     abi_arg_typs = []
     for i in range(len(args)):
         arg_kind = arg_kinds[i]
         arg_name = arg_names[i]
         arg = args[i]
 
-        if arg_kind == mypy.nodes.ArgKind.ARG_POS and i == 0:
-            method = arg
-        elif arg_kind == mypy.nodes.ArgKind.ARG_POS:
-            abi_args.append(arg)
-            abi_arg_typs.append(arg_typs[i])
+        if arg_kind == mypy.nodes.ArgKind.ARG_POS:
+            if i == 0:
+                method = arg
+            else:
+                abi_args.append(expect_instance_builder_or_literal(arg))
+                abi_arg_typs.append(arg_typs[i])
         elif arg_kind == mypy.nodes.ArgKind.ARG_NAMED:
             if arg_name is None:
                 raise InternalError(f"Expected named argument at pos {i}", location)
-            kwargs[arg_name] = arg
+            kwargs[arg_name] = expect_instance_builder_or_literal(arg)
         else:
             raise CodeError(f"Unexpected argument kind for '{arg_name}'", location)
     if method is None:

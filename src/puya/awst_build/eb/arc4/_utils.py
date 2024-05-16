@@ -16,7 +16,7 @@ from puya.awst import (
 from puya.awst.nodes import DecimalConstant, Expression, Literal
 from puya.awst_build import constants, pytypes
 from puya.awst_build.arc4_utils import arc4_encode, get_arc4_method_config, get_func_types
-from puya.awst_build.eb.base import ExpressionBuilder
+from puya.awst_build.eb.base import InstanceBuilder
 from puya.awst_build.utils import convert_literal, get_decorators_by_fullname
 from puya.errors import CodeError
 
@@ -110,14 +110,14 @@ def convert_arc4_literal(
 
 
 def expect_arc4_operand_wtype(
-    literal_or_expr: awst_nodes.Literal | awst_nodes.Expression | ExpressionBuilder,
+    literal_or_expr: awst_nodes.Literal | awst_nodes.Expression | InstanceBuilder,
     target_wtype: wtypes.WType,
 ) -> awst_nodes.Expression:
     if isinstance(literal_or_expr, awst_nodes.Literal):
         if isinstance(target_wtype, wtypes.ARC4Type):
             return convert_arc4_literal(literal_or_expr, target_wtype)
         return convert_literal(literal_or_expr, target_wtype)
-    if isinstance(literal_or_expr, ExpressionBuilder):
+    if isinstance(literal_or_expr, InstanceBuilder):
         literal_or_expr = literal_or_expr.rvalue()
 
     if wtypes.has_arc4_equivalent_type(target_wtype):
@@ -168,7 +168,7 @@ def get_arc4_signature(
 def get_arc4_args_and_signature(
     method_sig: str,
     arg_typs: Sequence[pytypes.PyType],
-    native_args: Sequence[ExpressionBuilder | Literal],
+    native_args: Sequence[InstanceBuilder | Literal],
     loc: SourceLocation,
 ) -> tuple[Sequence[Expression], ARC4Signature]:
     method_name, maybe_args, maybe_return_type = _parse_method_signature(method_sig, loc)

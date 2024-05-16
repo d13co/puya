@@ -1,6 +1,5 @@
 import enum
 
-from puya.awst import wtypes
 from puya.awst.nodes import UInt64Constant
 from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder
 from puya.awst_build.eb.uint64 import UInt64ExpressionBuilder
@@ -13,9 +12,6 @@ class NamedIntegerConstsTypeBuilder(TypeBuilder):
         super().__init__(location=location)
         self.enum_name = enum_name
         self.data = data
-
-    def produces(self) -> wtypes.WType:
-        return wtypes.uint64_wtype
 
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         try:
