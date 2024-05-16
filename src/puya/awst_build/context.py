@@ -178,6 +178,9 @@ class ASTConversionModuleContext(ASTConversionContext):
                 return pytypes.BytesLiteralType
             case mypy.nodes.StrExpr():
                 return pytypes.StrLiteralType
+            case mypy.nodes.RefExpr(node=mypy.nodes.Var(type=mypy.types.Type() as var_typ)):
+                # this can be due to unreachable code
+                return self.type_to_pytype(var_typ, source_location=expr_loc)
             case _:
                 raise InternalError(f"mypy expression not present in type table: {expr}", expr_loc)
 
@@ -264,7 +267,7 @@ class ASTConversionModuleContext(ASTConversionContext):
             case mypy.types.NoneType() | mypy.types.PartialType(type=None):
                 return pytypes.NoneType
             case mypy.types.UninhabitedType():
-                raise CodeError("Cannot resolve empty type", loc)
+                return pytypes.NoneType  # TODO: make this it's own type
             case mypy.types.AnyType(type_of_any=type_of_any):
                 msg = _type_of_any_to_error_message(type_of_any, loc)
                 raise CodeError(msg, loc)
