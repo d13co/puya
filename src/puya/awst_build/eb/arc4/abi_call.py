@@ -27,7 +27,6 @@ from puya.awst.nodes import (
     UInt64Constant,
 )
 from puya.awst_build import constants, pytypes
-from puya.awst_build.constants import TransactionType
 from puya.awst_build.eb.arc4._utils import (
     ARC4Signature,
     arc4_tuple_from_items,
@@ -37,6 +36,7 @@ from puya.awst_build.eb.arc4._utils import (
 )
 from puya.awst_build.eb.arc4.base import ARC4FromLogBuilder
 from puya.awst_build.eb.base import (
+    CallableBuilder,
     ExpressionBuilder,
     FunctionBuilder,
     InstanceBuilder,
@@ -87,7 +87,7 @@ class _ABICallExpr:
     abi_arg_typs: Sequence[pytypes.PyType]
 
 
-class ABICallGenericClassExpressionBuilder(InstanceBuilder, FunctionBuilder):
+class ABICallFuncBuilder(FunctionBuilder):
     @typing.override
     def call(
         self,
@@ -97,54 +97,23 @@ class ABICallGenericClassExpressionBuilder(InstanceBuilder, FunctionBuilder):
         arg_names: list[str | None],
         location: SourceLocation,
     ) -> ExpressionBuilder:
-        return ABICallClassExpressionBuilder(None, self.source_location).call(
-            args, arg_typs, arg_kinds, arg_names, location
-        )
+        return _abi_call(args, arg_typs, arg_kinds, arg_names, location, return_type=None)
+
+
+class ABICallInstanceBuilder(InstanceBuilder[pytypes.ABICallWithReturnType], CallableBuilder):
+    def __init__(self, typ: pytypes.PyType, source_location: SourceLocation) -> None:
+        assert isinstance(typ, pytypes.ABICallWithReturnType)
+        super().__init__(typ, source_location)
+        # self.result_wtype = result_wtype
+        # app_itxn_wtype = wtypes.WInnerTransaction.from_type(TransactionType.appl)
+        # if _is_typed(result_wtype):
+        #     self.wtype: wtypes.WInnerTransaction | wtypes.WTuple = wtypes.WTuple(
+        #         (result_wtype, app_itxn_wtype), source_location
+        #     )
+        # else:
+        #     self.wtype = app_itxn_wtype
 
     @typing.override
-    def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> TypeBuilder:
-        try:
-            (index,) = indexes
-        except ValueError as ex:
-            raise CodeError("Expected a single type arg", location) from ex
-        match index:
-            case TypeBuilder() as type_class:
-                wtype = type_class.produces()
-            case _:
-                raise CodeError("Invalid type parameter", index.source_location)
-        return ABICallClassExpressionBuilder(wtype, location)
-
-
-class ARC4ClientClassExpressionBuilder(IntermediateExpressionBuilder):
-    def __init__(
-        self,
-        context: ASTConversionModuleContext,
-        source_location: SourceLocation,
-        type_info: mypy.nodes.TypeInfo,
-    ):
-        super().__init__(source_location)
-        self.context = context
-        self.type_info = type_info
-
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
-        return ARC4ClientMethodExpressionBuilder(self.context, self.type_info, name, location)
-
-
-class ARC4ClientMethodExpressionBuilder(IntermediateExpressionBuilder):
-    def __init__(
-        self,
-        context: ASTConversionModuleContext,
-        type_info: mypy.nodes.TypeInfo,
-        name: str,
-        location: SourceLocation,
-    ):
-        super().__init__(location)
-        self.context = context
-        self.type_info = type_info
-        self.name = name
-
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -153,94 +122,77 @@ class ARC4ClientMethodExpressionBuilder(IntermediateExpressionBuilder):
         arg_names: list[str | None],
         location: SourceLocation,
     ) -> ExpressionBuilder:
-        raise CodeError(
-            f"Can't invoke client methods directly, use {constants.CLS_ARC4_ABI_CALL}", location
+        return _abi_call(
+            args=args,
+            arg_typs=arg_typs,
+            arg_kinds=arg_kinds,
+            arg_names=arg_names,
+            location=location,
+            return_type=self.pytype.return_type,
         )
 
 
-class ABICallClassExpressionBuilder(TypeBuilder):
-    def __init__(self, result_wtype: wtypes.WType | None, source_location: SourceLocation) -> None:
-        super().__init__(source_location)
-        self.result_wtype = result_wtype
-        app_itxn_wtype = wtypes.WInnerTransaction.from_type(TransactionType.appl)
-        if _is_typed(result_wtype):
-            self.wtype: wtypes.WInnerTransaction | wtypes.WTuple = wtypes.WTuple(
-                (result_wtype, app_itxn_wtype), source_location
+def _abi_call(
+    args: Sequence[ExpressionBuilder | Literal],
+    arg_typs: Sequence[pytypes.PyType],
+    arg_kinds: list[mypy.nodes.ArgKind],
+    arg_names: list[str | None],
+    location: SourceLocation,
+    *,
+    return_type: pytypes.PyType | None,
+) -> ExpressionBuilder:
+    abi_call_expr = _extract_abi_call_args(args, arg_typs, arg_kinds, arg_names, location)
+    method = abi_call_expr.method
+
+    match method:
+        case Literal(value=str(method_str)):
+            arc4_args, signature = get_arc4_args_and_signature(
+                method_str, abi_call_expr.abi_arg_typs, abi_call_expr.abi_args, location
             )
-        else:
-            self.wtype = app_itxn_wtype
-
-    def produces(self) -> wtypes.WType:
-        return self.wtype
-
-    def call(
-        self,
-        args: Sequence[ExpressionBuilder | Literal],
-        arg_typs: Sequence[pytypes.PyType],
-        arg_kinds: list[mypy.nodes.ArgKind],
-        arg_names: list[str | None],
-        location: SourceLocation,
-    ) -> ExpressionBuilder:
-        abi_call_expr = _extract_abi_call_args(args, arg_typs, arg_kinds, arg_names, location)
-        method = abi_call_expr.method
-
-        result_wtype = self.result_wtype
-        match method:
-            case Literal(value=str(method_str)):
-                arc4_args, signature = get_arc4_args_and_signature(
-                    method_str, abi_call_expr.abi_arg_typs, abi_call_expr.abi_args, location
-                )
-                if result_wtype is not None:
-                    # this will be validated against signature below, by comparing
-                    # the generated method_selector against the supplied method_str
-                    signature = attrs.evolve(
-                        signature,
-                        # TODO: remove this HACK
-                        return_type=pytypes._builtins_registry.get(result_wtype.stub_name)
-                        or pytypes.ARC4DynamicBytesType,
-                    )
-                elif signature.return_type is None:
-                    signature = attrs.evolve(signature, return_type=pytypes.NoneType)
-                if not signature.method_selector.startswith(method_str):
-                    raise CodeError(
-                        f"Method selector from args '{signature.method_selector}' "
-                        f"does not match provided method selector: '{method_str}'",
-                        method.source_location,
-                    )
-            case (
-                ARC4ClientMethodExpressionBuilder() | BaseClassSubroutineInvokerExpressionBuilder()
-            ) as eb:  # TODO: can probably use func type from arg_typs now
-                signature = get_arc4_signature(eb.context, eb.type_info, eb.name, location)
-                result_wtype = (
-                    signature.return_type.wtype if signature.return_type is not None else None
-                )
-                num_args = len(abi_call_expr.abi_args)
-                num_types = len(signature.arg_types)
-                if num_types != num_args:
-                    raise CodeError(
-                        f"Number of arguments ({num_args})"
-                        f" does not match signature ({num_types})",
-                        location,
-                    )
-                arc4_args = [
-                    expect_arc4_operand_wtype(arg, pt.wtype)
-                    for arg, pt in zip(abi_call_expr.abi_args, signature.arg_types, strict=True)
-                ]
-            case _:
+            if return_type is not None:
+                # this will be validated against signature below, by comparing
+                # the generated method_selector against the supplied method_str
+                signature = attrs.evolve(signature, return_type=return_type)
+            elif signature.return_type is None:
+                signature = attrs.evolve(signature, return_type=pytypes.NoneType)
+            if not signature.method_selector.startswith(method_str):
                 raise CodeError(
-                    "First argument must be a `str` value of an ARC4 method name/selector",
+                    f"Method selector from args '{signature.method_selector}' "
+                    f"does not match provided method selector: '{method_str}'",
+                    method.source_location,
+                )
+        case (
+            ARC4ClientMethodExpressionBuilder() | BaseClassSubroutineInvokerExpressionBuilder()
+        ) as eb:  # TODO: can probably use func type from arg_typs now
+            signature = get_arc4_signature(eb.context, eb.type_info, eb.name, location)
+            assert signature.return_type is not None  # TODO: error
+            return_type = signature.return_type
+            num_args = len(abi_call_expr.abi_args)
+            num_types = len(signature.arg_types)
+            if num_types != num_args:
+                raise CodeError(
+                    f"Number of arguments ({num_args}) does not match signature ({num_types})",
                     location,
                 )
-
-        return var_expression(
-            _create_abi_call_expr(
-                signature,
-                arc4_args,
-                abi_call_expr.transaction_kwargs,
+            arc4_args = [
+                expect_arc4_operand_wtype(arg, pt.wtype)
+                for arg, pt in zip(abi_call_expr.abi_args, signature.arg_types, strict=True)
+            ]
+        case _:
+            raise CodeError(
+                "First argument must be a `str` value of an ARC4 method name/selector",
                 location,
-                return_inner_txn_only=not _is_typed(result_wtype),
             )
+
+    return var_expression(
+        _create_abi_call_expr(
+            signature,
+            arc4_args,
+            abi_call_expr.transaction_kwargs,
+            location,
+            return_inner_txn_only=not _is_typed(return_type),
         )
+    )
 
 
 def _is_typed(wtype: wtypes.WType | None) -> typing.TypeGuard[wtypes.WType]:
@@ -406,3 +358,44 @@ def _extract_abi_call_args(
     return _ABICallExpr(
         method=method, abi_args=abi_args, transaction_kwargs=kwargs, abi_arg_typs=abi_arg_typs
     )
+
+
+class ARC4ClientClassExpressionBuilder(TypeBuilder):
+    def __init__(
+        self,
+        context: ASTConversionModuleContext,
+        source_location: SourceLocation,
+        type_info: mypy.nodes.TypeInfo,
+    ):
+        super().__init__(source_location)
+        self.context = context
+        self.type_info = type_info
+
+    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+        return ARC4ClientMethodExpressionBuilder(self.context, self.type_info, name, location)
+
+
+class ARC4ClientMethodExpressionBuilder(FunctionBuilder):
+    def __init__(
+        self,
+        context: ASTConversionModuleContext,
+        type_info: mypy.nodes.TypeInfo,
+        name: str,
+        location: SourceLocation,
+    ):
+        super().__init__(location)
+        self.context = context
+        self.type_info = type_info
+        self.name = name
+
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_typs: Sequence[pytypes.PyType],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+    ) -> ExpressionBuilder:
+        raise CodeError(
+            f"Can't invoke client methods directly, use {constants.CLS_ARC4_ABI_CALL}", location
+        )

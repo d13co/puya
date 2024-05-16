@@ -1,4 +1,5 @@
 import typing
+from collections.abc import Sequence
 
 import mypy.nodes
 import mypy.types
@@ -10,6 +11,7 @@ from puya.awst.nodes import (
     BaseClassSubroutineTarget,
     BoxProxyField,
     InstanceSubroutineTarget,
+    Literal,
 )
 from puya.awst_build import pytypes
 from puya.awst_build.context import ASTConversionModuleContext
@@ -47,6 +49,18 @@ class ContractTypeExpressionBuilder(TypeBuilder):
         self.context = context
         self._type_info = type_info
 
+    @typing.override
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_typs: Sequence[pytypes.PyType],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+    ) -> ExpressionBuilder:
+        raise CodeError("Contract instances cannot be instantiated", location)
+
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         type_info = self._type_info
         cref = qualified_class_name(type_info)

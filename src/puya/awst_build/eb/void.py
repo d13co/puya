@@ -6,7 +6,12 @@ import mypy.nodes
 from puya.awst.nodes import Literal
 from puya.awst_build import pytypes
 from puya.awst_build.eb._utils import bool_eval_to_constant
-from puya.awst_build.eb.base import ExpressionBuilder, TypeBuilder, ValueExpressionBuilder
+from puya.awst_build.eb.base import (
+    ExpressionBuilder,
+    InstanceBuilder,
+    TypeBuilder,
+    ValueExpressionBuilder,
+)
 from puya.errors import CodeError
 from puya.parse import SourceLocation
 
@@ -32,7 +37,8 @@ class VoidExpressionBuilder(ValueExpressionBuilder):
     def __init__(self, expr: Expression):
         super().__init__(pytypes.NoneType, expr)
 
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> ExpressionBuilder:
+    @typing.override
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
         return bool_eval_to_constant(value=True, location=location, negate=negate)
 
     def lvalue(self) -> typing.Never:

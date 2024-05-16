@@ -1,3 +1,4 @@
+# ruff: noqa: ARG002
 from __future__ import annotations
 
 import abc
@@ -7,7 +8,6 @@ import typing
 import typing_extensions
 
 from puya.awst.nodes import (
-    BytesConstant,
     ContractReference,
     Expression,
     FieldExpression,
@@ -21,7 +21,6 @@ from puya.awst.nodes import (
     TupleItemExpression,
 )
 from puya.awst_build import pytypes
-from puya.awst_build.contract_data import AppStorageDeclaration
 from puya.errors import CodeError, InternalError
 
 if typing.TYPE_CHECKING:
@@ -31,6 +30,7 @@ if typing.TYPE_CHECKING:
     import mypy.types
 
     from puya.awst import wtypes
+    from puya.awst_build.contract_data import AppStorageDeclaration
     from puya.parse import SourceLocation
 
 __all__ = [
@@ -77,13 +77,25 @@ class BuilderBinaryOp(enum.StrEnum):
     bit_and = "&"
 
 
-class ExpressionBuilder(abc.ABC):
-    def __init__(self, location: SourceLocation):
-        self.source_location = location
+_TPyType = typing_extensions.TypeVar(
+    "_TPyType", bound=pytypes.PyType, default=pytypes.PyType, covariant=True
+)
 
+
+class ExpressionBuilder(typing.Generic[_TPyType], abc.ABC):
+    def __init__(self, typ: _TPyType, location: SourceLocation):
+        self._pytype = typ
+        self._source_location = location
+
+    @typing.final
     @property
-    @abc.abstractmethod
-    def pytype(self) -> pytypes.PyType: ...
+    def pytype(self) -> _TPyType:
+        return self._pytype
+
+    @typing.final
+    @property
+    def source_location(self) -> SourceLocation:
+        return self._source_location
 
     def __str__(self) -> str:
         return str(self.pytype)
@@ -91,10 +103,13 @@ class ExpressionBuilder(abc.ABC):
     @abc.abstractmethod
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         """Handle self.name"""
-        raise CodeError(f"{self} does not support member access {name}", location)
+
+    @abc.abstractmethod
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
+        """Handle boolean-ness evaluation, possibly inverted (ie "not" unary operator)"""
 
 
-class CallableBuilder(ExpressionBuilder, abc.ABC):
+class CallableBuilder(ExpressionBuilder[_TPyType], abc.ABC):
     @abc.abstractmethod
     def call(
         self,
@@ -107,34 +122,27 @@ class CallableBuilder(ExpressionBuilder, abc.ABC):
         """Handle self(args...)"""
 
 
-class FunctionBuilder(CallableBuilder, abc.ABC):
-    def __init__(self, typ: pytypes.FuncType, location: SourceLocation):
-        super().__init__(location)
-        self._pytype = typ
-
-    @property
-    def pytype(self) -> pytypes.FuncType:
-        return self._pytype
-
+class FunctionBuilder(CallableBuilder[pytypes.FuncType], abc.ABC):
     @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         raise CodeError(f"{self} is a function and does not support member access", location)
 
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
+        from puya.awst_build.eb._utils import bool_eval_to_constant
 
-class TypeBuilder(CallableBuilder, abc.ABC):
-    def __init__(self, typ: pytypes.TypeType, location: SourceLocation):
-        super().__init__(location)
-        self._pytype = typ
+        return bool_eval_to_constant(value=True, location=location, negate=negate)
 
-    @typing.override
-    @property
-    def pytype(self) -> pytypes.TypeType:
-        return self._pytype
 
+class TypeBuilder(CallableBuilder[pytypes.TypeType], abc.ABC):
     @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
         """Handle self.name"""
         raise CodeError(f"{self.pytype.typ} does not support static member access", location)
+
+    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
+        from puya.awst_build.eb._utils import bool_eval_to_constant
+
+        return bool_eval_to_constant(value=True, location=location, negate=negate)
 
 
 class GenericTypeBuilder(TypeBuilder, abc.ABC):
@@ -154,7 +162,7 @@ class GenericTypeBuilder(TypeBuilder, abc.ABC):
         raise CodeError("Generic type usage requires parameters", location)
 
 
-class InstanceBuilder(ExpressionBuilder, abc.ABC):
+class InstanceBuilder(ExpressionBuilder[_TPyType], abc.ABC):
     @abc.abstractmethod
     def rvalue(self) -> Expression:
         """Produce an expression for use as an intermediary"""
@@ -163,33 +171,27 @@ class InstanceBuilder(ExpressionBuilder, abc.ABC):
     def lvalue(self) -> Lvalue:
         """Produce an expression for the target of an assignment"""
 
-    @abc.abstractmethod
     def delete(self, location: SourceLocation) -> Statement:
-        """Handle del operator statement"""
+        raise CodeError(f"{self} is not valid as del target", location)
 
-    @abc.abstractmethod
-    def bool_eval(self, location: SourceLocation, *, negate: bool = False) -> InstanceBuilder:
-        """Handle boolean-ness evaluation, possibly inverted (ie "not" unary operator)"""
+    @typing.override
+    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
+        raise CodeError(f"Unrecognised member of {self}: {name}", location)
 
-    @abc.abstractmethod
     def unary_plus(self, location: SourceLocation) -> InstanceBuilder:
-        """Handle +self"""
+        raise CodeError(f"{self} does not support unary plus operator", location)
 
-    @abc.abstractmethod
     def unary_minus(self, location: SourceLocation) -> InstanceBuilder:
-        """Handle -self"""
+        raise CodeError(f"{self} does not support unary minus operator", location)
 
-    @abc.abstractmethod
     def bitwise_invert(self, location: SourceLocation) -> InstanceBuilder:
-        """Handle ~self"""
+        raise CodeError(f"{self} does not support bitwise inversion", location)
 
-    @abc.abstractmethod
     def compare(
         self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
     ) -> InstanceBuilder:
-        """handle self {comparison op} other"""
+        return NotImplemented
 
-    @abc.abstractmethod
     def binary_op(
         self,
         other: InstanceBuilder | Literal,
@@ -198,20 +200,22 @@ class InstanceBuilder(ExpressionBuilder, abc.ABC):
         *,
         reverse: bool,
     ) -> InstanceBuilder:
-        """handle self {binary op} other"""
+        return NotImplemented
 
-    @abc.abstractmethod
     def augmented_assignment(
         self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
     ) -> Statement:
-        """Handle self {binary op}= rhs"""
+        raise CodeError(f"{self} does not support augmented assignment", location)
 
+
+class ContainerBuilder(InstanceBuilder[_TPyType], abc.ABC):
     @abc.abstractmethod
     def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
         """Handle self[index]"""
+        raise CodeError(f"{self} does not support indexing", location)
 
     @abc.abstractmethod
-    def slice_index(  # TODO: roll into index, have a Slice EB
+    def slice_index(  # TODO: maybe roll into index, have a Slice EB ??
         self,
         begin_index: InstanceBuilder | Literal | None,
         end_index: InstanceBuilder | Literal | None,
@@ -219,54 +223,33 @@ class InstanceBuilder(ExpressionBuilder, abc.ABC):
         location: SourceLocation,
     ) -> InstanceBuilder:
         """Handle self[begin_index:end_index:stride]"""
+        raise CodeError(f"{self} does not support slicing", location)
 
     @abc.abstractmethod
     def contains(
         self, item: InstanceBuilder | Literal, location: SourceLocation
     ) -> InstanceBuilder:
         """Handle `elem in self`"""
+        raise CodeError(f"{self} does not support in/not in checks", location)
 
     @abc.abstractmethod
     def iterate(self) -> Iteration:
         """handle for ... in self"""
+        raise CodeError(f"{self} does not support iteration", self.source_location)
 
 
-class StateProxyDefinitionBuilder(InstanceBuilder, abc.ABC):
-    def __init__(
-        self,
-        location: SourceLocation,
-        storage: wtypes.WType,
-        key_override: BytesConstant | None,
-        description: str | None,
-        initial_value: Expression | None = None,
-    ):
-        super().__init__(location)
-        self.storage = storage
-        self.key_override = key_override
-        self.description = description
-        self.initial_value = initial_value
-
+class StateProxyDefinitionBuilder(ExpressionBuilder[pytypes.StorageProxyType], abc.ABC):
+    @abc.abstractmethod
     def build_definition(
         self,
         member_name: str,
         defined_in: ContractReference,
         typ: pytypes.PyType,
         location: SourceLocation,
-    ) -> AppStorageDeclaration:
-        return AppStorageDeclaration(
-            description=self.description,
-            member_name=member_name,
-            key_override=self.key_override,
-            source_location=location,
-            typ=typ,
-            defined_in=defined_in,
-        )
+    ) -> AppStorageDeclaration: ...
 
 
-_TPyType = typing_extensions.TypeVar("_TPyType", bound=pytypes.PyType, default=pytypes.PyType)
-
-
-class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC):
+class ValueExpressionBuilder(InstanceBuilder[_TPyType], abc.ABC):
 
     def __init__(self, typ: _TPyType, expr: Expression):
         if expr.wtype != typ.wtype:
@@ -274,18 +257,12 @@ class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC)
                 f"Invalid type of expression for {typ}: {expr.wtype}",
                 expr.source_location,
             )
-        super().__init__(expr.source_location)
-        self._pytype = typ
+        super().__init__(typ, expr.source_location)
         self.__expr = expr
 
     @property
     def expr(self) -> Expression:
         return self.__expr
-
-    @typing.override
-    @property
-    def pytype(self) -> _TPyType:
-        return self._pytype
 
     @property
     def wtype(self) -> wtypes.WType:  # TODO: YEET ME
@@ -299,74 +276,6 @@ class ValueExpressionBuilder(InstanceBuilder, typing.Generic[_TPyType], abc.ABC)
     @typing.override
     def rvalue(self) -> Expression:
         return self.expr
-
-    @typing.override
-    def delete(self, location: SourceLocation) -> Statement:
-        raise CodeError(f"{self} is not valid as del target", location)
-
-    @typing.override
-    def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
-        raise CodeError(f"{self} does not support indexing", location)
-
-    @typing.override
-    def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder | Literal:
-        raise CodeError(f"Unrecognised member of {self}: {name}", location)
-
-    @typing.override
-    def iterate(self) -> Iteration:
-        """Produce target of ForInLoop"""
-        raise CodeError(f"{self} does not support iteration", self.source_location)
-
-    @typing.override
-    def unary_plus(self, location: SourceLocation) -> InstanceBuilder:
-        raise CodeError(f"{self} does not support unary plus operator", location)
-
-    @typing.override
-    def unary_minus(self, location: SourceLocation) -> InstanceBuilder:
-        raise CodeError(f"{self} does not support unary minus operator", location)
-
-    @typing.override
-    def bitwise_invert(self, location: SourceLocation) -> InstanceBuilder:
-        raise CodeError(f"{self} does not support bitwise inversion", location)
-
-    @typing.override
-    def contains(
-        self, item: InstanceBuilder | Literal, location: SourceLocation
-    ) -> InstanceBuilder:
-        raise CodeError(f"{self} does not support in/not in checks", location)
-
-    @typing.override
-    def compare(
-        self, other: InstanceBuilder | Literal, op: BuilderComparisonOp, location: SourceLocation
-    ) -> InstanceBuilder:
-        return NotImplemented
-
-    @typing.override
-    def binary_op(
-        self,
-        other: InstanceBuilder | Literal,
-        op: BuilderBinaryOp,
-        location: SourceLocation,
-        *,
-        reverse: bool,
-    ) -> InstanceBuilder:
-        return NotImplemented
-
-    @typing.override
-    def augmented_assignment(
-        self, op: BuilderBinaryOp, rhs: InstanceBuilder | Literal, location: SourceLocation
-    ) -> Statement:
-        raise CodeError(f"{self} does not support augmented assignment", location)
-
-    @typing.override
-    def slice_index(
-        self,
-        begin_index: InstanceBuilder | Literal | None,
-        end_index: InstanceBuilder | Literal | None,
-        stride: InstanceBuilder | Literal | None,
-        location: SourceLocation,
-    ) -> InstanceBuilder:
-        raise CodeError(f"{self} does not support slicing", location)
 
 
 def _validate_lvalue(resolved: Expression) -> Lvalue:

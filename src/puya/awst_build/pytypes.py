@@ -931,3 +931,41 @@ ARC4ContractBaseType: typing.Final[PyType] = _BaseType(
 ARC4ClientBaseType: typing.Final[PyType] = _BaseType(name=constants.CLS_ARC4_CLIENT)
 ARC4StructBaseType: typing.Final[PyType] = _BaseType(name=constants.CLS_ARC4_STRUCT)
 StructBaseType: typing.Final[PyType] = _BaseType(name=constants.STRUCT_BASE)
+
+
+@typing.final
+@attrs.frozen
+class ABICallWithReturnType(PyType):
+    return_type: PyType
+    generic: _GenericType[ABICallWithReturnType]
+    bases: Sequence[PyType] = attrs.field(default=(), init=False)
+    mro: Sequence[PyType] = attrs.field(default=(), init=False)
+
+    @property
+    def wtype(self) -> typing.Never:
+        raise CodeError(f"{self} not a value")
+
+
+def _parameterise_abi_call_with_return_type(
+    self: _GenericType[ABICallWithReturnType],
+    args: _TypeArgs,
+    source_location: SourceLocation | None,
+) -> ABICallWithReturnType:
+    try:
+        (arg,) = args
+    except ValueError:
+        raise CodeError(
+            f"Expected a single type parameter, got {len(args)} parameters", source_location
+        ) from None
+    name = f"{self.name}[{arg.name}]"
+    return ABICallWithReturnType(
+        generic=self,
+        name=name,
+        return_type=arg,
+    )
+
+
+GenericABICallWithReturnType: typing.Final[PyType] = _GenericType(
+    name=f"{constants.ARC4_PREFIX}_ABICallWithReturnProtocol",
+    parameterise=_parameterise_abi_call_with_return_type,
+)
