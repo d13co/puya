@@ -8,15 +8,15 @@ from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderBinaryOp,
     BuilderComparisonOp,
+    InstanceExpressionBuilder,
     Iteration,
     NodeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.var_factory import var_expression
 from puya.parse import SourceLocation
 
 
-class ValueProxyExpressionBuilder(ValueExpressionBuilder):
+class ValueProxyExpressionBuilder(InstanceExpressionBuilder):
     @property
     def _proxied(self) -> NodeBuilder:
         return var_expression(self.expr)

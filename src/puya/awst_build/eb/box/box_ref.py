@@ -15,10 +15,10 @@ from puya.awst.nodes import (
 )
 from puya.awst_build import constants, pytypes
 from puya.awst_build.eb.base import (
+    InstanceExpressionBuilder,
     IntermediateExpressionBuilder,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.box._common import BoxGetExpressionBuilder, BoxMaybeExpressionBuilder
@@ -64,7 +64,7 @@ class BoxRefClassExpressionBuilder(TypeBuilder):
         )
 
 
-class BoxRefProxyExpressionBuilder(ValueExpressionBuilder):
+class BoxRefProxyExpressionBuilder(InstanceExpressionBuilder):
     def __init__(self, expr: Expression) -> None:
         if expr.wtype != wtypes.box_ref_proxy_type:
             raise InternalError(

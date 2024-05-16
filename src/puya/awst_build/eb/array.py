@@ -8,11 +8,11 @@ from puya.awst.nodes import ArrayExtend, Contains, Expression, Literal, NewArray
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     GenericClassExpressionBuilder,
+    InstanceExpressionBuilder,
     IntermediateExpressionBuilder,
     Iteration,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.void import VoidExpressionBuilder
@@ -76,7 +76,7 @@ class ArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuil
         return ArrayExpressionBuilder(array_expr)
 
 
-class ArrayExpressionBuilder(ValueExpressionBuilder):
+class ArrayExpressionBuilder(InstanceExpressionBuilder):
     def __init__(self, expr: Expression):
         assert isinstance(expr.wtype, wtypes.WArray)
         self.wtype: wtypes.WArray = expr.wtype

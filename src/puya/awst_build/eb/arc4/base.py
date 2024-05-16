@@ -25,8 +25,8 @@ from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     FunctionBuilder,
     InstanceBuilder,
+    InstanceExpressionBuilder,
     NodeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.bytes_backed import BytesBackedClassExpressionBuilder
@@ -153,7 +153,7 @@ def native_eb(expr: Expression, location: SourceLocation) -> NodeBuilder:
     )
 
 
-class ARC4EncodedExpressionBuilder(ValueExpressionBuilder, abc.ABC):
+class ARC4EncodedExpressionBuilder(InstanceExpressionBuilder, abc.ABC):
     @typing.override
     def member_access(self, name: str, location: SourceLocation) -> NodeBuilder:
         match name:

@@ -3,14 +3,14 @@ from collections.abc import Sequence
 
 import mypy.nodes
 
-from puya.awst.nodes import Literal
+from puya.awst.nodes import Expression, Literal
 from puya.awst_build import pytypes
 from puya.awst_build.eb._utils import bool_eval_to_constant
 from puya.awst_build.eb.base import (
     InstanceBuilder,
+    InstanceExpressionBuilder,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.errors import CodeError
 from puya.parse import SourceLocation
@@ -33,7 +33,7 @@ class VoidTypeExpressionBuilder(TypeBuilder):
         raise CodeError("None is not usable as a value", location)
 
 
-class VoidExpressionBuilder(ValueExpressionBuilder):
+class VoidExpressionBuilder(InstanceExpressionBuilder):
     def __init__(self, expr: Expression):
         super().__init__(pytypes.NoneType, expr)
 

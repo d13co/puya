@@ -44,10 +44,10 @@ from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     FunctionBuilder,
     InstanceBuilder,
+    InstanceExpressionBuilder,
     Iteration,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.bytes_backed import BytesBackedClassExpressionBuilder
@@ -267,7 +267,7 @@ class AddressClassExpressionBuilder(StaticArrayClassExpressionBuilder):
         )
 
 
-class ARC4ArrayExpressionBuilder(ValueExpressionBuilder[pytypes.ArrayType], ABC):
+class ARC4ArrayExpressionBuilder(InstanceExpressionBuilder[pytypes.ArrayType], ABC):
     def __init__(self, typ: pytypes.PyType, expr: Expression):
         assert isinstance(typ, pytypes.ArrayType)
         super().__init__(typ, expr)

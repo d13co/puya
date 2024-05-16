@@ -16,10 +16,10 @@ from puya.awst.nodes import (
     UpdateInnerTransaction,
 )
 from puya.awst_build.eb.base import (
+    InstanceExpressionBuilder,
     IntermediateExpressionBuilder,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.transaction import get_field_python_name
 from puya.awst_build.eb.transaction.base import expect_wtype
@@ -72,9 +72,9 @@ def _maybe_transform_program_field_expr(
         else TxnFields.clear_state_program_pages
     )
     match eb:
-        case ValueExpressionBuilder(wtype=wtypes.WTuple(types=tuple_item_types) as wtype) if all(
-            field.valid_type(t) for t in tuple_item_types
-        ):
+        case InstanceExpressionBuilder(
+            wtype=wtypes.WTuple(types=tuple_item_types) as wtype
+        ) if all(field.valid_type(t) for t in tuple_item_types):
             expr = expect_operand_wtype(eb, wtype)
         case _:
             expr = expect_operand_wtype(eb, field.wtype)
@@ -210,7 +210,7 @@ class SetInnerTxnParamsExpressionBuilder(IntermediateExpressionBuilder):
         )
 
 
-class InnerTxnParamsExpressionBuilder(ValueExpressionBuilder):
+class InnerTxnParamsExpressionBuilder(InstanceExpressionBuilder):
     wtype: wtypes.WInnerTransactionFields
 
     def __init__(self, expr: Expression):

@@ -19,9 +19,9 @@ from puya.awst_build import constants, pytypes
 from puya.awst_build.eb._utils import get_bytes_expr
 from puya.awst_build.eb.base import (
     GenericClassExpressionBuilder,
+    InstanceExpressionBuilder,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.box._common import BoxGetExpressionBuilder, BoxMaybeExpressionBuilder
@@ -95,7 +95,7 @@ class BoxClassExpressionBuilder(GenericClassExpressionBuilder, TypeBuilder):
         )
 
 
-class BoxProxyExpressionBuilder(ValueExpressionBuilder):
+class BoxProxyExpressionBuilder(InstanceExpressionBuilder):
     wtype: wtypes.WBoxProxy
     python_name = constants.CLS_BOX_PROXY
 

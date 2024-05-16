@@ -44,7 +44,7 @@ __all__ = [
     "GenericTypeBuilder",
     "InstanceBuilder",
     "StateProxyDefinitionBuilder",
-    "ValueExpressionBuilder",
+    "InstanceExpressionBuilder",
 ]
 
 Iteration: typing.TypeAlias = Expression | Range
@@ -77,7 +77,7 @@ class BuilderBinaryOp(enum.StrEnum):
     bit_and = "&"
 
 
-_TPyType = typing_extensions.TypeVar(
+_TPyType = typing_extensions.TypeVar(  # noqa: PLC0105
     "_TPyType", bound=pytypes.PyType, default=pytypes.PyType, covariant=True
 )
 
@@ -167,9 +167,10 @@ class InstanceBuilder(NodeBuilder[_TPyType], abc.ABC):
     def rvalue(self) -> Expression:
         """Produce an expression for use as an intermediary"""
 
-    @abc.abstractmethod
     def lvalue(self) -> Lvalue:
         """Produce an expression for the target of an assignment"""
+        resolved = self.rvalue()
+        return _validate_lvalue(resolved)
 
     def delete(self, location: SourceLocation) -> Statement:
         raise CodeError(f"{self} is not valid as del target", location)
@@ -207,14 +208,10 @@ class InstanceBuilder(NodeBuilder[_TPyType], abc.ABC):
     ) -> Statement:
         raise CodeError(f"{self} does not support augmented assignment", location)
 
-
-class ContainerBuilder(InstanceBuilder[_TPyType], abc.ABC):
-    @abc.abstractmethod
     def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
         """Handle self[index]"""
         raise CodeError(f"{self} does not support indexing", location)
 
-    @abc.abstractmethod
     def slice_index(  # TODO: maybe roll into index, have a Slice EB ??
         self,
         begin_index: InstanceBuilder | Literal | None,
@@ -225,14 +222,12 @@ class ContainerBuilder(InstanceBuilder[_TPyType], abc.ABC):
         """Handle self[begin_index:end_index:stride]"""
         raise CodeError(f"{self} does not support slicing", location)
 
-    @abc.abstractmethod
     def contains(
         self, item: InstanceBuilder | Literal, location: SourceLocation
     ) -> InstanceBuilder:
         """Handle `elem in self`"""
         raise CodeError(f"{self} does not support in/not in checks", location)
 
-    @abc.abstractmethod
     def iterate(self) -> Iteration:
         """handle for ... in self"""
         raise CodeError(f"{self} does not support iteration", self.source_location)
@@ -249,8 +244,7 @@ class StateProxyDefinitionBuilder(NodeBuilder[pytypes.StorageProxyType], abc.ABC
     ) -> AppStorageDeclaration: ...
 
 
-class ValueExpressionBuilder(InstanceBuilder[_TPyType], abc.ABC):
-
+class InstanceExpressionBuilder(InstanceBuilder[_TPyType], abc.ABC):
     def __init__(self, typ: _TPyType, expr: Expression):
         if expr.wtype != typ.wtype:
             raise InternalError(
@@ -258,24 +252,22 @@ class ValueExpressionBuilder(InstanceBuilder[_TPyType], abc.ABC):
                 expr.source_location,
             )
         super().__init__(typ, expr.source_location)
-        self.__expr = expr
+        self._expr = expr
 
+    @typing.final
     @property
     def expr(self) -> Expression:
-        return self.__expr
+        return self._expr
 
+    @typing.final
     @property
     def wtype(self) -> wtypes.WType:  # TODO: YEET ME
         return self.pytype.wtype
 
-    @typing.override
-    def lvalue(self) -> Lvalue:
-        resolved = self.rvalue()
-        return _validate_lvalue(resolved)
-
+    @typing.final
     @typing.override
     def rvalue(self) -> Expression:
-        return self.expr
+        return self._expr
 
 
 def _validate_lvalue(resolved: Expression) -> Lvalue:

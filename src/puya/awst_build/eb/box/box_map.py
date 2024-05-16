@@ -18,10 +18,10 @@ from puya.awst.nodes import (
 from puya.awst_build import constants, pytypes
 from puya.awst_build.eb.base import (
     GenericClassExpressionBuilder,
+    InstanceExpressionBuilder,
     IntermediateExpressionBuilder,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.box.box import BoxValueExpressionBuilder
@@ -135,7 +135,7 @@ def _box_value_expr(
     )
 
 
-class BoxMapProxyExpressionBuilder(ValueExpressionBuilder):
+class BoxMapProxyExpressionBuilder(InstanceExpressionBuilder):
     wtype: wtypes.WBoxMapProxy
     python_name = constants.CLS_BOX_MAP_PROXY
 

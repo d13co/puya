@@ -18,8 +18,8 @@ from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     InstanceBuilder,
+    InstanceExpressionBuilder,
     NodeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
@@ -31,7 +31,7 @@ if typing.TYPE_CHECKING:
     from puya.parse import SourceLocation
 
 
-class ReferenceValueExpressionBuilder(ValueExpressionBuilder, abc.ABC):
+class ReferenceValueExpressionBuilder(InstanceExpressionBuilder, abc.ABC):
     native_type: pytypes.PyType
     native_access_member: str
     field_mapping: immutabledict[str, tuple[str, wtypes.WType]]

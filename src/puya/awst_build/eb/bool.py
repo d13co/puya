@@ -17,9 +17,9 @@ from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     InstanceBuilder,
+    InstanceExpressionBuilder,
     NodeBuilder,
     TypeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.utils import bool_eval, convert_literal_to_expr
 from puya.errors import CodeError
@@ -57,7 +57,7 @@ class BoolClassExpressionBuilder(TypeBuilder):
                 raise CodeError("Too many arguments", location=location)
 
 
-class BoolExpressionBuilder(ValueExpressionBuilder):
+class BoolExpressionBuilder(InstanceExpressionBuilder):
     def __init__(self, expr: Expression):
         super().__init__(pytypes.BoolType, expr)
 

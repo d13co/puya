@@ -22,9 +22,9 @@ from puya.awst_build.eb.base import (
     BuilderComparisonOp,
     GenericTypeBuilder,
     InstanceBuilder,
+    InstanceExpressionBuilder,
     Iteration,
     NodeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.bool import BoolExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
@@ -53,7 +53,7 @@ class TupleTypeExpressionBuilder(GenericTypeBuilder):
         return TupleExpressionBuilder(tuple_typ, tuple_expr)
 
 
-class TupleExpressionBuilder(ValueExpressionBuilder[pytypes.TupleType]):
+class TupleExpressionBuilder(InstanceExpressionBuilder[pytypes.TupleType]):
     @typing.override
     def index(self, index: InstanceBuilder | Literal, location: SourceLocation) -> InstanceBuilder:
         # special handling of tuples, they can be indexed by int literal only,

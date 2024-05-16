@@ -6,8 +6,8 @@ import typing
 from puya.awst import wtypes
 from puya.awst.nodes import TXN_FIELDS
 from puya.awst_build.eb.base import (
+    InstanceExpressionBuilder,
     NodeBuilder,
-    ValueExpressionBuilder,
 )
 from puya.awst_build.eb.transaction.fields import get_field_python_name
 from puya.awst_build.eb.var_factory import var_expression
@@ -20,7 +20,7 @@ if typing.TYPE_CHECKING:
 _PYTHON_MEMBER_FIELD_MAP = {get_field_python_name(f): f for f in TXN_FIELDS}
 
 
-class BaseTransactionExpressionBuilder(ValueExpressionBuilder, abc.ABC):
+class BaseTransactionExpressionBuilder(InstanceExpressionBuilder, abc.ABC):
     @abc.abstractmethod
     def get_field_value(self, field: TxnField, location: SourceLocation) -> Expression: ...
 
