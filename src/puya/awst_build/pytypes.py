@@ -58,6 +58,7 @@ class PyType(abc.ABC):
 
         result, _ = re.subn(r"\bbuiltins\.", "", self.name)
         result, _ = re.subn(r"algopy\._[^.]+", "algopy", result)
+        result = result.replace(NoneType.name, "None")
         return result
 
     def __str__(self) -> str:
@@ -338,7 +339,7 @@ class _LiteralOnlyType(PyType):
         _register_builtin(self)
 
 
-NoneType: typing.Final[PyType] = _SimpleType(name="builtins.None", wtype=wtypes.void_wtype)
+NoneType: typing.Final[PyType] = _SimpleType(name="types.NoneType", wtype=wtypes.void_wtype)
 BoolType: typing.Final[PyType] = _SimpleType(name="builtins.bool", wtype=wtypes.bool_wtype)
 IntLiteralType: typing.Final[PyType] = _LiteralOnlyType(name="builtins.int")
 StrLiteralType: typing.Final[PyType] = _LiteralOnlyType(name="builtins.str")
