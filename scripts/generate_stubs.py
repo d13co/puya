@@ -6,7 +6,7 @@ import keyword
 import subprocess
 import textwrap
 import typing
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from pathlib import Path
 
 import attrs
@@ -78,40 +78,43 @@ ALGORAND_OP_URL = "https://developer.algorand.org/docs/get-details/dapps/avm/tea
 
 
 class OpCodeGroup(typing.Protocol):
-    def includes_op(self, op: str) -> bool: ...
+    def handled_ops(self) -> Iterator[str]: ...
 
 
 @attrs.define(kw_only=True)
-class RenamedOpCode:
+class RenamedOpCode(OpCodeGroup):
     name: str
     stack_aliases: dict[str, list[str]] = attrs.field(factory=dict)
     """ops that are aliases for other ops that take stack values instead of immediates"""
     op: str
 
-    def includes_op(self, op: str) -> bool:
-        return self.op == op or op in self.stack_aliases
+    def handled_ops(self) -> Iterator[str]:
+        yield self.op
+        yield from self.stack_aliases.keys()
 
 
 @attrs.define(kw_only=True)
-class MergedOpCodes:
+class MergedOpCodes(OpCodeGroup):
     name: str
     doc: str
     ops: dict[str, dict[str, list[str]]]
 
-    def includes_op(self, op: str) -> bool:
-        return op in self.ops or any(op in alias_dict for alias_dict in self.ops.values())
+    def handled_ops(self) -> Iterator[str]:
+        for op, aliases in self.ops.items():
+            yield op
+            yield from aliases.keys()
 
 
 @attrs.define(kw_only=True)
-class GroupedOpCodes:
+class GroupedOpCodes(OpCodeGroup):
     name: str
     """ops that are aliases for other ops that take stack values instead of immediates"""
     doc: str
     ops: dict[str, str] = attrs.field(factory=dict)
     """ops to include in group, mapped to their new name"""
 
-    def includes_op(self, op: str) -> bool:
-        return op in self.ops
+    def handled_ops(self) -> Iterator[str]:
+        yield from self.ops.keys()
 
 
 GROUPED_OP_CODES = [
@@ -275,12 +278,6 @@ RENAMED_OP_CODES = [
         op="return",
     ),
 ]
-OPCODE_GROUPS: list[OpCodeGroup] = [
-    *GROUPED_OP_CODES,
-    *MERGED_OP_CODES,
-    *RENAMED_OP_CODES,
-]
-
 
 EXCLUDED_OPCODES = {
     # low level flow control
@@ -379,11 +376,27 @@ def main() -> None:
     lang_spec_json = json.loads(spec_path.read_text(encoding="utf-8"))
     lang_spec = LanguageSpec.from_json(lang_spec_json)
 
+    non_simple_ops = {
+        *EXCLUDED_OPCODES,
+        *dir(builtins),
+        *keyword.kwlist,  # TODO: maybe consider softkwlist too?
+    }
     function_defs = list[FunctionDef]()
     class_defs = list[ClassDef]()
     enums_to_build = dict[str, bool]()
+
+    for merged in MERGED_OP_CODES:
+        non_simple_ops.update(merged.handled_ops())
+        class_defs.append(build_merged_ops(lang_spec, merged))
+    for grouped in GROUPED_OP_CODES:
+        non_simple_ops.update(grouped.handled_ops())
+        class_defs.append(build_grouped_ops(lang_spec, grouped, enums_to_build))
+    for aliased in RENAMED_OP_CODES:
+        function_defs.extend(build_aliased_ops(lang_spec, aliased))
+        non_simple_ops.update(aliased.handled_ops())
+
     for op in lang_spec.ops.values():
-        if not is_simple_op(op):
+        if op.name in non_simple_ops or not op.name.isidentifier():
             logger.info(f"Ignoring: {op.name}")
             continue
         overriding_immediate = get_overriding_immediate(op)
@@ -407,12 +420,7 @@ def main() -> None:
                     assert immediate.arg_enum is not None
                     enums_to_build[immediate.arg_enum] = True
             function_defs.extend(build_operation_methods(op, op.name, []))
-    for merged in MERGED_OP_CODES:
-        class_defs.append(build_merged_ops(lang_spec, merged))
-    for grouped in GROUPED_OP_CODES:
-        class_defs.append(build_grouped_ops(lang_spec, grouped, enums_to_build))
-    for aliased in RENAMED_OP_CODES:
-        function_defs.extend(build_aliased_ops(lang_spec, aliased))
+
     function_defs.sort(key=lambda x: x.name)
     class_defs.sort(key=lambda x: x.name)
 
@@ -431,23 +439,6 @@ def sub_types(type_name: StackType, *, covariant: bool) -> Sequence[pytypes.PyTy
     else:
         last_index = None if covariant else 1
         return typs[:last_index]
-
-
-_NON_SIMPLE_OPS: typing.Final = frozenset(
-    {
-        *EXCLUDED_OPCODES,
-        *dir(builtins),
-        *keyword.kwlist,  # TODO: maybe consider softkwlist too?
-    }
-)
-
-
-def is_simple_op(op: Op) -> bool:
-    return not (
-        op.name in _NON_SIMPLE_OPS
-        or not op.name.isidentifier()
-        or any(g.includes_op(op.name) for g in OPCODE_GROUPS)  # handled separately
-    )
 
 
 def immediate_kind_to_type(kind: ImmediateKind) -> type[int | str]:
