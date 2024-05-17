@@ -15,7 +15,6 @@ from puya.awst_build.eb import (
     box,
     bytes as bytes_,
     ensure_budget,
-contracts,
     intrinsics,
     log,
     named_int_constants,
@@ -39,16 +38,19 @@ __all__ = [
 ]
 
 ExpressionBuilderFromSourceFactory = Callable[[SourceLocation], ExpressionBuilder]
-ExpressionBuilderFromTypeAndSourceFactory = Callable[
+ExpressionBuilderFromWTypeAndSourceFactory = Callable[
     [wtypes.WType, SourceLocation], ExpressionBuilder
+]
+ExpressionBuilderFromPyTypeAndSourceFactory = Callable[
+    [pytypes.PyType, SourceLocation], ExpressionBuilder
 ]
 ExpressionBuilderFromExpressionFactory = Callable[[Expression], ExpressionBuilder]
 CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
     "builtins.None": void.VoidTypeExpressionBuilder,
     "builtins.bool": bool_.BoolClassExpressionBuilder,
     "builtins.tuple": tuple_.GenericTupleTypeExpressionBuilder,
-    constants.URANGE: unsigned_builtins.UnsignedRangeBuilder,
-    constants.UENUMERATE: unsigned_builtins.UnsignedEnumerateBuilder,
+    # constants.URANGE: unsigned_builtins.UnsignedRangeBuilder,
+    # constants.UENUMERATE: unsigned_builtins.UnsignedEnumerateBuilder,
     constants.ARC4_SIGNATURE: intrinsics.Arc4SignatureBuilder,
     constants.ENSURE_BUDGET: ensure_budget.EnsureBudgetBuilder,
     constants.LOG: log.LogBuilder,
@@ -118,16 +120,16 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
         for enum_name, enum_data in constants.NAMED_INT_CONST_ENUM_DATA.items()
     },
 }
-PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
+PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[
+    pytypes.PyType | None, ExpressionBuilderFromPyTypeAndSourceFactory
+] = {
     pytypes.uenumerateGenericType: unsigned_builtins.UnsignedEnumerateBuilder,
     pytypes.urangeType: unsigned_builtins.UnsignedRangeBuilder,
     pytypes.reversedGenericType: unsigned_builtins.ReversedFunctionExpressionBuilder,
+    pytypes.GenericTemplateVarType: template_variables.TemplateVariableExpressionBuilder,
+    pytypes.GenericABICallWithReturnType: arc4.ABICallClassExpressionBuilder,
 }
-PYTYPE_BASE_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
-    pytypes.urangeType: unsigned_builtins.UnsignedRangeBuilder,
-    pytypes.reversedGenericType: unsigned_builtins.ReversedFunctionExpressionBuilder,
-}
-WTYPE_TO_TYPE_BUILDER: dict[type[wtypes.WType], ExpressionBuilderFromTypeAndSourceFactory] = {
+WTYPE_TO_TYPE_BUILDER: dict[type[wtypes.WType], ExpressionBuilderFromWTypeAndSourceFactory] = {
     wtypes.WTuple: tuple_.TupleTypeExpressionBuilder,
     wtypes.WArray: array.ArrayClassExpressionBuilder,
     wtypes.ARC4UFixedNxM: arc4.UFixedNxMClassExpressionBuilder,

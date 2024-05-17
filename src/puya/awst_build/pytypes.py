@@ -966,6 +966,6 @@ GenericABICallWithReturnType: typing.Final[PyType] = _GenericType(
     parameterise=_parameterise_pseudo_generic_function_type,
 )
 GenericTemplateVarType: typing.Final[PyType] = _GenericType(
-    name=f"{constants.ALGOPY_PREFIX}._template_variables._TemplateVarMethod",
+    name=f"{constants.ALGOPY_PREFIX}_template_variables._TemplateVarMethod",
     parameterise=_parameterise_pseudo_generic_function_type,
 )

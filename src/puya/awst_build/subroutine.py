@@ -74,9 +74,6 @@ from puya.awst_build.eb.intrinsics import (
 from puya.awst_build.eb.struct import StructSubclassExpressionBuilder
 from puya.awst_build.eb.subroutine import SubroutineInvokerExpressionBuilder
 from puya.awst_build.eb.type_registry import get_type_builder
-from puya.awst_build.eb.unsigned_builtins import (
-    ReversedFunctionExpressionBuilder,
-)
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.exceptions import TypeUnionError
 from puya.awst_build.utils import (
@@ -637,21 +634,25 @@ class FunctionASTConverter(
         self, expr: mypy.nodes.MemberExpr | mypy.nodes.NameExpr
     ) -> ExpressionBuilder | Literal:
         expr_loc = self._location(expr)
-        py_typ = self.context.mypy_expr_node_type(expr)
-        if isinstance(py_typ, pytypes.TypeType):
-            inner_typ = py_typ.typ
+        # Do a straight forward lookup at the RefExpr level handle the cases of:
+        #  - type aliases
+        #  - simple (non-generic) types
+        #  - generic type that has not been parameterised
+        #    (e.g. when calling a constructor which can infer the type from its arguments)
+        # For parameterised generics, these are resolved at the IndexExpr level, without
+        # descending into IndexExpr.base.
+        # By doing a simple lookup instead of resolving the PyType of expr,
+        # we can side step complex construsts in the stubs that we don't support in user code,
+        # such as overloads.
+        if py_typ := self.context.lookup_pytype(expr.fullname):  # noqa: SIM102
+            # side step these ones for now
             if (
-                inner_typ not in pytypes.OpNamespaceTypes
-                and pytypes.ContractBaseType not in inner_typ.bases
-                and pytypes.ARC4ClientBaseType not in inner_typ.bases
+                py_typ not in pytypes.OpNamespaceTypes
+                and pytypes.ContractBaseType not in py_typ.mro
+                and pytypes.ARC4ClientBaseType not in py_typ.bases
             ):
-                return builder_for_type(inner_typ, expr_loc)
-        builder_or_literal = self._visit_ref_expr_maybe_aliased(expr, expr_loc)
-        return builder_or_literal
+                return builder_for_type(py_typ, expr_loc)
 
-    def _visit_ref_expr_maybe_aliased(
-        self, expr: mypy.nodes.MemberExpr | mypy.nodes.NameExpr, expr_loc: SourceLocation
-    ) -> ExpressionBuilder | Literal:
         if expr.name == "__all__":
             # special case here, we allow __all__ at the module level for it's "public vs private"
             # control implications w.r.t linting etc, but we do so by ignoring it.
@@ -811,8 +812,8 @@ class FunctionASTConverter(
                 raise CodeError(
                     "enumerate() is not supported - use algopy.uenumerate() instead", location
                 )
-            case "reversed":
-                return ReversedFunctionExpressionBuilder(location=location)
+            # case "reversed":
+            #     return ReversedFunctionExpressionBuilder(location=location)
             case _:
                 raise CodeError(f"Unsupported builtin: {rest_of_name}", location)
 
@@ -1048,7 +1049,10 @@ class FunctionASTConverter(
         expr_location = self._location(expr)
         match expr.analyzed:
             case None:
-                pass
+                with contextlib.suppress(PuyaError):
+                    result_pytyp = self.context.mypy_expr_node_type(expr)
+                    if isinstance(result_pytyp, pytypes.PseudoGenericFunctionType):
+                        return builder_for_type(result_pytyp, expr_location)
             case mypy.nodes.TypeAliasExpr():
                 raise CodeError("type aliases are not supported inside subroutines", expr_location)
             case mypy.nodes.TypeApplication():
@@ -1344,13 +1348,13 @@ def builder_for_type(inner_typ: pytypes.PyType, expr_loc: SourceLocation) -> Exp
 
     if tb := type_registry.CLS_NAME_TO_BUILDER.get(inner_typ.name):
         return tb(expr_loc)
-    if tb := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
-        return tb(expr_loc)
-    if tb := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ):
-        return tb(expr_loc)
+    if tb2 := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
+        return tb2(inner_typ, expr_loc)
+    if tb2 := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ):
+        return tb2(inner_typ, expr_loc)
     t_wtype = inner_typ.wtype
     try:
-        tb2 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
+        tb3 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
     except KeyError:
         raise CodeError(f"TODO: builder for {t_wtype}", expr_loc) from None
-    return tb2(t_wtype, expr_loc)
+    return tb3(t_wtype, expr_loc)

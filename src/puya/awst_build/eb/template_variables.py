@@ -1,8 +1,8 @@
+import typing
 from collections.abc import Sequence
 
 import mypy.nodes
 
-from puya.awst import wtypes
 from puya.awst.nodes import Literal, TemplateVar
 from puya.awst_build import pytypes
 from puya.awst_build.eb.base import (
@@ -17,16 +17,7 @@ from puya.parse import SourceLocation
 
 
 class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
-    def index_multiple(
-        self, indexes: Sequence[ExpressionBuilder | Literal], location: SourceLocation
-    ) -> ExpressionBuilder:
-        match indexes:
-            case [TypeClassExpressionBuilder() as eb]:
-                wtype = eb.produces()
-            case _:
-                raise CodeError("Invalid/unhandled arguments", location)
-        return TemplateVariableExpressionBuilder(location=location, wtype=wtype)
-
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -39,13 +30,11 @@ class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
 
 
 class TemplateVariableExpressionBuilder(TypeClassExpressionBuilder):
-    def __init__(self, location: SourceLocation, wtype: wtypes.WType):
-        super().__init__(location)
-        self.wtype = wtype
+    def __init__(self, typ: pytypes.PyType, location: SourceLocation):
+        assert isinstance(typ, pytypes.PseudoGenericFunctionType)
+        super().__init__(typ.return_type.wtype, location)
 
-    def produces(self) -> wtypes.WType:
-        return self.wtype
-
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -83,7 +72,9 @@ class TemplateVariableExpressionBuilder(TypeClassExpressionBuilder):
             case Literal(value=str(str_value)):
                 return var_expression(
                     TemplateVar(
-                        name=prefix_value + str_value, source_location=location, wtype=self.wtype
+                        name=prefix_value + str_value,
+                        source_location=location,
+                        wtype=self.produces(),
                     )
                 )
             case _:
