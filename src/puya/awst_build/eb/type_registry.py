@@ -49,8 +49,6 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
     "builtins.None": void.VoidTypeExpressionBuilder,
     "builtins.bool": bool_.BoolClassExpressionBuilder,
     "builtins.tuple": tuple_.GenericTupleTypeExpressionBuilder,
-    # constants.URANGE: unsigned_builtins.UnsignedRangeBuilder,
-    # constants.UENUMERATE: unsigned_builtins.UnsignedEnumerateBuilder,
     constants.ARC4_SIGNATURE: intrinsics.Arc4SignatureBuilder,
     constants.ENSURE_BUDGET: ensure_budget.EnsureBudgetBuilder,
     constants.LOG: log.LogBuilder,
@@ -128,6 +126,8 @@ PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[
     pytypes.reversedGenericType: unsigned_builtins.ReversedFunctionExpressionBuilder,
     pytypes.GenericTemplateVarType: template_variables.TemplateVariableExpressionBuilder,
     pytypes.GenericABICallWithReturnType: arc4.ABICallClassExpressionBuilder,
+    pytypes.GenericBoxType: box.BoxClassExpressionBuilder,
+    pytypes.GenericBoxMapType: box.BoxMapClassExpressionBuilder,
 }
 WTYPE_TO_TYPE_BUILDER: dict[type[wtypes.WType], ExpressionBuilderFromWTypeAndSourceFactory] = {
     wtypes.WTuple: tuple_.TupleTypeExpressionBuilder,
@@ -138,8 +138,6 @@ WTYPE_TO_TYPE_BUILDER: dict[type[wtypes.WType], ExpressionBuilderFromWTypeAndSou
     wtypes.ARC4DynamicArray: arc4.DynamicArrayClassExpressionBuilder,
     wtypes.ARC4StaticArray: arc4.StaticArrayClassExpressionBuilder,
     wtypes.ARC4Tuple: arc4.ARC4TupleClassExpressionBuilder,
-    wtypes.WBoxProxy: box.BoxClassExpressionBuilder,
-    wtypes.WBoxMapProxy: box.BoxMapClassExpressionBuilder,
 }
 WTYPE_TO_BUILDER: dict[
     wtypes.WType | type[wtypes.WType], ExpressionBuilderFromExpressionFactory
