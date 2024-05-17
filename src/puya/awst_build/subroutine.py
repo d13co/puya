@@ -801,11 +801,13 @@ class FunctionASTConverter(
     def _visit_ref_expr_of_algopy_op(fullname: str, location: SourceLocation) -> ExpressionBuilder:
         from puya.awst_build import intrinsic_data
 
-        if (enum_data := intrinsic_data.ENUM_CLASSES.get(fullname)) is not None:
+        name = fullname.removeprefix(constants.ALGOPY_OP_PREFIX)
+
+        if (enum_data := intrinsic_data.ENUM_CLASSES.get(name)) is not None:
             return IntrinsicEnumClassExpressionBuilder(fullname, enum_data, location)
-        if (cls_data := intrinsic_data.NAMESPACE_CLASSES.get(fullname)) is not None:
+        if (cls_data := intrinsic_data.NAMESPACE_CLASSES.get(name)) is not None:
             return IntrinsicNamespaceClassExpressionBuilder(fullname, cls_data, location)
-        if (mappings := intrinsic_data.FUNC_TO_AST_MAPPER.get(fullname)) is not None:
+        if (mappings := intrinsic_data.FUNC_TO_AST_MAPPER.get(name)) is not None:
             return IntrinsicFunctionExpressionBuilder(fullname, mappings, location)
         raise InternalError(f"No intrinsic data found for {fullname}", location)
 
