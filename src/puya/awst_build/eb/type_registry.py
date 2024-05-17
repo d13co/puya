@@ -55,35 +55,6 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
         template_variables.GenericTemplateVariableExpressionBuilder
     ),
     constants.SUBMIT_TXNS: transaction.SubmitInnerTransactionExpressionBuilder,
-    constants.CLS_TRANSACTION_BASE: functools.partial(
-        transaction.GroupTransactionClassExpressionBuilder,
-        wtype=wtypes.WGroupTransaction(
-            transaction_type=None,
-            stub_name=constants.CLS_TRANSACTION_BASE,
-            name="group_transaction_base",
-        ),
-    ),
-    **{
-        txn_cls.gtxn: functools.partial(
-            transaction.GroupTransactionClassExpressionBuilder,
-            wtype=wtypes.WGroupTransaction.from_type(txn_type),
-        )
-        for txn_type, txn_cls in constants.TRANSACTION_TYPE_TO_CLS.items()
-    },
-    **{
-        txn_cls.itxn_fields: functools.partial(
-            transaction.InnerTxnParamsClassExpressionBuilder,
-            wtype=wtypes.WInnerTransactionFields.from_type(txn_type),
-        )
-        for txn_type, txn_cls in constants.TRANSACTION_TYPE_TO_CLS.items()
-    },
-    **{
-        txn_cls.itxn_result: functools.partial(
-            transaction.InnerTransactionClassExpressionBuilder,
-            wtype=wtypes.WInnerTransaction.from_type(txn_type),
-        )
-        for txn_type, txn_cls in constants.TRANSACTION_TYPE_TO_CLS.items()
-    },
     **{
         enum_name: functools.partial(
             named_int_constants.NamedIntegerConstsTypeBuilder,
@@ -126,6 +97,27 @@ PYTYPE_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceF
     pytypes.BytesType: bytes_.BytesClassExpressionBuilder,
     pytypes.StringType: string.StringClassExpressionBuilder,
     pytypes.UInt64Type: uint64.UInt64ClassExpressionBuilder,
+    **{
+        gtxn_pytyp: functools.partial(
+            transaction.GroupTransactionClassExpressionBuilder, wtype=gtxn_pytyp.wtype
+        )
+        for gtxn_pytyp in (
+            pytypes.GroupTransactionBaseType,
+            *pytypes.GroupTransactionTypes.values(),
+        )
+    },
+    **{
+        itxn_fieldset_pytyp: functools.partial(
+            transaction.InnerTxnParamsClassExpressionBuilder, wtype=itxn_fieldset_pytyp.wtype
+        )
+        for itxn_fieldset_pytyp in pytypes.InnerTransactionFieldsetTypes.values()
+    },
+    **{
+        itxn_result_pytyp: functools.partial(
+            transaction.InnerTransactionClassExpressionBuilder, wtype=itxn_result_pytyp
+        )
+        for itxn_result_pytyp in pytypes.InnerTransactionResultTypes.values()
+    },
 }
 PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[
     pytypes.PyType | None, ExpressionBuilderFromPyTypeAndSourceFactory
