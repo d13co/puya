@@ -33,7 +33,6 @@ from puya.errors import InternalError
 from puya.parse import SourceLocation
 
 __all__ = [
-    "get_type_builder",
     "var_expression",
 ]
 
@@ -41,16 +40,16 @@ ExpressionBuilderFromSourceFactory = Callable[[SourceLocation], ExpressionBuilde
 ExpressionBuilderFromPyTypeAndSourceFactory = Callable[
     [pytypes.PyType, SourceLocation], ExpressionBuilder
 ]
-CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
+FUNC_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
     constants.ARC4_SIGNATURE: intrinsics.Arc4SignatureBuilder,
     constants.ENSURE_BUDGET: ensure_budget.EnsureBudgetBuilder,
     constants.LOG: log.LogBuilder,
     constants.EMIT: arc4.EmitBuilder,
+    constants.SUBMIT_TXNS: transaction.SubmitInnerTransactionExpressionBuilder,
     constants.CLS_ARC4_ABI_CALL: arc4.ABICallGenericClassExpressionBuilder,
     constants.CLS_TEMPLATE_VAR_METHOD: (
         template_variables.GenericTemplateVariableExpressionBuilder
     ),
-    constants.SUBMIT_TXNS: transaction.SubmitInnerTransactionExpressionBuilder,
 }
 PYTYPE_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
     pytypes.NoneType: void.VoidTypeExpressionBuilder,
@@ -174,15 +173,6 @@ WTYPE_TO_BUILDER: dict[
     wtypes.WBoxMapProxy: box.BoxMapProxyExpressionBuilder,
     wtypes.box_ref_proxy_type: box.BoxRefProxyExpressionBuilder,
 }
-
-
-def get_type_builder(python_type: str, source_location: SourceLocation) -> ExpressionBuilder:
-    try:
-        type_class = CLS_NAME_TO_BUILDER[python_type]
-    except KeyError as ex:
-        raise InternalError(f"Unhandled algopy name: {python_type}", source_location) from ex
-    else:
-        return type_class(source_location)
 
 
 def var_expression(expr: Expression) -> ExpressionBuilder:
