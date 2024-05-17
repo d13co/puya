@@ -38,10 +38,6 @@ logger = log.get_logger(__name__)
 
 
 class UnsignedRangeBuilder(IntermediateExpressionBuilder):
-    def __init__(self, typ: pytypes.PyType, location: SourceLocation):
-        self._pytyp = typ
-        super().__init__(location)
-
     @typing.override
     def call(
         self,
@@ -89,7 +85,7 @@ class UnsignedRange(IntermediateExpressionBuilder):
 
 
 class UnsignedEnumerateBuilder(IntermediateExpressionBuilder):
-    def __init__(self, typ: pytypes.PyType, location: SourceLocation):
+    def __init__(self, typ: pytypes.PyType | None, location: SourceLocation):  # TODO: remove None
         self._pytyp = typ
         super().__init__(location)
 
@@ -130,7 +126,7 @@ class UnsignedEnumerate(IntermediateExpressionBuilder):
 
 
 class ReversedFunctionExpressionBuilder(IntermediateExpressionBuilder):
-    def __init__(self, typ: pytypes.PyType, location: SourceLocation):
+    def __init__(self, typ: pytypes.PyType | None, location: SourceLocation):  # TODO: remove None
         self._pytyp = typ
         super().__init__(location)
 
