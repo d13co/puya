@@ -114,7 +114,7 @@ class GroupedOpCodes:
         return op in self.ops
 
 
-OPCODE_GROUPS: list[OpCodeGroup] = [
+GROUPED_OP_CODES = [
     GroupedOpCodes(
         name="AppGlobal",
         doc="Get or modify Global app state",
@@ -167,6 +167,18 @@ OPCODE_GROUPS: list[OpCodeGroup] = [
             "ec_subgroup_check": "subgroup_check",
         },
     ),
+    GroupedOpCodes(
+        name="ITxnCreate",
+        doc="Create inner transactions",
+        ops={
+            "itxn_begin": "begin",
+            "itxn_next": "next",
+            "itxn_submit": "submit",
+            "itxn_field": "set",
+        },
+    ),
+]
+MERGED_OP_CODES = [
     MergedOpCodes(
         name="Txn",
         doc="Get values for the current executing transaction",
@@ -190,16 +202,6 @@ OPCODE_GROUPS: list[OpCodeGroup] = [
                 "gtxna": ["F", "T", "I"],  # no stack args
                 "gtxnas": ["F", "T", "A"],  # array index on stack
             },
-        },
-    ),
-    GroupedOpCodes(
-        name="ITxnCreate",
-        doc="Create inner transactions",
-        ops={
-            "itxn_begin": "begin",
-            "itxn_next": "next",
-            "itxn_submit": "submit",
-            "itxn_field": "set",
         },
     ),
     MergedOpCodes(
@@ -227,6 +229,8 @@ OPCODE_GROUPS: list[OpCodeGroup] = [
         doc="Get Global values",
         ops={"global": {}},
     ),
+]
+RENAMED_OP_CODES = [
     RenamedOpCode(
         name="arg",
         op="args",
@@ -271,6 +275,12 @@ OPCODE_GROUPS: list[OpCodeGroup] = [
         op="return",
     ),
 ]
+OPCODE_GROUPS: list[OpCodeGroup] = [
+    *GROUPED_OP_CODES,
+    *MERGED_OP_CODES,
+    *RENAMED_OP_CODES,
+]
+
 
 EXCLUDED_OPCODES = {
     # low level flow control
@@ -373,40 +383,36 @@ def main() -> None:
     class_defs = list[ClassDef]()
     enums_to_build = dict[str, bool]()
     for op in lang_spec.ops.values():
-        if is_simple_op(op):
-            overriding_immediate = get_overriding_immediate(op)
-            if overriding_immediate:
-                class_defs.append(
-                    build_class_from_overriding_immediate(
-                        lang_spec,
-                        op,
-                        class_name=get_python_enum_class(op.name),
-                        class_doc=" ".join(op.doc),
-                        immediate=overriding_immediate,
-                        aliases=[],
-                    )
-                )
-            else:
-                for immediate in op.immediate_args:
-                    if immediate.immediate_type == ImmediateKind.arg_enum and (
-                        immediate.modifies_stack_input is None
-                        and immediate.modifies_stack_output is None
-                    ):
-                        assert immediate.arg_enum is not None
-                        enums_to_build[immediate.arg_enum] = True
-                function_defs.extend(build_operation_methods(op, op.name, []))
-        else:
+        if not is_simple_op(op):
             logger.info(f"Ignoring: {op.name}")
-    for group in OPCODE_GROUPS:
-        match group:
-            case MergedOpCodes() as merged:
-                class_defs.append(build_merged_ops(lang_spec, merged))
-            case GroupedOpCodes() as grouped:
-                class_defs.append(build_grouped_ops(lang_spec, grouped, enums_to_build))
-            case RenamedOpCode() as aliased:
-                function_defs.extend(build_aliased_ops(lang_spec, aliased))
-            case _:
-                raise TypeError("Unexpected op code group")
+            continue
+        overriding_immediate = get_overriding_immediate(op)
+        if overriding_immediate:
+            class_defs.append(
+                build_class_from_overriding_immediate(
+                    lang_spec,
+                    op,
+                    class_name=get_python_enum_class(op.name),
+                    class_doc=" ".join(op.doc),
+                    immediate=overriding_immediate,
+                    aliases=[],
+                )
+            )
+        else:
+            for immediate in op.immediate_args:
+                if immediate.immediate_type == ImmediateKind.arg_enum and (
+                    immediate.modifies_stack_input is None
+                    and immediate.modifies_stack_output is None
+                ):
+                    assert immediate.arg_enum is not None
+                    enums_to_build[immediate.arg_enum] = True
+            function_defs.extend(build_operation_methods(op, op.name, []))
+    for merged in MERGED_OP_CODES:
+        class_defs.append(build_merged_ops(lang_spec, merged))
+    for grouped in GROUPED_OP_CODES:
+        class_defs.append(build_grouped_ops(lang_spec, grouped, enums_to_build))
+    for aliased in RENAMED_OP_CODES:
+        function_defs.extend(build_aliased_ops(lang_spec, aliased))
     function_defs.sort(key=lambda x: x.name)
     class_defs.sort(key=lambda x: x.name)
 
@@ -427,16 +433,21 @@ def sub_types(type_name: StackType, *, covariant: bool) -> Sequence[pytypes.PyTy
         return typs[:last_index]
 
 
+_NON_SIMPLE_OPS: typing.Final = frozenset(
+    {
+        *EXCLUDED_OPCODES,
+        *dir(builtins),
+        *keyword.kwlist,  # TODO: maybe consider softkwlist too?
+    }
+)
+
+
 def is_simple_op(op: Op) -> bool:
-    if (
-        op.name in EXCLUDED_OPCODES
-        or any(g.includes_op(op.name) for g in OPCODE_GROUPS)  # handled separately
+    return not (
+        op.name in _NON_SIMPLE_OPS
         or not op.name.isidentifier()
-        or keyword.iskeyword(op.name)  # TODO: maybe consider issoftkeyword too?
-        or op.name in dir(builtins)
-    ):
-        return False
-    return True
+        or any(g.includes_op(op.name) for g in OPCODE_GROUPS)  # handled separately
+    )
 
 
 def immediate_kind_to_type(kind: ImmediateKind) -> type[int | str]:
