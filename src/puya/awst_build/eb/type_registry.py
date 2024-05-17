@@ -118,6 +118,24 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
         for enum_name, enum_data in constants.NAMED_INT_CONST_ENUM_DATA.items()
     },
 }
+PYTYPE_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
+    # pytypes.uenumerateGenericType: unsigned_builtins.UnsignedEnumerateBuilder,
+    # pytypes.urangeType: unsigned_builtins.UnsignedRangeBuilder,
+    # pytypes.reversedGenericType: unsigned_builtins.ReversedFunctionExpressionBuilder,
+    # pytypes.GenericTemplateVarType: template_variables.TemplateVariableExpressionBuilder,
+    # pytypes.GenericABICallWithReturnType: arc4.ABICallClassExpressionBuilder,
+    # pytypes.GenericBoxType: box.BoxClassExpressionBuilder,
+    # pytypes.GenericBoxMapType: box.BoxMapClassExpressionBuilder,
+    # pytypes.GenericARC4TupleType: arc4.ARC4TupleClassExpressionBuilder,
+    # pytypes.GenericTupleType: tuple_.TupleTypeExpressionBuilder,
+    # pytypes.GenericArrayType: array.ArrayClassExpressionBuilder,
+    # pytypes.GenericARC4UFixedNxMType: arc4.UFixedNxMClassExpressionBuilder,
+    # pytypes.GenericARC4BigUFixedNxMType: arc4.UFixedNxMClassExpressionBuilder,
+    # pytypes.GenericARC4UIntNType: arc4.UIntNClassExpressionBuilder,
+    # pytypes.GenericARC4BigUIntNType: arc4.UIntNClassExpressionBuilder,
+    # pytypes.GenericARC4DynamicArrayType: arc4.DynamicArrayClassExpressionBuilder,
+    # pytypes.GenericARC4StaticArrayType: arc4.StaticArrayClassExpressionBuilder,
+}
 PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[
     pytypes.PyType | None, ExpressionBuilderFromPyTypeAndSourceFactory
 ] = {
@@ -128,16 +146,21 @@ PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[
     pytypes.GenericABICallWithReturnType: arc4.ABICallClassExpressionBuilder,
     pytypes.GenericBoxType: box.BoxClassExpressionBuilder,
     pytypes.GenericBoxMapType: box.BoxMapClassExpressionBuilder,
+    pytypes.GenericARC4TupleType: arc4.ARC4TupleClassExpressionBuilder,
+    pytypes.GenericTupleType: tuple_.TupleTypeExpressionBuilder,
+    pytypes.GenericArrayType: array.ArrayClassExpressionBuilder,
+    pytypes.GenericARC4UFixedNxMType: arc4.UFixedNxMClassExpressionBuilder,
+    pytypes.GenericARC4BigUFixedNxMType: arc4.UFixedNxMClassExpressionBuilder,
+    pytypes.GenericARC4UIntNType: arc4.UIntNClassExpressionBuilder,
+    pytypes.GenericARC4BigUIntNType: arc4.UIntNClassExpressionBuilder,
+    pytypes.GenericARC4DynamicArrayType: arc4.DynamicArrayClassExpressionBuilder,
+    pytypes.GenericARC4StaticArrayType: arc4.StaticArrayClassExpressionBuilder,
 }
-WTYPE_TO_TYPE_BUILDER: dict[type[wtypes.WType], ExpressionBuilderFromWTypeAndSourceFactory] = {
-    wtypes.WTuple: tuple_.TupleTypeExpressionBuilder,
-    wtypes.WArray: array.ArrayClassExpressionBuilder,
-    wtypes.ARC4UFixedNxM: arc4.UFixedNxMClassExpressionBuilder,
-    wtypes.ARC4Struct: arc4.ARC4StructClassExpressionBuilder,
-    wtypes.ARC4UIntN: arc4.UIntNClassExpressionBuilder,
-    wtypes.ARC4DynamicArray: arc4.DynamicArrayClassExpressionBuilder,
-    wtypes.ARC4StaticArray: arc4.StaticArrayClassExpressionBuilder,
-    wtypes.ARC4Tuple: arc4.ARC4TupleClassExpressionBuilder,
+PYTYPE_BASE_TO_TYPE_BUILDER: dict[
+    pytypes.PyType | None, ExpressionBuilderFromPyTypeAndSourceFactory
+] = {
+    pytypes.ARC4StructBaseType: arc4.ARC4StructClassExpressionBuilder,
+    pytypes.StructBaseType: struct.StructSubclassExpressionBuilder,
 }
 WTYPE_TO_BUILDER: dict[
     wtypes.WType | type[wtypes.WType], ExpressionBuilderFromExpressionFactory

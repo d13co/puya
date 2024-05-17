@@ -680,9 +680,9 @@ class FunctionASTConverter(
                     # TODO: use PyType directly
                     wtype = pytyp.wtype
                     if isinstance(wtype, wtypes.WStructType):
-                        return StructSubclassExpressionBuilder(wtype, expr_loc)
+                        return StructSubclassExpressionBuilder(pytyp, expr_loc)
                     elif isinstance(wtype, wtypes.ARC4Struct):
-                        return ARC4StructClassExpressionBuilder(wtype, expr_loc)
+                        return ARC4StructClassExpressionBuilder(pytyp, expr_loc)
                     else:
                         raise InternalError(
                             f"Unhandled struct sub-type: {type(wtype).__name__}", expr_loc
@@ -1346,15 +1346,15 @@ def temporary_assignment_if_required(
 def builder_for_type(inner_typ: pytypes.PyType, expr_loc: SourceLocation) -> ExpressionBuilder:
     from puya.awst_build.eb import type_registry
 
-    if tb := type_registry.CLS_NAME_TO_BUILDER.get(inner_typ.name):
+    if tb := type_registry.PYTYPE_TO_TYPE_BUILDER.get(inner_typ):
         return tb(expr_loc)
-    if tb2 := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
-        return tb2(inner_typ, expr_loc)
-    if tb2 := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ):
-        return tb2(inner_typ, expr_loc)
-    t_wtype = inner_typ.wtype
-    try:
-        tb3 = type_registry.WTYPE_TO_TYPE_BUILDER[type(t_wtype)]
-    except KeyError:
-        raise CodeError(f"TODO: builder for {t_wtype}", expr_loc) from None
-    return tb3(t_wtype, expr_loc)
+    if tb_param_generic := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
+        return tb_param_generic(inner_typ, expr_loc)
+    for base in inner_typ.mro:
+        if tb_base := type_registry.PYTYPE_BASE_TO_TYPE_BUILDER.get(base):
+            return tb_base(inner_typ, expr_loc)
+
+    if tb := type_registry.CLS_NAME_TO_BUILDER.get(inner_typ.name):  # TODO: yeet me
+        logger.debug(f"TODO: registry update for {inner_typ}", location=expr_loc)
+        return tb(expr_loc)
+    raise CodeError(f"TODO: builder for {inner_typ}", expr_loc)

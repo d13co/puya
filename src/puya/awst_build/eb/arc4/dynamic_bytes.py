@@ -3,14 +3,12 @@ from __future__ import annotations
 import typing
 
 from puya.awst import wtypes
-from puya.awst.nodes import ARC4Encode, Literal, ReinterpretCast
+from puya.awst.nodes import ARC4Encode, Literal, NewArray, ReinterpretCast
 from puya.awst_build.eb.arc4._utils import convert_arc4_literal
-from puya.awst_build.eb.arc4.arrays import (
-    DynamicArrayClassExpressionBuilder,
-    DynamicArrayExpressionBuilder,
-)
+from puya.awst_build.eb.arc4.arrays import DynamicArrayExpressionBuilder
 from puya.awst_build.eb.arc4.base import native_eb
 from puya.awst_build.eb.base import ExpressionBuilder
+from puya.awst_build.eb.bytes_backed import BytesBackedClassExpressionBuilder
 from puya.errors import CodeError
 
 if typing.TYPE_CHECKING:
@@ -22,10 +20,13 @@ if typing.TYPE_CHECKING:
     from puya.parse import SourceLocation
 
 
-class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
+class DynamicBytesClassExpressionBuilder(
+    BytesBackedClassExpressionBuilder[wtypes.ARC4DynamicArray]
+):
     def __init__(self, location: SourceLocation):
         super().__init__(location=location, wtype=wtypes.arc4_dynamic_bytes)
 
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -44,12 +45,10 @@ class DynamicBytesClassExpressionBuilder(DynamicArrayClassExpressionBuilder):
                     ARC4Encode(value=eb.rvalue(), source_location=location, wtype=self.produces())
                 )
 
-        return super().call(
-            args=list(map(_coerce_to_byte, args)),
-            arg_typs=arg_typs,
-            arg_kinds=arg_kinds,
-            arg_names=arg_names,
-            location=location,
+        non_literal_args = tuple(_coerce_to_byte(a).rvalue() for a in args)
+        wtype = self.produces()
+        return DynamicArrayExpressionBuilder(
+            NewArray(values=non_literal_args, wtype=wtype, source_location=location)
         )
 
 

@@ -100,7 +100,11 @@ class DynamicArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
 class DynamicArrayClassExpressionBuilder(
     BytesBackedClassExpressionBuilder[wtypes.ARC4DynamicArray]
 ):
-    def __init__(self, wtype: wtypes.WType, location: SourceLocation):
+    def __init__(self, typ: pytypes.PyType, location: SourceLocation):
+        assert isinstance(typ, pytypes.ArrayType)
+        assert typ.generic == pytypes.GenericARC4DynamicArrayType
+        assert typ.size is None
+        wtype = typ.wtype
         assert isinstance(wtype, wtypes.ARC4DynamicArray)
         super().__init__(wtype, location)
 
@@ -163,7 +167,11 @@ class StaticArrayGenericClassExpressionBuilder(GenericClassExpressionBuilder):
 
 
 class StaticArrayClassExpressionBuilder(BytesBackedClassExpressionBuilder[wtypes.ARC4StaticArray]):
-    def __init__(self, wtype: wtypes.WType, location: SourceLocation):
+    def __init__(self, typ: pytypes.PyType, location: SourceLocation):
+        assert isinstance(typ, pytypes.ArrayType)
+        assert typ.generic == pytypes.GenericARC4StaticArrayType
+        assert typ.size is not None
+        wtype = typ.wtype
         assert isinstance(wtype, wtypes.ARC4StaticArray)
         super().__init__(wtype, location)
 
