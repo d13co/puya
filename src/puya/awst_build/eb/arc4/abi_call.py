@@ -27,7 +27,6 @@ from puya.awst.nodes import (
     UInt64Constant,
 )
 from puya.awst_build import constants, pytypes
-from puya.awst_build.constants import TransactionType
 from puya.awst_build.eb.arc4._utils import (
     ARC4Signature,
     arc4_tuple_from_items,
@@ -36,12 +35,7 @@ from puya.awst_build.eb.arc4._utils import (
     get_arc4_signature,
 )
 from puya.awst_build.eb.arc4.base import ARC4FromLogBuilder
-from puya.awst_build.eb.base import (
-    ExpressionBuilder,
-    GenericClassExpressionBuilder,
-    IntermediateExpressionBuilder,
-    TypeClassExpressionBuilder,
-)
+from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBuilder
 from puya.awst_build.eb.subroutine import BaseClassSubroutineInvokerExpressionBuilder
 from puya.awst_build.eb.transaction.fields import get_field_python_name
 from puya.awst_build.eb.transaction.inner_params import get_field_expr
@@ -76,27 +70,6 @@ _APP_TRANSACTION_FIELDS = {
         "RekeyTo",
     )
 }
-
-
-@attrs.frozen
-class _ABICallExpr:
-    method: ExpressionBuilder | Literal
-    abi_args: Sequence[ExpressionBuilder | Literal]
-    transaction_kwargs: dict[str, ExpressionBuilder | Literal]
-    abi_arg_typs: Sequence[pytypes.PyType]
-
-
-class ABICallGenericClassExpressionBuilder(GenericClassExpressionBuilder):
-    @typing.override
-    def call(
-        self,
-        args: Sequence[ExpressionBuilder | Literal],
-        arg_typs: Sequence[pytypes.PyType],
-        arg_kinds: list[mypy.nodes.ArgKind],
-        arg_names: list[str | None],
-        location: SourceLocation,
-    ) -> ExpressionBuilder:
-        return _abi_call(args, arg_typs, arg_kinds, arg_names, location, abi_return_type=None)
 
 
 class ARC4ClientClassExpressionBuilder(IntermediateExpressionBuilder):
@@ -153,18 +126,24 @@ class ARC4ClientMethodExpressionBuilder(IntermediateExpressionBuilder):
         )
 
 
-class ABICallClassExpressionBuilder(TypeClassExpressionBuilder):
+class ABICallGenericClassExpressionBuilder(IntermediateExpressionBuilder):
+    @typing.override
+    def call(
+        self,
+        args: Sequence[ExpressionBuilder | Literal],
+        arg_typs: Sequence[pytypes.PyType],
+        arg_kinds: list[mypy.nodes.ArgKind],
+        arg_names: list[str | None],
+        location: SourceLocation,
+    ) -> ExpressionBuilder:
+        return _abi_call(args, arg_typs, arg_kinds, arg_names, location, abi_return_type=None)
+
+
+class ABICallClassExpressionBuilder(IntermediateExpressionBuilder):
     def __init__(self, typ: pytypes.PyType, location: SourceLocation):
         assert isinstance(typ, pytypes.PseudoGenericFunctionType)
         self.abi_return_type = typ.return_type
-        app_itxn_wtype = wtypes.WInnerTransaction.from_type(TransactionType.appl)
-        if _is_typed(self.abi_return_type):
-            wtype: wtypes.WInnerTransaction | wtypes.WTuple = wtypes.WTuple(
-                (self.abi_return_type.wtype, app_itxn_wtype), location
-            )
-        else:
-            wtype = app_itxn_wtype
-        super().__init__(wtype, location)
+        super().__init__(location)
 
     @typing.override
     def call(
@@ -178,6 +157,14 @@ class ABICallClassExpressionBuilder(TypeClassExpressionBuilder):
         return _abi_call(
             args, arg_typs, arg_kinds, arg_names, location, abi_return_type=self.abi_return_type
         )
+
+
+@attrs.frozen
+class _ABICallExpr:
+    method: ExpressionBuilder | Literal
+    abi_args: Sequence[ExpressionBuilder | Literal]
+    transaction_kwargs: dict[str, ExpressionBuilder | Literal]
+    abi_arg_typs: Sequence[pytypes.PyType]
 
 
 def _abi_call(

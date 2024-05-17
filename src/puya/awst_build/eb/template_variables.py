@@ -5,18 +5,14 @@ import mypy.nodes
 
 from puya.awst.nodes import Literal, TemplateVar
 from puya.awst_build import pytypes
-from puya.awst_build.eb.base import (
-    ExpressionBuilder,
-    GenericClassExpressionBuilder,
-    TypeClassExpressionBuilder,
-)
+from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBuilder
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.utils import get_arg_mapping
 from puya.errors import CodeError
 from puya.parse import SourceLocation
 
 
-class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
+class GenericTemplateVariableExpressionBuilder(IntermediateExpressionBuilder):
     @typing.override
     def call(
         self,
@@ -29,10 +25,11 @@ class GenericTemplateVariableExpressionBuilder(GenericClassExpressionBuilder):
         raise CodeError("TemplateVar usage requires type parameter", location)
 
 
-class TemplateVariableExpressionBuilder(TypeClassExpressionBuilder):
+class TemplateVariableExpressionBuilder(IntermediateExpressionBuilder):
     def __init__(self, typ: pytypes.PyType, location: SourceLocation):
         assert isinstance(typ, pytypes.PseudoGenericFunctionType)
-        super().__init__(typ.return_type.wtype, location)
+        self._wtype = typ.return_type.wtype
+        super().__init__(location)
 
     @typing.override
     def call(
@@ -73,8 +70,8 @@ class TemplateVariableExpressionBuilder(TypeClassExpressionBuilder):
                 return var_expression(
                     TemplateVar(
                         name=prefix_value + str_value,
+                        wtype=self._wtype,
                         source_location=location,
-                        wtype=self.produces(),
                     )
                 )
             case _:

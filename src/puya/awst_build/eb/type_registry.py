@@ -38,13 +38,9 @@ __all__ = [
 ]
 
 ExpressionBuilderFromSourceFactory = Callable[[SourceLocation], ExpressionBuilder]
-ExpressionBuilderFromWTypeAndSourceFactory = Callable[
-    [wtypes.WType, SourceLocation], ExpressionBuilder
-]
 ExpressionBuilderFromPyTypeAndSourceFactory = Callable[
     [pytypes.PyType, SourceLocation], ExpressionBuilder
 ]
-ExpressionBuilderFromExpressionFactory = Callable[[Expression], ExpressionBuilder]
 CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
     constants.ARC4_SIGNATURE: intrinsics.Arc4SignatureBuilder,
     constants.ENSURE_BUDGET: ensure_budget.EnsureBudgetBuilder,
@@ -144,6 +140,8 @@ PYTYPE_BASE_TO_TYPE_BUILDER: dict[
     pytypes.ARC4StructBaseType: arc4.ARC4StructClassExpressionBuilder,
     pytypes.StructBaseType: struct.StructSubclassExpressionBuilder,
 }
+
+ExpressionBuilderFromExpressionFactory = Callable[[Expression], ExpressionBuilder]
 WTYPE_TO_BUILDER: dict[
     wtypes.WType | type[wtypes.WType], ExpressionBuilderFromExpressionFactory
 ] = {
