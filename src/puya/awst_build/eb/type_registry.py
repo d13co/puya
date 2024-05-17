@@ -51,14 +51,6 @@ CLS_NAME_TO_BUILDER: dict[str, ExpressionBuilderFromSourceFactory] = {
         template_variables.GenericTemplateVariableExpressionBuilder
     ),
     constants.SUBMIT_TXNS: transaction.SubmitInnerTransactionExpressionBuilder,
-    **{
-        enum_name: functools.partial(
-            named_int_constants.NamedIntegerConstsTypeBuilder,
-            enum_name=enum_name,
-            data=enum_data,
-        )
-        for enum_name, enum_data in constants.NAMED_INT_CONST_ENUM_DATA.items()
-    },
 }
 PYTYPE_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceFactory] = {
     pytypes.NoneType: void.VoidTypeExpressionBuilder,
@@ -110,9 +102,17 @@ PYTYPE_TO_TYPE_BUILDER: dict[pytypes.PyType | None, ExpressionBuilderFromSourceF
     },
     **{
         itxn_result_pytyp: functools.partial(
-            transaction.InnerTransactionClassExpressionBuilder, wtype=itxn_result_pytyp
+            transaction.InnerTransactionClassExpressionBuilder, wtype=itxn_result_pytyp.wtype
         )
         for itxn_result_pytyp in pytypes.InnerTransactionResultTypes.values()
+    },
+    **{
+        int_enum_typ: functools.partial(
+            named_int_constants.NamedIntegerConstsTypeBuilder,
+            enum_name=int_enum_typ.name,
+            data=constants.NAMED_INT_CONST_ENUM_DATA[int_enum_typ.name],  # TODO: hmmm
+        )
+        for int_enum_typ in (pytypes.TransactionType, pytypes.OnCompleteActionType)
     },
 }
 PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[
