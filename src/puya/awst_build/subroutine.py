@@ -72,6 +72,7 @@ from puya.awst_build.eb.intrinsics import (
     IntrinsicNamespaceClassExpressionBuilder,
 )
 from puya.awst_build.eb.subroutine import SubroutineInvokerExpressionBuilder
+from puya.awst_build.eb.type_registry import builder_for_type
 from puya.awst_build.eb.var_factory import var_expression
 from puya.awst_build.exceptions import TypeUnionError
 from puya.awst_build.utils import (
@@ -1304,16 +1305,3 @@ def temporary_assignment_if_required(
         return var_expression(operand)
     else:
         return operand
-
-
-def builder_for_type(inner_typ: pytypes.PyType, expr_loc: SourceLocation) -> ExpressionBuilder:
-    from puya.awst_build.eb import type_registry
-
-    if tb := type_registry.PYTYPE_TO_TYPE_BUILDER.get(inner_typ):
-        return tb(expr_loc)
-    if tb_param_generic := type_registry.PYTYPE_GENERIC_TO_TYPE_BUILDER.get(inner_typ.generic):
-        return tb_param_generic(inner_typ, expr_loc)
-    for base in inner_typ.mro:
-        if tb_base := type_registry.PYTYPE_BASE_TO_TYPE_BUILDER.get(base):
-            return tb_base(inner_typ, expr_loc)
-    raise InternalError(f"No builder for type: {inner_typ}", expr_loc)

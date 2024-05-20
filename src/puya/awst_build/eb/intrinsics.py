@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import typing
 
-import mypy.nodes
-
 from puya import log
 from puya.awst.nodes import Expression, IntrinsicCall, Literal, MethodConstant
 from puya.awst_build.constants import ARC4_SIGNATURE_ALIAS
@@ -17,6 +15,8 @@ from puya.utils import StableSet
 
 if typing.TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
+
+    import mypy.nodes
 
     from puya.awst_build import pytypes
     from puya.parse import SourceLocation
