@@ -4,15 +4,15 @@ test_cases.typed_abi_call.logger.Logger.approval_program:
     txn NumAppArgs
     bz main_bare_routing@12
     method "echo(string)string"
-    method "log_uint64(uint64)void"
-    method "log_uint512(uint512)void"
-    method "log_string(string)void"
-    method "log_bool(bool)void"
-    method "log_bytes(byte[])void"
-    method "log_asset_account_app(asset,account,application)void"
+    method "log(uint64)void"
+    method "log(uint512)void"
+    method "log(string)void"
+    method "log(bool)void"
+    method "log(byte[])void"
+    method "log(asset,account,application)void"
     method "return_args_after_14th(uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint64,uint8,uint8,uint8,uint8,(uint8,uint8,uint8,uint8),uint8)byte[]"
     txna ApplicationArgs 0
-    match main_echo_route@2 main_log_uint64_route@3 main_log_uint512_route@4 main_log_string_route@5 main_log_bool_route@6 main_log_bytes_route@7 main_log_asset_account_app_route@8 main_return_args_after_14th_route@9
+    match main_echo_route@2 main_log_route@3 main_log_route@4 main_log_route@5 main_log_route@6 main_log_route@7 main_log_route@8 main_return_args_after_14th_route@9
     err // reject transaction
 
 main_echo_route@2:
@@ -30,7 +30,7 @@ main_echo_route@2:
     int 1
     return
 
-main_log_uint64_route@3:
+main_log_route@3:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
@@ -41,7 +41,7 @@ main_log_uint64_route@3:
     int 1
     return
 
-main_log_uint512_route@4:
+main_log_route@4:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
@@ -52,7 +52,7 @@ main_log_uint512_route@4:
     int 1
     return
 
-main_log_string_route@5:
+main_log_route@5:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
@@ -63,7 +63,7 @@ main_log_string_route@5:
     int 1
     return
 
-main_log_bool_route@6:
+main_log_route@6:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
@@ -74,7 +74,7 @@ main_log_bool_route@6:
     int 1
     return
 
-main_log_bytes_route@7:
+main_log_route@7:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
@@ -85,7 +85,7 @@ main_log_bytes_route@7:
     int 1
     return
 
-main_log_asset_account_app_route@8:
+main_log_route@8:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
