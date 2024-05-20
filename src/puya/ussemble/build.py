@@ -26,25 +26,25 @@ def lower_ops(ctx: AssembleContext, program: teal.TealProgram) -> list[models.No
 
 def lower_op(ctx: AssembleContext, op: teal.TealOp) -> models.AVMOp:
     match op:
-        case teal.PushInt(n=int(int_value)):
+        case teal.Int(value=int(int_value)):
             return models.PushInt(int_value)
-        case teal.PushInt(n=str(int_alias)):
+        case teal.Int(value=str(int_alias)):
             try:
                 int_value = TEAL_ALIASES[int_alias]
             except KeyError as ex:
                 raise InternalError(f"Unknown teal alias: {int_alias}", op.source_location) from ex
             return models.PushInt(int_value)
-        case teal.PushBytes(n=bytes_value):
+        case teal.Byte(value=bytes_value):
             return models.PushBytes(bytes_value)
-        case teal.PushMethod(a=method_value):
+        case teal.Method(value=method_value):
             bytes_value = sha512_256_hash(method_value.encode("utf8"))[:4]
             return models.PushBytes(bytes_value)
-        case teal.PushAddress(a=address_value, source_location=loc):
+        case teal.Address(value=address_value, source_location=loc):
             address = Address.parse(address_value)
             if not address.is_valid:
                 raise InternalError(f"Invalid address literal: {address_value}", loc)
             return models.PushBytes(address.public_key)
-        case teal.PushTemplateVar(name=name, op_code=op_code, source_location=loc):
+        case teal.TemplateVar(name=name, op_code=op_code, source_location=loc):
             try:
                 value = ctx.template_variables[name]
             except KeyError as ex:

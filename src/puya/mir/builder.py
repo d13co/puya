@@ -85,7 +85,7 @@ class MemoryIRBuilder(IRVisitor[None]):
 
     def visit_template_var(self, deploy_var: ir.TemplateVar) -> None:
         self._add_op(
-            models.PushTemplateVar(
+            models.TemplateVar(
                 name=deploy_var.name,
                 atype=deploy_var.atype,
                 source_location=deploy_var.source_location,
@@ -94,7 +94,7 @@ class MemoryIRBuilder(IRVisitor[None]):
 
     def visit_uint64_constant(self, const: ir.UInt64Constant) -> None:
         self._add_op(
-            models.PushInt(
+            models.Int(
                 const.value if not const.teal_alias else const.teal_alias,
                 source_location=const.source_location,
             )
@@ -103,7 +103,7 @@ class MemoryIRBuilder(IRVisitor[None]):
     def visit_biguint_constant(self, const: ir.BigUIntConstant) -> None:
         big_uint_bytes = biguint_bytes_eval(const.value)
         self._add_op(
-            models.PushBytes(
+            models.Byte(
                 big_uint_bytes,
                 source_location=const.source_location,
                 comment=str(const.value),
@@ -113,14 +113,14 @@ class MemoryIRBuilder(IRVisitor[None]):
 
     def visit_bytes_constant(self, const: ir.BytesConstant) -> None:
         self._add_op(
-            models.PushBytes(
+            models.Byte(
                 const.value, encoding=const.encoding, source_location=const.source_location
             )
         )
 
     def visit_address_constant(self, const: ir.AddressConstant) -> None:
         self._add_op(
-            models.PushAddress(
+            models.Address(
                 const.value,
                 source_location=const.source_location,
             )
@@ -128,7 +128,7 @@ class MemoryIRBuilder(IRVisitor[None]):
 
     def visit_method_constant(self, const: ir.MethodConstant) -> None:
         self._add_op(
-            models.PushMethod(
+            models.Method(
                 const.value,
                 source_location=const.source_location,
             )
@@ -142,7 +142,7 @@ class MemoryIRBuilder(IRVisitor[None]):
                     self.context, program_id, const.template_variables, const.source_location
                 )
                 self._add_op(
-                    models.PushBytes(
+                    models.Byte(
                         value=program,
                         encoding=AVMBytesEncoding.base64,
                         source_location=const.source_location,
@@ -154,7 +154,7 @@ class MemoryIRBuilder(IRVisitor[None]):
                 )
                 address_public_key = sha512_256_hash(b"Program" + program)
                 self._add_op(
-                    models.PushAddress(
+                    models.Address(
                         value=Address.from_public_key(address_public_key).address,
                         source_location=const.source_location,
                     )
@@ -169,7 +169,7 @@ class MemoryIRBuilder(IRVisitor[None]):
                     total_bytes += len(program)
                 extra_pages = (total_bytes - 1) // MAX_APP_PAGE_SIZE
                 self._add_op(
-                    models.PushInt(
+                    models.Int(
                         value=extra_pages,
                         source_location=const.source_location,
                     )
@@ -184,7 +184,7 @@ class MemoryIRBuilder(IRVisitor[None]):
                     self.context, const.artifact, state_field, const.source_location
                 )
                 self._add_op(
-                    models.PushInt(
+                    models.Int(
                         value=total,
                         source_location=const.source_location,
                     )
