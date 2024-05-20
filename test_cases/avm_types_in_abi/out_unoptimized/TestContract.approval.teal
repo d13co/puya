@@ -40,12 +40,12 @@ main_create_route@1:
     int 0
     uncover 2
     setbit
-    swap
+    cover 1
     dup
     int 1
     int 8
     extract3
-    swap
+    cover 1
     dup
     int 9
     extract_uint16
@@ -58,12 +58,12 @@ main_create_route@1:
     uncover 2
     uncover 2
     extract3
-    swap
+    cover 1
     dup
     int 11
     int 64
     extract3
-    swap
+    cover 1
     dup
     int 75
     extract_uint16
@@ -77,7 +77,7 @@ main_create_route@1:
     uncover 2
     extract3
     uncover 4
-    swap
+    cover 1
     uncover 4
     cover 2
     uncover 4
@@ -88,9 +88,9 @@ main_create_route@1:
     cover 3
     btoi
     cover 2
-    swap
+    uncover 1
     extract 2 0
-    swap
+    cover 1
     extract 2 0
     // avm_types_in_abi/contract.py:5
     // @arc4.abimethod(allow_actions=["NoOp"], create="require")
@@ -108,7 +108,7 @@ main_create_route@1:
     cover 4
     cover 3
     cover 2
-    swap
+    cover 1
     byte 0x00
     int 0
     uncover 2
@@ -120,7 +120,7 @@ main_create_route@1:
     len
     itob
     substring 6 8
-    swap
+    uncover 1
     concat
     cover 2
     dup
@@ -137,7 +137,7 @@ main_create_route@1:
     extract 6 2
     uncover 2
     concat
-    swap
+    cover 1
     byte 0x
     uncover 4
     concat
@@ -150,21 +150,21 @@ main_create_route@1:
     dig 3
     len
     int 77
-    swap
+    uncover 1
     +
-    swap
+    uncover 1
     uncover 2
     concat
-    swap
+    cover 1
     itob
     extract 6 2
     concat
     uncover 2
     concat
-    swap
+    uncover 1
     concat
     byte 0x151f7c75
-    swap
+    uncover 1
     concat
     log
     int 1
@@ -186,21 +186,21 @@ main_tuple_of_arc4_route@2:
     int 0
     int 1
     extract3
-    swap
+    cover 1
     int 1
     int 32
     extract3
     // avm_types_in_abi/contract.py:19
     // @arc4.abimethod
     callsub tuple_of_arc4
-    swap
+    cover 1
     byte 0x
-    swap
+    uncover 1
     concat
-    swap
+    uncover 1
     concat
     byte 0x151f7c75
-    swap
+    uncover 1
     concat
     log
     int 1
@@ -230,15 +230,15 @@ create:
     // result = (bool_param, uint64_param, bytes_param, biguint_param, string_param)
     frame_dig -10
     dup
-    swap
+    cover 1
     frame_dig -9
-    swap
+    cover 1
     frame_dig -8
-    swap
+    cover 1
     frame_dig -7
-    swap
+    cover 1
     frame_dig -6
-    swap
+    cover 1
     // avm_types_in_abi/contract.py:16
     // assert result == tuple_param
     frame_dig -5

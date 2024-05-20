@@ -69,7 +69,7 @@ main_after_if_else@4:
     assert // check my_bytes exists for account
     dig 3
     concat
-    swap
+    uncover 1
     byte "my_bytes"
     uncover 2
     app_local_put

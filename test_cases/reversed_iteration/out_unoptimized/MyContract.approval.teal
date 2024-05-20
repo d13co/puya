@@ -22,18 +22,18 @@ test_cases.reversed_iteration.contract.MyContract.approval_program:
     %
     int 0
     !=
-    swap
+    uncover 1
     int 1
     /
-    swap
+    uncover 1
     +
     int 1
     -
     int 1
-    swap
+    uncover 1
     *
     int 0
-    swap
+    uncover 1
     +
     bury 10
     dig 9
@@ -86,7 +86,7 @@ main_for_header@7:
     int 1
     *
     byte 0x
-    swap
+    uncover 1
     int 1
     extract3
     // reversed_iteration/contract.py:12
@@ -120,7 +120,7 @@ main_after_for@10:
     int 0
     int 4
     <
-    swap
+    uncover 1
     bury 21
     bz main_after_for@16
     int 4
@@ -131,18 +131,18 @@ main_after_for@10:
     %
     int 0
     !=
-    swap
+    uncover 1
     int 1
     /
-    swap
+    uncover 1
     +
     int 1
     -
     int 1
-    swap
+    uncover 1
     *
     int 0
-    swap
+    uncover 1
     +
     bury 9
     int 0
@@ -162,12 +162,12 @@ main_for_body@13:
     // for index, item in uenumerate(reversed(urange(4))):
     dig 8
     dig 12
-    swap
+    cover 1
     // reversed_iteration/contract.py:17
     // test_array[index] = arc4.UInt8(item)
     itob
     extract 7 1
-    swap
+    cover 1
     dup
     int 4
     <
@@ -175,7 +175,7 @@ main_for_body@13:
     int 1
     *
     dig 22
-    swap
+    uncover 1
     uncover 2
     replace3
     bury 21
@@ -216,7 +216,7 @@ main_after_for@16:
     int 4
     int 8
     <
-    swap
+    uncover 1
     bury 21
     bz main_after_for@24
     int 8
@@ -227,10 +227,10 @@ main_after_for@16:
     %
     int 0
     !=
-    swap
+    uncover 1
     int 1
     /
-    swap
+    uncover 1
     +
     int 1
     -
@@ -254,12 +254,12 @@ main_for_header@18:
     dig 15
     dig 12
     -
-    swap
+    cover 1
     // reversed_iteration/contract.py:22
     // test_array[index] = arc4.UInt8(item)
     itob
     extract 7 1
-    swap
+    cover 1
     dup
     int 4
     <
@@ -268,7 +268,7 @@ main_for_header@18:
     int 1
     *
     dig 23
-    swap
+    uncover 1
     uncover 3
     replace3
     bury 22
@@ -311,20 +311,20 @@ main_after_for@24:
     itob
     extract 6 2
     byte 0x
-    swap
+    uncover 1
     concat
     byte "\x00\x01a"
     len
     int 6
-    swap
+    uncover 1
     +
     dup
     itob
     extract 6 2
     uncover 2
-    swap
+    uncover 1
     concat
-    swap
+    cover 1
     byte "\x00\x01b"
     len
     +
@@ -366,7 +366,7 @@ main_for_header@25:
     dig 22
     dup
     cover 2
-    swap
+    uncover 1
     extract_uint16
     dig 1
     dig 1
@@ -381,14 +381,14 @@ main_for_header@25:
     // some_string_reversed += str_item
     dig 23
     extract 2 0
-    swap
+    cover 1
     extract 2 0
     concat
     dup
     len
     itob
     extract 6 0
-    swap
+    uncover 1
     concat
     bury 23
     dig 16
@@ -435,7 +435,7 @@ main_for_header@29:
     dig 1
     int 1
     extract3
-    swap
+    cover 1
     // reversed_iteration/contract.py:37
     // bytes_reversed_with_index += op.itob(index)[-1:] + bytes_item
     itob
@@ -449,16 +449,16 @@ main_for_header@29:
     uncover 2
     select
     dig 1
-    swap
+    uncover 1
     -
     uncover 2
-    swap
+    uncover 1
     uncover 2
     substring3
-    swap
+    uncover 1
     concat
     dig 24
-    swap
+    uncover 1
     concat
     bury 24
     dig 15
@@ -511,7 +511,7 @@ main_for_body@37:
     dig 4
     // reversed_iteration/contract.py:51
     // assert index + tuple_item == 3
-    swap
+    uncover 1
     +
     int 3
     ==
@@ -601,7 +601,7 @@ main_for_body@44:
     assert
     // reversed_iteration/contract.py:72
     // prev_item = tuple_item
-    swap
+    uncover 1
     bury 14
     // reversed_iteration/contract.py:73
     // prev_index = index

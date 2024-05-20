@@ -224,7 +224,7 @@ contract test_cases.compile.factory.HelloFactory:
                 let txn.ConfigAssetClawback#0: bytes = itxn[txn#0].ConfigAssetClawback
                 let txn.FreezeAsset#0: uint64 = itxn[txn#0].FreezeAsset
                 let txn.FreezeAssetAccount#0: bytes = itxn[txn#0].FreezeAssetAccount
-                let txn.FreezeAssetFrozen#0: uint64 = itxn[txn#0].FreezeAssetFrozen
+                let txn.FreezeAssetFrozen#0: bool = itxn[txn#0].FreezeAssetFrozen
                 let txn.NumAssets#0: uint64 = itxn[txn#0].NumAssets
                 let txn.NumApplications#0: uint64 = itxn[txn#0].NumApplications
                 let txn.GlobalNumUint#0: uint64 = itxn[txn#0].GlobalNumUint
@@ -519,7 +519,7 @@ contract test_cases.compile.factory.HelloFactory:
                 let _txn.ConfigAssetClawback#0: bytes = itxn[_txn#0].ConfigAssetClawback
                 let _txn.FreezeAsset#0: uint64 = itxn[_txn#0].FreezeAsset
                 let _txn.FreezeAssetAccount#0: bytes = itxn[_txn#0].FreezeAssetAccount
-                let _txn.FreezeAssetFrozen#0: uint64 = itxn[_txn#0].FreezeAssetFrozen
+                let _txn.FreezeAssetFrozen#0: bool = itxn[_txn#0].FreezeAssetFrozen
                 let _txn.NumAssets#0: uint64 = itxn[_txn#0].NumAssets
                 let _txn.NumApplications#0: uint64 = itxn[_txn#0].NumApplications
                 let _txn.GlobalNumUint#0: uint64 = itxn[_txn#0].GlobalNumUint
