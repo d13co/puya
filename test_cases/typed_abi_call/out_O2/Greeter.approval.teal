@@ -347,7 +347,7 @@ test_arg_conversion:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_string(string)void"
+    method "log(string)void"
     itxn_field ApplicationArgs
     byte "\x00\nconverted1"
     itxn_field ApplicationArgs
@@ -363,7 +363,7 @@ test_arg_conversion:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_uint64(uint64)void"
+    method "log(uint64)void"
     itxn_field ApplicationArgs
     byte 0x0000000000000002
     itxn_field ApplicationArgs
@@ -380,7 +380,7 @@ test_arg_conversion:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_uint512(uint512)void"
+    method "log(uint512)void"
     itxn_field ApplicationArgs
     byte 0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003
     itxn_field ApplicationArgs
@@ -396,7 +396,7 @@ test_arg_conversion:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_bytes(byte[])void"
+    method "log(byte[])void"
     itxn_field ApplicationArgs
     byte 0x000134
     itxn_field ApplicationArgs
@@ -412,7 +412,7 @@ test_arg_conversion:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_bool(bool)void"
+    method "log(bool)void"
     itxn_field ApplicationArgs
     byte 0x80
     itxn_field ApplicationArgs
@@ -492,7 +492,7 @@ test_void:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_string(string)void"
+    method "log(string)void"
     itxn_field ApplicationArgs
     byte "\x00\x06World1"
     itxn_field ApplicationArgs
@@ -508,7 +508,7 @@ test_void:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_string(string)void"
+    method "log(string)void"
     itxn_field ApplicationArgs
     byte "\x00\x06World2"
     itxn_field ApplicationArgs
@@ -524,7 +524,7 @@ test_void:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_string(string)void"
+    method "log(string)void"
     itxn_field ApplicationArgs
     byte "\x00\x06World3"
     itxn_field ApplicationArgs
@@ -540,7 +540,7 @@ test_void:
     itxn_begin
     frame_dig -1
     itxn_field ApplicationID
-    method "log_string(string)void"
+    method "log(string)void"
     itxn_field ApplicationArgs
     byte "\x00\x06World4"
     itxn_field ApplicationArgs
@@ -568,7 +568,7 @@ test_ref_types:
     frame_dig -2
     itxn_field Applications
     itxn_field Accounts
-    method "log_asset_account_app(asset,account,application)void"
+    method "log(asset,account,application)void"
     itxn_field ApplicationArgs
     byte 0x00
     itxn_field ApplicationArgs

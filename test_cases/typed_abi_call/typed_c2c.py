@@ -1,5 +1,4 @@
 from algopy import Application, ARC4Contract, Asset, Bytes, Global, arc4, op
-
 from test_cases.typed_abi_call.logger import Logger, LoggerClient
 
 
@@ -79,13 +78,13 @@ class Greeter(ARC4Contract):
 
     @arc4.abimethod()
     def test_void(self, app: Application) -> None:
-        txn = arc4.abi_call("log_string(string)void", "World1", app_id=app)
+        txn = arc4.abi_call("log(string)void", "World1", app_id=app)
         assert txn.last_log == b"World1"
 
-        txn = arc4.abi_call("log_string(string)", "World2", app_id=app)
+        txn = arc4.abi_call("log(string)", "World2", app_id=app)
         assert txn.last_log == b"World2"
 
-        txn = arc4.abi_call("log_string", arc4.String("World3"), app_id=app)
+        txn = arc4.abi_call("log", arc4.String("World3"), app_id=app)
         assert txn.last_log == b"World3"
 
         txn = arc4.abi_call(Logger.log_string, "World4", app_id=app)
