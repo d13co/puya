@@ -38,6 +38,7 @@ class PuyaOptions:
     log_level: LogLevel = LogLevel.info
     target_avm_version: int = MAINNET_TEAL_LANGUAGE_VERSION
     template_vars: list[str] = attrs.field(factory=list)
+    template_vars_prefix: str = "TMPL_"
     template_vars_path: Path | None = attrs.field(default=None, repr=str)
     # TODO: the below is probably not scalable as a set of optimisation on/off flags,
     #       but it'll do for now

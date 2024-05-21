@@ -1,14 +1,19 @@
 #pragma version 10
 
 test_cases.compile.factory.Hello.approval_program:
+    txn ApplicationID
+    bnz main_entrypoint@2
+    callsub __init__
+
+main_entrypoint@2:
     method "create(string)void"
     method "delete()void"
     method "greet(string)string"
     txna ApplicationArgs 0
-    match main_create_route@1 main_delete_route@2 main_greet_route@3
+    match main_create_route@3 main_delete_route@4 main_greet_route@5
     err // reject transaction
 
-main_create_route@1:
+main_create_route@3:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
@@ -21,7 +26,7 @@ main_create_route@1:
     int 1
     return
 
-main_delete_route@2:
+main_delete_route@4:
     txn OnCompletion
     int DeleteApplication
     ==
@@ -32,7 +37,7 @@ main_delete_route@2:
     int 1
     return
 
-main_greet_route@3:
+main_greet_route@5:
     txn OnCompletion
     !
     assert // OnCompletion is NoOp
@@ -64,13 +69,13 @@ create:
     retsub
 
 
-// test_cases.compile.factory.Hello.delete() -> void:
+// test_cases.compile.factory.HelloBase.delete() -> void:
 delete:
     proto 0 0
     retsub
 
 
-// test_cases.compile.factory.Hello.greet(name: bytes) -> bytes:
+// test_cases.compile.factory.HelloBase.greet(name: bytes) -> bytes:
 greet:
     proto 1 1
     int 0
@@ -81,4 +86,13 @@ greet:
     concat
     frame_dig -1
     concat
+    retsub
+
+
+// test_cases.compile.factory.HelloBase.__init__() -> void:
+__init__:
+    proto 0 0
+    byte "greeting"
+    byte ""
+    app_global_put
     retsub

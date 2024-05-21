@@ -94,6 +94,8 @@ class _ABICallExpr:
     method: ExpressionBuilder | Literal
     abi_args: Sequence[ExpressionBuilder | Literal]
     transaction_kwargs: dict[str, ExpressionBuilder | Literal]
+    prefix: str | None
+    template_vars: dict[str, int | bytes]
 
 
 class ABICallGenericClassExpressionBuilder(GenericClassExpressionBuilder):
@@ -235,7 +237,7 @@ class ABICallClassExpressionBuilder(TypeClassExpressionBuilder):
                     location,
                 )
 
-        _add_default_args(transaction_kwargs, arc4_config, artifact, location)
+        _add_default_args(abi_call_expr, arc4_config, artifact, location)
         _validate_transaction_kwargs(transaction_kwargs, arc4_config, location)
         return var_expression(
             _create_abi_call_expr(
@@ -330,38 +332,48 @@ def _validate_transaction_kwargs(
 
 
 def _add_default_args(
-    transaction_kwargs: dict[str, ExpressionBuilder | Literal],
+    abi_call_expr: _ABICallExpr,
     arc4_config: ARC4MethodConfig | None,
     artifact: str,
     location: SourceLocation,
 ) -> None:
+    transaction_kwargs = abi_call_expr.transaction_kwargs
     on_complete = _get_singular_on_complete(transaction_kwargs, arc4_config)
-    default_args = dict[str, Expression]()
-    if on_complete:
-        default_args["on_completion"] = UInt64Constant(
-            source_location=location, value=on_complete.value, teal_alias=on_complete.name
-        )
-    if artifact:
-        is_creating = _is_creating(transaction_kwargs)
-        if is_creating or on_complete == OnCompletionAction.UpdateApplication:
-            for arg, field in _CREATE_OR_UPDATE_ARGS.items():
-                default_args[arg] = CompiledReference(
-                    artifact=artifact,
-                    field=field,
-                    source_location=location,
-                    template_variables={},  # TODO: need to add to stubs
-                )
-        if is_creating:
-            for arg, field in _CREATE_ARGS.items():
-                default_args[arg] = CompiledReference(
-                    artifact=artifact,
-                    field=field,
-                    source_location=location,
-                )
 
-    for arg, expr in default_args.items():
-        if arg not in transaction_kwargs:
-            transaction_kwargs[arg] = var_expression(expr)
+    if on_complete and "on_completion" not in transaction_kwargs:
+        transaction_kwargs["on_completion"] = var_expression(
+            UInt64Constant(
+                source_location=location, value=on_complete.value, teal_alias=on_complete.name
+            )
+        )
+
+    if not artifact:
+        return
+
+    is_creating = _is_creating(transaction_kwargs)
+
+    if on_complete == OnCompletionAction.UpdateApplication:
+        compile_ref_fields = _CREATE_OR_UPDATE_ARGS
+    elif is_creating:
+        compile_ref_fields = {
+            **_CREATE_OR_UPDATE_ARGS,
+            **_CREATE_ARGS,
+        }
+    else:
+        return
+
+    # add all compile references not already defined
+    for arg in set(compile_ref_fields).difference(transaction_kwargs):
+        field = compile_ref_fields[arg]
+        transaction_kwargs[arg] = var_expression(
+            CompiledReference(
+                artifact=artifact,
+                field=field,
+                prefix=abi_call_expr.prefix,
+                template_variables=abi_call_expr.template_vars,
+                source_location=location,
+            )
+        )
 
 
 def _get_arc4_signature_and_return_wtype(
@@ -547,7 +559,9 @@ def _extract_abi_call_args(
 ) -> _ABICallExpr:
     method: ExpressionBuilder | Literal | None = None
     abi_args = list[ExpressionBuilder | Literal]()
-    kwargs = dict[str, ExpressionBuilder | Literal]()
+    transaction_kwargs = dict[str, ExpressionBuilder | Literal]()
+    template_vars = dict[str, int | bytes]()
+    prefix: str | None = None
     for i in range(len(args)):
         arg_kind = arg_kinds[i]
         arg_name = arg_names[i]
@@ -559,12 +573,35 @@ def _extract_abi_call_args(
         elif arg_kind == mypy.nodes.ArgKind.ARG_NAMED:
             if arg_name is None:
                 raise InternalError(f"Expected named argument at pos {i}", location)
-            kwargs[arg_name] = arg
+            if arg_name in _APP_TRANSACTION_FIELDS:
+                transaction_kwargs[arg_name] = arg
+            elif arg_name == "prefix":
+                prefix = _literal_str(arg)
+            else:
+                template_vars[arg_name] = _literal_int_or_bytes(arg)
         else:
             raise CodeError(f"Unexpected argument kind for '{arg_name}'", location)
     if method is None:
         raise CodeError("Missing required method positional argument", location)
-    return _ABICallExpr(method=method, abi_args=abi_args, transaction_kwargs=kwargs)
+    return _ABICallExpr(
+        method=method,
+        abi_args=abi_args,
+        transaction_kwargs=transaction_kwargs,
+        prefix=prefix,
+        template_vars=template_vars,
+    )
+
+
+def _literal_int_or_bytes(arg: ExpressionBuilder | Literal) -> int | bytes:
+    if isinstance(arg, Literal) and isinstance(arg.value, int | bytes):
+        return arg.value
+    raise CodeError("Invalid template value, expected int or bytes", arg.source_location)
+
+
+def _literal_str(arg: ExpressionBuilder | Literal) -> str:
+    if isinstance(arg, Literal) and isinstance(arg.value, str):
+        return arg.value
+    raise CodeError("Invalid prefix, expected str", arg.source_location)
 
 
 @attrs.frozen(kw_only=True)
@@ -608,7 +645,10 @@ def _get_arc4_method_data(
 def _get_singular_on_complete(
     args: dict[str, ExpressionBuilder | Literal], config: ARC4MethodConfig | None
 ) -> OnCompletionAction | None:
-    """Returns OnComplete value if it is constant or can be inferred from config"""
+    """
+    Returns OnCompletionAction value if it is constant or can be inferred from config
+    Returns None if a non-constant value is provided or more than one action is allowed
+    """
     on_complete: OnCompletionAction | None = None
     arg = args.get("on_completion")
     if isinstance(arg, ExpressionBuilder):
@@ -622,7 +662,11 @@ def _get_singular_on_complete(
 
 
 def _is_creating(args: dict[str, ExpressionBuilder | Literal]) -> bool | None:
-    """Returns true if no app_id specified, or is specified as a constant zero"""
+    """
+    Returns True if no app_id specified, or is specified as a constant zero
+    Returns False if a constant non-zero app_id is provided
+    Returns None if unable to statically infer whether it is creating
+    """
     arg = args.get("app_id")
     match arg:
         case None:

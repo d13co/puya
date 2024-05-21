@@ -382,6 +382,7 @@ class CompiledReference(Expression):
     artifact: str
     """Contract or logic sig fullname"""
     field: CompiledReferenceField
+    prefix: str | None = None
     template_variables: Mapping[str, bytes | int] = attrs.field(
         converter=immutabledict, factory=immutabledict
     )

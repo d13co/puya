@@ -1,16 +1,19 @@
+import copy
 from collections.abc import Iterable
 
 import algosdk.error
 import pytest
 from _pytest.mark import ParameterSet
-from algokit_utils import Program, replace_template_variables
+from algokit_utils import Program
 from algosdk.v2client.algod import AlgodClient
 from puya.context import CompileContext
+from puya.ir.types_ import AVMBytesEncoding
 from puya.models import CompiledContract, CompiledLogicSignature
 from puya.options import PuyaOptions
-from puya.teal.models import TealProgram
+from puya.teal.models import Byte, Int, TealProgram, TemplateVar
 from puya.teal.output import emit_teal
-from puya.ussemble.main import assemble_program, get_template_vars
+from puya.ussemble.main import assemble_program
+from puya.ussemble.template import get_template_vars
 
 from tests.utils import (
     PuyaExample,
@@ -106,7 +109,7 @@ def puya_assemble_program(
     context: CompileContext,
     program: TealProgram,
 ) -> bytes:
-    return assemble_program(context, program, get_template_vars(context)).bytecode
+    return assemble_program(context, program, get_template_vars(context.options)).bytecode
 
 
 def _value_as_tmpl_str(value: int | bytes | str) -> str:
@@ -126,12 +129,8 @@ def assemble_and_compare_program(
     name: str,
 ) -> None:
     puya_program = puya_assemble_program(context, program)
+    program = _replace_template_variables(context.options, program)
     teal_src = emit_teal(context, program)
-    teal_src = replace_template_variables(
-        teal_src,
-        # algokit_utils.replace_template_variables expects the variables *without* the TMPL_ prefix
-        template_values={k[len("TMPL_") :]: v for k, v in get_template_vars(context).items()},
-    )
     algod_program = Program(teal_src, algod_client).raw_binary
 
     expected = algod_program.hex()
@@ -147,3 +146,27 @@ def assemble_and_compare_program(
             expected = algod_client.disassemble(algod_program)["result"]
             actual = puya_dis
     assert actual == expected, f"{name} bytecode does not match algod bytecode"
+
+
+def _replace_template_variables(options: PuyaOptions, program: TealProgram) -> TealProgram:
+    program = copy.deepcopy(program)
+    template_vars = get_template_vars(options)
+    for sub in program.all_subroutines:
+        for block in sub.blocks:
+            for op_idx, op in enumerate(block.ops):
+                match op:
+                    case TemplateVar(op_code="int", name=name, source_location=loc):
+                        value = template_vars[name]
+                        assert isinstance(value, int)
+                        op = Int(value=value, source_location=loc)
+                    case TemplateVar(op_code="byte", name=name, source_location=loc):
+                        value = template_vars[name]
+                        assert isinstance(value, bytes)
+                        op = Byte(
+                            value=value, encoding=AVMBytesEncoding.base16, source_location=loc
+                        )
+                    case _:
+                        continue
+                block.ops[op_idx] = op
+
+    return program

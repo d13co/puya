@@ -90,7 +90,6 @@ def _is_different_push_type(
 
 def _combine_ops(consecutive: list[models.PushInt | models.PushBytes]) -> models.Node:
     values = [op.value for op in consecutive]
-    # TODO: check value types
     if isinstance(values[0], int):
         int_values = [int(v) for v in values]
         return models.PushInts(values=int_values)

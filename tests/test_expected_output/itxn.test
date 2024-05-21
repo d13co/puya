@@ -111,8 +111,8 @@ def method_selector_mismatch() -> None:
 
 @subroutine
 def allowed_coercions() -> None:
-    arc4.abi_call("foo", 256) # value inferred from args
-    arc4.abi_call(Client.foo, 1)
+    arc4.abi_call("foo", 256, app_id=1) # value inferred from args
+    arc4.abi_call(Client.foo, 1, app_id=1)
 
 ## case: test_stale_itxn_array_read
 from algopy import (

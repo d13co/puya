@@ -405,21 +405,24 @@ def _assemble_program_bytes(
 ) -> bytes:
     from puya.mir.main import program_ir_to_mir
     from puya.teal.main import mir_to_teal
-    from puya.ussemble.main import assemble_program, get_template_vars
+    from puya.ussemble.main import assemble_program
+    from puya.ussemble.template import get_template_vars
 
+    # this assumes the current_assembles list is the same instance across contexts
+    current_assembles = context.current_assembles
     try:
         program_ir = context.all_programs[program_id]
     except KeyError as ex:
         raise CodeError(f"Unknown program reference: {program_id}", loc) from ex
 
     try:
-        program_index = context.current_assembles.index(program_id)
+        program_index = current_assembles.index(program_id)
     except ValueError:
         pass
     else:
-        chain = " -> ".join(context.current_assembles[program_index:] + [program_id])
+        chain = " -> ".join(current_assembles[program_index:] + [program_id])
         raise CodeError(f"Self referencing program cycle detected: {chain}", loc)
-    context.current_assembles.append(program_id)
+    current_assembles.append(program_id)
     context = attrs.evolve(
         context,
         options=attrs.evolve(
@@ -432,8 +435,8 @@ def _assemble_program_bytes(
     program_mir = program_ir_to_mir(context, program_ir, None)
     program_teal = mir_to_teal(context, program_mir)
     template_vars = {
-        **get_template_vars(context),
+        **get_template_vars(context.options),
         **template_vars,
     }
-    context.current_assembles.pop()
+    current_assembles.pop()
     return assemble_program(context, program_teal, template_vars).bytecode

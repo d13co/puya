@@ -29,8 +29,11 @@
   calculator                                       349       317     32       315      2 
   callsub                                           32        32      0        32      0 
   chained_assignment/ChainedAssignment              88        87      1        87      0 
-  compile/Hello                                    153       144      9       144      0 
-  compile/HelloFactory                             497       464     33       464      0 
+  compile/Hello                                    169       160      9       160      0 
+  compile/HelloBase                                158       141     17       141      0 
+  compile/HelloFactory                            1646      1557     89      1557      0 
+  compile/HelloPrfx                                163       154      9       154      0 
+  compile/HelloTmpl                                163       154      9       154      0 
   conditional_execution/ConditionalExecution       368       348     20       348      0 
   conditional_expressions                          225       185     40       185      0 
   constants/AddressConstant                         70        47     23        47      0 

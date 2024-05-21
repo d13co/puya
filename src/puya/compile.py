@@ -41,7 +41,8 @@ from puya.parse import (
 from puya.teal.main import mir_to_teal
 from puya.teal.models import TealProgram
 from puya.teal.output import emit_teal
-from puya.ussemble.main import assemble_program, get_template_vars
+from puya.ussemble.main import assemble_program
+from puya.ussemble.template import get_template_vars
 from puya.utils import attrs_extend, determine_out_dir, make_path_relative_to_cwd
 
 # this should contain the lowest version number that this compiler does NOT support
@@ -390,7 +391,7 @@ def write_program_bytecode(
     for suffix, program in programs.items():
         output_path = base_path.with_suffix(suffix)
         assembled = assemble_program(
-            context, program, template_variables=get_template_vars(context)
+            context, program, template_variables=get_template_vars(context.options)
         )
         logger.info(f"Writing {make_path_relative_to_cwd(output_path)}")
         output_path.write_bytes(assembled.bytecode)

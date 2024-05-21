@@ -66,8 +66,10 @@ class GetCompiledProgramExpressionBuilder(IntermediateExpressionBuilder):
                 template_names = []
                 template_values = []
                 logger.error("Invalid program reference", location=location)
+        kwargs = dict(zip(template_names, template_values, strict=True))
+        prefix = _get_prefix(kwargs)
         template_vars = dict[str, int | bytes]()
-        for template_name, template_value in zip(template_names, template_values, strict=True):
+        for template_name, template_value in kwargs.items():
             if (
                 isinstance(template_name, str)
                 and isinstance(template_value, Literal)
@@ -79,8 +81,20 @@ class GetCompiledProgramExpressionBuilder(IntermediateExpressionBuilder):
         return var_expression(
             CompiledReference(
                 artifact=fullname,
+                prefix=prefix,
                 field=self.field,
                 template_variables=template_vars,
                 source_location=location,
             )
         )
+
+
+def _get_prefix(kwargs: dict[str | None, ExpressionBuilder | Literal]) -> str | None:
+    try:
+        prefix = kwargs.pop("prefix")
+    except KeyError:
+        return None
+    if isinstance(prefix, Literal) and isinstance(prefix.value, str):
+        return prefix.value
+    logger.error("Wrong argument type, expected str", location=prefix.source_location)
+    return None

@@ -4,6 +4,7 @@ import typing as t
 from collections.abc import Iterable, Iterator, Mapping, Sequence
 
 import attrs
+from immutabledict import immutabledict
 
 from puya import log
 from puya.avm_type import AVMType
@@ -276,7 +277,7 @@ class BytesConstant(Constant):
 class CompiledReference(Value):
     artifact: str
     field: CompiledReferenceField
-    template_variables: Mapping[str, bytes | int]
+    template_variables: Mapping[str, bytes | int] = attrs.field(converter=immutabledict)
     source_location: SourceLocation | None = attrs.field(eq=False)
 
     def accept(self, visitor: IRVisitor[T]) -> T:

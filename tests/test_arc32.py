@@ -1124,5 +1124,9 @@ def test_compile(algod_client: AlgodClient, account: algokit_utils.Account) -> N
     txn_params = algokit_utils.OnCompleteCallParameters(suggested_params=increased_fee)
     algokit_utils.config.config.configure(debug=True, trace_all=True)
     app_client.call("test_get_program", transaction_parameters=txn_params)
+    app_client.call("test_get_program_tmpl", transaction_parameters=txn_params)
+    app_client.call("test_get_program_prfx", transaction_parameters=txn_params)
 
     app_client.call("test_abi_call", transaction_parameters=txn_params)
+    app_client.call("test_abi_call_tmpl", transaction_parameters=txn_params)
+    app_client.call("test_abi_call_prfx", transaction_parameters=txn_params)

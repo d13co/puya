@@ -1,18 +1,22 @@
 #pragma version 10
 
 test_cases.compile.factory.HelloFactory.approval_program:
-    // compile/factory.py:27
+    // compile/factory.py:54
     // class HelloFactory(ARC4Contract):
     txn NumAppArgs
-    bz main_bare_routing@6
+    bz main_bare_routing@10
     method "test_get_program()void"
+    method "test_get_program_tmpl()void"
+    method "test_get_program_prfx()void"
     method "test_abi_call()void"
+    method "test_abi_call_tmpl()void"
+    method "test_abi_call_prfx()void"
     txna ApplicationArgs 0
-    match main_test_get_program_route@2 main_test_abi_call_route@3
+    match main_test_get_program_route@2 main_test_get_program_tmpl_route@3 main_test_get_program_prfx_route@4 main_test_abi_call_route@5 main_test_abi_call_tmpl_route@6 main_test_abi_call_prfx_route@7
     err // reject transaction
 
 main_test_get_program_route@2:
-    // compile/factory.py:29
+    // compile/factory.py:56
     // @arc4.abimethod()
     txn OnCompletion
     !
@@ -23,8 +27,32 @@ main_test_get_program_route@2:
     int 1
     return
 
-main_test_abi_call_route@3:
-    // compile/factory.py:59
+main_test_get_program_tmpl_route@3:
+    // compile/factory.py:86
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub test_get_program_tmpl
+    int 1
+    return
+
+main_test_get_program_prfx_route@4:
+    // compile/factory.py:116
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub test_get_program_prfx
+    int 1
+    return
+
+main_test_abi_call_route@5:
+    // compile/factory.py:146
     // @arc4.abimethod()
     txn OnCompletion
     !
@@ -35,8 +63,32 @@ main_test_abi_call_route@3:
     int 1
     return
 
-main_bare_routing@6:
-    // compile/factory.py:27
+main_test_abi_call_tmpl_route@6:
+    // compile/factory.py:168
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub test_abi_call_tmpl
+    int 1
+    return
+
+main_test_abi_call_prfx_route@7:
+    // compile/factory.py:188
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub test_abi_call_prfx
+    int 1
+    return
+
+main_bare_routing@10:
+    // compile/factory.py:54
     // class HelloFactory(ARC4Contract):
     txn OnCompletion
     !
@@ -50,11 +102,11 @@ main_bare_routing@6:
 
 // test_cases.compile.factory.HelloFactory.test_get_program() -> void:
 test_get_program:
-    // compile/factory.py:29-30
+    // compile/factory.py:56-57
     // @arc4.abimethod()
     // def test_get_program(self) -> None:
     proto 0 0
-    // compile/factory.py:33-39
+    // compile/factory.py:60-66
     // itxn.ApplicationCall(
     //     app_args=(arc4.arc4_signature("create(string)void"), arc4.String("hello")),
     //     approval_program=get_approval_program(Hello),
@@ -63,31 +115,31 @@ test_get_program:
     // )
     // .submit()
     itxn_begin
-    // compile/factory.py:35
+    // compile/factory.py:62
     // approval_program=get_approval_program(Hello),
-    byte base64 CiABASYBCGdyZWV0aW5nggMEIN86VAQkN408BNCiggA2GgCOAwABABQAIgAxGRREMRgURDYaAVcCAIgAMyJDMRmBBRJEMRhEiAAtIkMxGRREMRhENhoBVwIAiAAfSRUWVwYCTFCABBUffHVMULAiQ4oBACiL/2eJigAAiYoBAYEAKGVEgAEgUIv/UIk=
-    // compile/factory.py:36
+    byte base64 CiABASYBCGdyZWV0aW5nMRhAAAOIAH2CAwQg3zpUBCQ3jTwE0KKCADYaAI4DAAEAFAAiADEZFEQxGBRENhoBVwIAiAAzIkMxGYEFEkQxGESIAC0iQzEZFEQxGEQ2GgFXAgCIAB9JFRZXBgJMUIAEFR98dUxQsCJDigEAKIv/Z4mKAACJigEBgQAoZUSAASBQi/9QiYoAACiAAGeJ
+    // compile/factory.py:63
     // clear_state_program=get_clear_state_program(Hello),
     byte base64 CoEBQw==
-    // compile/factory.py:37
+    // compile/factory.py:64
     // global_num_bytes=1,
     int 1
     itxn_field GlobalNumByteSlice
     itxn_field ClearStateProgramPages
     itxn_field ApprovalProgramPages
-    // compile/factory.py:34
+    // compile/factory.py:61
     // app_args=(arc4.arc4_signature("create(string)void"), arc4.String("hello")),
     method "create(string)void"
     itxn_field ApplicationArgs
     byte "\x00\x05hello"
     itxn_field ApplicationArgs
-    // compile/factory.py:33
+    // compile/factory.py:60
     // itxn.ApplicationCall(
     int appl
     itxn_field TypeEnum
     int 0
     itxn_field Fee
-    // compile/factory.py:33-39
+    // compile/factory.py:60-66
     // itxn.ApplicationCall(
     //     app_args=(arc4.arc4_signature("create(string)void"), arc4.String("hello")),
     //     approval_program=get_approval_program(Hello),
@@ -96,7 +148,7 @@ test_get_program:
     // )
     // .submit()
     itxn_submit
-    // compile/factory.py:33-40
+    // compile/factory.py:60-67
     // itxn.ApplicationCall(
     //     app_args=(arc4.arc4_signature("create(string)void"), arc4.String("hello")),
     //     approval_program=get_approval_program(Hello),
@@ -106,7 +158,7 @@ test_get_program:
     // .submit()
     // .created_app
     itxn CreatedApplicationID
-    // compile/factory.py:43-47
+    // compile/factory.py:70-74
     // # call the new app
     // txn = itxn.ApplicationCall(
     //     app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
@@ -115,20 +167,20 @@ test_get_program:
     itxn_begin
     dup
     itxn_field ApplicationID
-    // compile/factory.py:45
+    // compile/factory.py:72
     // app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
     method "greet(string)string"
     itxn_field ApplicationArgs
     byte "\x00\x05world"
     itxn_field ApplicationArgs
-    // compile/factory.py:43-44
+    // compile/factory.py:70-71
     // # call the new app
     // txn = itxn.ApplicationCall(
     int appl
     itxn_field TypeEnum
     int 0
     itxn_field Fee
-    // compile/factory.py:43-47
+    // compile/factory.py:70-74
     // # call the new app
     // txn = itxn.ApplicationCall(
     //     app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
@@ -136,7 +188,7 @@ test_get_program:
     // ).submit()
     itxn_submit
     itxn LastLog
-    // compile/factory.py:48
+    // compile/factory.py:75
     // result = arc4.String.from_log(txn.last_log)
     dup
     extract 4 0
@@ -145,7 +197,7 @@ test_get_program:
     byte 0x151f7c75
     ==
     assert // ARC4 prefix is valid
-    // compile/factory.py:50-55
+    // compile/factory.py:77-82
     // # delete the app
     // itxn.ApplicationCall(
     //     app_id=hello_app,
@@ -153,24 +205,24 @@ test_get_program:
     //     on_completion=OnCompleteAction.DeleteApplication,
     // ).submit()
     itxn_begin
-    // compile/factory.py:54
+    // compile/factory.py:81
     // on_completion=OnCompleteAction.DeleteApplication,
     int DeleteApplication
     itxn_field OnCompletion
-    // compile/factory.py:53
+    // compile/factory.py:80
     // app_args=(arc4.arc4_signature("delete()void"),),
     method "delete()void"
     itxn_field ApplicationArgs
     swap
     itxn_field ApplicationID
-    // compile/factory.py:50-51
+    // compile/factory.py:77-78
     // # delete the app
     // itxn.ApplicationCall(
     int appl
     itxn_field TypeEnum
     int 0
     itxn_field Fee
-    // compile/factory.py:50-55
+    // compile/factory.py:77-82
     // # delete the app
     // itxn.ApplicationCall(
     //     app_id=hello_app,
@@ -178,7 +230,7 @@ test_get_program:
     //     on_completion=OnCompleteAction.DeleteApplication,
     // ).submit()
     itxn_submit
-    // compile/factory.py:57
+    // compile/factory.py:84
     // assert result == "hello world"
     byte "\x00\x0bhello world"
     ==
@@ -186,13 +238,285 @@ test_get_program:
     retsub
 
 
+// test_cases.compile.factory.HelloFactory.test_get_program_tmpl() -> void:
+test_get_program_tmpl:
+    // compile/factory.py:86-87
+    // @arc4.abimethod()
+    // def test_get_program_tmpl(self) -> None:
+    proto 0 0
+    // compile/factory.py:90-96
+    // itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("create()void"),),
+    //     approval_program=get_approval_program(HelloTmpl, GREETING=b"hey"),
+    //     clear_state_program=get_clear_state_program(HelloTmpl),
+    //     global_num_bytes=1,
+    // )
+    // .submit()
+    itxn_begin
+    // compile/factory.py:92
+    // approval_program=get_approval_program(HelloTmpl, GREETING=b"hey"),
+    byte base64 CiABASYBCGdyZWV0aW5nMRhAAAOIAHOCAwRMXGG6BCQ3jTwE0KKCADYaAI4DAAEADgAcADEZFEQxGBREiAAzIkMxGYEFEkQxGESIACkiQzEZFEQxGEQ2GgFXAgCIABtJFRZXBgJMUIAEFR98dUxQsCJDigAAiYoAAImKAQGBAChlRIABIFCL/1CJigAAKIADaGV5Z4k=
+    // compile/factory.py:93
+    // clear_state_program=get_clear_state_program(HelloTmpl),
+    byte base64 CoEBQw==
+    // compile/factory.py:94
+    // global_num_bytes=1,
+    int 1
+    itxn_field GlobalNumByteSlice
+    itxn_field ClearStateProgramPages
+    itxn_field ApprovalProgramPages
+    // compile/factory.py:91
+    // app_args=(arc4.arc4_signature("create()void"),),
+    method "create()void"
+    itxn_field ApplicationArgs
+    // compile/factory.py:90
+    // itxn.ApplicationCall(
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    // compile/factory.py:90-96
+    // itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("create()void"),),
+    //     approval_program=get_approval_program(HelloTmpl, GREETING=b"hey"),
+    //     clear_state_program=get_clear_state_program(HelloTmpl),
+    //     global_num_bytes=1,
+    // )
+    // .submit()
+    itxn_submit
+    // compile/factory.py:90-97
+    // itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("create()void"),),
+    //     approval_program=get_approval_program(HelloTmpl, GREETING=b"hey"),
+    //     clear_state_program=get_clear_state_program(HelloTmpl),
+    //     global_num_bytes=1,
+    // )
+    // .submit()
+    // .created_app
+    itxn CreatedApplicationID
+    // compile/factory.py:100-104
+    // # call the new app
+    // txn = itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
+    //     app_id=hello_app,
+    // ).submit()
+    itxn_begin
+    dup
+    itxn_field ApplicationID
+    // compile/factory.py:102
+    // app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
+    method "greet(string)string"
+    itxn_field ApplicationArgs
+    byte "\x00\x05world"
+    itxn_field ApplicationArgs
+    // compile/factory.py:100-101
+    // # call the new app
+    // txn = itxn.ApplicationCall(
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    // compile/factory.py:100-104
+    // # call the new app
+    // txn = itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
+    //     app_id=hello_app,
+    // ).submit()
+    itxn_submit
+    itxn LastLog
+    // compile/factory.py:105
+    // result = arc4.String.from_log(txn.last_log)
+    dup
+    extract 4 0
+    swap
+    extract 0 4
+    byte 0x151f7c75
+    ==
+    assert // ARC4 prefix is valid
+    // compile/factory.py:107-112
+    // # delete the app
+    // itxn.ApplicationCall(
+    //     app_id=hello_app,
+    //     app_args=(arc4.arc4_signature("delete()void"),),
+    //     on_completion=OnCompleteAction.DeleteApplication,
+    // ).submit()
+    itxn_begin
+    // compile/factory.py:111
+    // on_completion=OnCompleteAction.DeleteApplication,
+    int DeleteApplication
+    itxn_field OnCompletion
+    // compile/factory.py:110
+    // app_args=(arc4.arc4_signature("delete()void"),),
+    method "delete()void"
+    itxn_field ApplicationArgs
+    swap
+    itxn_field ApplicationID
+    // compile/factory.py:107-108
+    // # delete the app
+    // itxn.ApplicationCall(
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    // compile/factory.py:107-112
+    // # delete the app
+    // itxn.ApplicationCall(
+    //     app_id=hello_app,
+    //     app_args=(arc4.arc4_signature("delete()void"),),
+    //     on_completion=OnCompleteAction.DeleteApplication,
+    // ).submit()
+    itxn_submit
+    // compile/factory.py:114
+    // assert result == "hey world"
+    byte "\x00\they world"
+    ==
+    assert
+    retsub
+
+
+// test_cases.compile.factory.HelloFactory.test_get_program_prfx() -> void:
+test_get_program_prfx:
+    // compile/factory.py:116-117
+    // @arc4.abimethod()
+    // def test_get_program_prfx(self) -> None:
+    proto 0 0
+    // compile/factory.py:120-126
+    // itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("create()void"),),
+    //     approval_program=get_approval_program(HelloPrfx, prefix="PRFX_", GREETING=b"hi"),
+    //     clear_state_program=get_clear_state_program(HelloPrfx),
+    //     global_num_bytes=1,
+    // )
+    // .submit()
+    itxn_begin
+    // compile/factory.py:122
+    // approval_program=get_approval_program(HelloPrfx, prefix="PRFX_", GREETING=b"hi"),
+    byte base64 CiABASYBCGdyZWV0aW5nMRhAAAOIAHOCAwRMXGG6BCQ3jTwE0KKCADYaAI4DAAEADgAcADEZFEQxGBREiAAzIkMxGYEFEkQxGESIACkiQzEZFEQxGEQ2GgFXAgCIABtJFRZXBgJMUIAEFR98dUxQsCJDigAAiYoAAImKAQGBAChlRIABIFCL/1CJigAAKIACaGlniQ==
+    // compile/factory.py:123
+    // clear_state_program=get_clear_state_program(HelloPrfx),
+    byte base64 CoEBQw==
+    // compile/factory.py:124
+    // global_num_bytes=1,
+    int 1
+    itxn_field GlobalNumByteSlice
+    itxn_field ClearStateProgramPages
+    itxn_field ApprovalProgramPages
+    // compile/factory.py:121
+    // app_args=(arc4.arc4_signature("create()void"),),
+    method "create()void"
+    itxn_field ApplicationArgs
+    // compile/factory.py:120
+    // itxn.ApplicationCall(
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    // compile/factory.py:120-126
+    // itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("create()void"),),
+    //     approval_program=get_approval_program(HelloPrfx, prefix="PRFX_", GREETING=b"hi"),
+    //     clear_state_program=get_clear_state_program(HelloPrfx),
+    //     global_num_bytes=1,
+    // )
+    // .submit()
+    itxn_submit
+    // compile/factory.py:120-127
+    // itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("create()void"),),
+    //     approval_program=get_approval_program(HelloPrfx, prefix="PRFX_", GREETING=b"hi"),
+    //     clear_state_program=get_clear_state_program(HelloPrfx),
+    //     global_num_bytes=1,
+    // )
+    // .submit()
+    // .created_app
+    itxn CreatedApplicationID
+    // compile/factory.py:130-134
+    // # call the new app
+    // txn = itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
+    //     app_id=hello_app,
+    // ).submit()
+    itxn_begin
+    dup
+    itxn_field ApplicationID
+    // compile/factory.py:132
+    // app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
+    method "greet(string)string"
+    itxn_field ApplicationArgs
+    byte "\x00\x05world"
+    itxn_field ApplicationArgs
+    // compile/factory.py:130-131
+    // # call the new app
+    // txn = itxn.ApplicationCall(
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    // compile/factory.py:130-134
+    // # call the new app
+    // txn = itxn.ApplicationCall(
+    //     app_args=(arc4.arc4_signature("greet(string)string"), arc4.String("world")),
+    //     app_id=hello_app,
+    // ).submit()
+    itxn_submit
+    itxn LastLog
+    // compile/factory.py:135
+    // result = arc4.String.from_log(txn.last_log)
+    dup
+    extract 4 0
+    swap
+    extract 0 4
+    byte 0x151f7c75
+    ==
+    assert // ARC4 prefix is valid
+    // compile/factory.py:137-142
+    // # delete the app
+    // itxn.ApplicationCall(
+    //     app_id=hello_app,
+    //     app_args=(arc4.arc4_signature("delete()void"),),
+    //     on_completion=OnCompleteAction.DeleteApplication,
+    // ).submit()
+    itxn_begin
+    // compile/factory.py:141
+    // on_completion=OnCompleteAction.DeleteApplication,
+    int DeleteApplication
+    itxn_field OnCompletion
+    // compile/factory.py:140
+    // app_args=(arc4.arc4_signature("delete()void"),),
+    method "delete()void"
+    itxn_field ApplicationArgs
+    swap
+    itxn_field ApplicationID
+    // compile/factory.py:137-138
+    // # delete the app
+    // itxn.ApplicationCall(
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    // compile/factory.py:137-142
+    // # delete the app
+    // itxn.ApplicationCall(
+    //     app_id=hello_app,
+    //     app_args=(arc4.arc4_signature("delete()void"),),
+    //     on_completion=OnCompleteAction.DeleteApplication,
+    // ).submit()
+    itxn_submit
+    // compile/factory.py:144
+    // assert result == "hi world"
+    byte "\x00\x08hi world"
+    ==
+    assert
+    retsub
+
+
 // test_cases.compile.factory.HelloFactory.test_abi_call() -> void:
 test_abi_call:
-    // compile/factory.py:59-60
+    // compile/factory.py:146-147
     // @arc4.abimethod()
     // def test_abi_call(self) -> None:
     proto 0 0
-    // compile/factory.py:61-67
+    // compile/factory.py:148-154
     // # create app
     // hello_app = arc4.abi_call(
     //     Hello.create,
@@ -201,7 +525,7 @@ test_abi_call:
     //     # extra_program_pages are automatically set based on Hello contract
     // ).created_app
     itxn_begin
-    byte base64 CiABASYBCGdyZWV0aW5nggMEIN86VAQkN408BNCiggA2GgCOAwABABQAIgAxGRREMRgURDYaAVcCAIgAMyJDMRmBBRJEMRhEiAAtIkMxGRREMRhENhoBVwIAiAAfSRUWVwYCTFCABBUffHVMULAiQ4oBACiL/2eJigAAiYoBAYEAKGVEgAEgUIv/UIk=
+    byte base64 CiABASYBCGdyZWV0aW5nMRhAAAOIAH2CAwQg3zpUBCQ3jTwE0KKCADYaAI4DAAEAFAAiADEZFEQxGBRENhoBVwIAiAAzIkMxGYEFEkQxGESIAC0iQzEZFEQxGEQ2GgFXAgCIAB9JFRZXBgJMUIAEFR98dUxQsCJDigEAKIv/Z4mKAACJigEBgQAoZUSAASBQi/9QiYoAACiAAGeJ
     byte base64 CoEBQw==
     int 0
     int 1
@@ -216,11 +540,11 @@ test_abi_call:
     itxn_field ApprovalProgramPages
     method "create(string)void"
     itxn_field ApplicationArgs
-    // compile/factory.py:64
+    // compile/factory.py:151
     // "hello",
     byte "\x00\x05hello"
     itxn_field ApplicationArgs
-    // compile/factory.py:61-67
+    // compile/factory.py:148-154
     // # create app
     // hello_app = arc4.abi_call(
     //     Hello.create,
@@ -234,7 +558,7 @@ test_abi_call:
     itxn_field Fee
     itxn_submit
     itxn CreatedApplicationID
-    // compile/factory.py:69-70
+    // compile/factory.py:156-157
     // # call the new app
     // result, _txn = arc4.abi_call(Hello.greet, "world", app_id=hello_app)
     itxn_begin
@@ -258,7 +582,7 @@ test_abi_call:
     ==
     assert // ARC4 prefix is valid
     extract 2 0
-    // compile/factory.py:72-77
+    // compile/factory.py:159-164
     // # delete the app
     // arc4.abi_call(
     //     Hello.delete,
@@ -277,9 +601,180 @@ test_abi_call:
     int 0
     itxn_field Fee
     itxn_submit
-    // compile/factory.py:79
+    // compile/factory.py:166
     // assert result == "hello world"
     byte "hello world"
+    ==
+    assert
+    retsub
+
+
+// test_cases.compile.factory.HelloFactory.test_abi_call_tmpl() -> void:
+test_abi_call_tmpl:
+    // compile/factory.py:168-169
+    // @arc4.abimethod()
+    // def test_abi_call_tmpl(self) -> None:
+    proto 0 0
+    // compile/factory.py:170-174
+    // # create app
+    // hello_app = arc4.abi_call(
+    //     HelloTmpl.create,
+    //     GREETING=b"tmpl2",
+    // ).created_app
+    itxn_begin
+    byte base64 CiABASYBCGdyZWV0aW5nMRhAAAOIAHOCAwRMXGG6BCQ3jTwE0KKCADYaAI4DAAEADgAcADEZFEQxGBREiAAzIkMxGYEFEkQxGESIACkiQzEZFEQxGEQ2GgFXAgCIABtJFRZXBgJMUIAEFR98dUxQsCJDigAAiYoAAImKAQGBAChlRIABIFCL/1CJigAAKIAFdG1wbDJniQ==
+    byte base64 CoEBQw==
+    int 0
+    int 1
+    int 0
+    dupn 2
+    itxn_field ExtraProgramPages
+    itxn_field LocalNumByteSlice
+    itxn_field LocalNumUint
+    itxn_field GlobalNumByteSlice
+    itxn_field GlobalNumUint
+    itxn_field ClearStateProgramPages
+    itxn_field ApprovalProgramPages
+    method "create()void"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn CreatedApplicationID
+    // compile/factory.py:176-177
+    // # call the new app
+    // result, _txn = arc4.abi_call(HelloTmpl.greet, "world", app_id=hello_app)
+    itxn_begin
+    dup
+    itxn_field ApplicationID
+    method "greet(string)string"
+    itxn_field ApplicationArgs
+    byte "\x00\x05world"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn LastLog
+    dup
+    extract 4 0
+    swap
+    extract 0 4
+    byte 0x151f7c75
+    ==
+    assert // ARC4 prefix is valid
+    extract 2 0
+    // compile/factory.py:179-184
+    // # delete the app
+    // arc4.abi_call(
+    //     HelloTmpl.delete,
+    //     app_id=hello_app,
+    //     # on_complete is inferred from Hello.delete ARC4 definition
+    // )
+    itxn_begin
+    int DeleteApplication
+    itxn_field OnCompletion
+    swap
+    itxn_field ApplicationID
+    method "delete()void"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    // compile/factory.py:186
+    // assert result == "tmpl2 world"
+    byte "tmpl2 world"
+    ==
+    assert
+    retsub
+
+
+// test_cases.compile.factory.HelloFactory.test_abi_call_prfx() -> void:
+test_abi_call_prfx:
+    // compile/factory.py:188-189
+    // @arc4.abimethod()
+    // def test_abi_call_prfx(self) -> None:
+    proto 0 0
+    // compile/factory.py:190-195
+    // # create app
+    // hello_app = arc4.abi_call(
+    //     HelloPrfx.create,
+    //     prefix="PRFX_",
+    //     GREETING=b"prfx2",
+    // ).created_app
+    itxn_begin
+    byte base64 CiABASYBCGdyZWV0aW5nMRhAAAOIAHOCAwRMXGG6BCQ3jTwE0KKCADYaAI4DAAEADgAcADEZFEQxGBREiAAzIkMxGYEFEkQxGESIACkiQzEZFEQxGEQ2GgFXAgCIABtJFRZXBgJMUIAEFR98dUxQsCJDigAAiYoAAImKAQGBAChlRIABIFCL/1CJigAAKIAFcHJmeDJniQ==
+    byte base64 CoEBQw==
+    int 0
+    int 1
+    int 0
+    dupn 2
+    itxn_field ExtraProgramPages
+    itxn_field LocalNumByteSlice
+    itxn_field LocalNumUint
+    itxn_field GlobalNumByteSlice
+    itxn_field GlobalNumUint
+    itxn_field ClearStateProgramPages
+    itxn_field ApprovalProgramPages
+    method "create()void"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn CreatedApplicationID
+    // compile/factory.py:197-198
+    // # call the new app
+    // result, _txn = arc4.abi_call(HelloPrfx.greet, "world", app_id=hello_app)
+    itxn_begin
+    dup
+    itxn_field ApplicationID
+    method "greet(string)string"
+    itxn_field ApplicationArgs
+    byte "\x00\x05world"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    itxn LastLog
+    dup
+    extract 4 0
+    swap
+    extract 0 4
+    byte 0x151f7c75
+    ==
+    assert // ARC4 prefix is valid
+    extract 2 0
+    // compile/factory.py:200-205
+    // # delete the app
+    // arc4.abi_call(
+    //     HelloPrfx.delete,
+    //     app_id=hello_app,
+    //     # on_complete is inferred from Hello.delete ARC4 definition
+    // )
+    itxn_begin
+    int DeleteApplication
+    itxn_field OnCompletion
+    swap
+    itxn_field ApplicationID
+    method "delete()void"
+    itxn_field ApplicationArgs
+    int appl
+    itxn_field TypeEnum
+    int 0
+    itxn_field Fee
+    itxn_submit
+    // compile/factory.py:207
+    // assert result == "prfx2 world"
+    byte "prfx2 world"
     ==
     assert
     retsub

@@ -134,12 +134,13 @@ class FunctionIRBuilder(
         return arc4.encode_expr(self.context, expr)
 
     def visit_compiled_reference(self, expr: awst_nodes.CompiledReference) -> TExpression:
+        prefix = self.context.options.template_vars_prefix if expr.prefix is None else expr.prefix
         return CompiledReference(
             artifact=expr.artifact,
             field=expr.field,
             ir_type=wtype_to_ir_type(expr.wtype),
             source_location=expr.source_location,
-            template_variables=expr.template_variables,
+            template_variables={prefix + k: v for k, v in expr.template_variables.items()},
         )
 
     def visit_assignment_statement(self, stmt: awst_nodes.AssignmentStatement) -> TStatement:
