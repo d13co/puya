@@ -64,9 +64,9 @@ PYTYPE_TO_TYPE_BUILDER: dict[pytypes.PyType, ExpressionBuilderFromSourceFactory]
         unsigned_builtins.UnsignedEnumerateBuilder, None
     ),
     pytypes.OpUpFeeSourceType: ensure_budget.OpUpFeeSourceClassBuilder,
-    pytypes.GenericBoxType: box.BoxClassGenericExpressionBuilder,
+    # pytypes.GenericBoxType: box.BoxClassGenericExpressionBuilder,
     pytypes.BoxRefType: box.BoxRefClassExpressionBuilder,
-    pytypes.GenericBoxMapType: box.BoxMapClassGenericExpressionBuilder,
+    # pytypes.GenericBoxMapType: box.BoxMapClassGenericExpressionBuilder,
     pytypes.GenericLocalStateType: app_account_state.AppAccountStateGenericClassExpressionBuilder,
     pytypes.GenericGlobalStateType: app_state.AppStateGenericClassExpressionBuilder,
     pytypes.ARC4AddressType: arc4.AddressClassExpressionBuilder,
@@ -116,8 +116,8 @@ PYTYPE_GENERIC_TO_TYPE_BUILDER: dict[
     pytypes.GenericABICallWithReturnType: arc4.ABICallClassExpressionBuilder,
     pytypes.GenericLocalStateType: app_account_state.AppAccountStateClassExpressionBuilder,
     pytypes.GenericGlobalStateType: app_state.AppStateClassExpressionBuilder,
-    pytypes.GenericBoxType: box.BoxClassExpressionBuilder,
-    pytypes.GenericBoxMapType: box.BoxMapClassExpressionBuilder,
+    # pytypes.GenericBoxType: box.BoxClassExpressionBuilder,
+    # pytypes.GenericBoxMapType: box.BoxMapClassExpressionBuilder,
     pytypes.GenericARC4TupleType: arc4.ARC4TupleClassExpressionBuilder,
     pytypes.GenericTupleType: tuple_.TupleTypeExpressionBuilder,
     pytypes.GenericArrayType: array.ArrayClassExpressionBuilder,
@@ -210,8 +210,8 @@ PYTYPE_GENERIC_TO_BUILDER: dict[
     pytypes.PyType | None, ExpressionBuilderFromExpressionAndPyTypeFactory
 ] = {
     pytypes.GenericTupleType: tuple_.TupleExpressionBuilder,
-    pytypes.GenericBoxType: box.BoxProxyExpressionBuilder,
-    pytypes.GenericBoxMapType: box.BoxMapProxyExpressionBuilder,
+    # pytypes.GenericBoxType: box.BoxProxyExpressionBuilder,
+    # pytypes.GenericBoxMapType: box.BoxMapProxyExpressionBuilder,
     pytypes.GenericArrayType: array.ArrayExpressionBuilder,
     pytypes.GenericARC4DynamicArrayType: arc4.DynamicArrayExpressionBuilder,
     pytypes.GenericARC4StaticArrayType: arc4.StaticArrayExpressionBuilder,

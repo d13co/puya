@@ -14,8 +14,6 @@ from puya.awst_build.eb.app_account_state import AppAccountStateExpressionBuilde
 from puya.awst_build.eb.app_state import AppStateExpressionBuilder
 from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBuilder
 from puya.awst_build.eb.box import (
-    BoxMapProxyExpressionBuilder,
-    BoxProxyExpressionBuilder,
     BoxRefProxyExpressionBuilder,
 )
 from puya.awst_build.eb.subroutine import (
@@ -97,10 +95,10 @@ def _builder_for_storage_access(
             )
         case pytypes.BoxRefType:
             return BoxRefProxyExpressionBuilder(storage_decl.key, storage_decl.member_name)
-        case pytypes.PyType(generic=pytypes.GenericBoxType):
-            return BoxProxyExpressionBuilder(storage_decl, location)
-        case pytypes.PyType(generic=pytypes.GenericBoxMapType):
-            return BoxMapProxyExpressionBuilder(storage_decl, location)
+        # case pytypes.PyType(generic=pytypes.GenericBoxType):
+        #     return BoxProxyExpressionBuilder(storage_decl, location)
+        # case pytypes.PyType(generic=pytypes.GenericBoxMapType):
+        #     return BoxMapProxyExpressionBuilder(storage_decl, location)
         case _:
             return var_expression(
                 AppStateExpression(
