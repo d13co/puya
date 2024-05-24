@@ -5,7 +5,11 @@ import typing
 from puya import log
 from puya.awst.nodes import Expression, IntrinsicCall, Literal, MethodConstant
 from puya.awst_build.constants import ARC4_SIGNATURE_ALIAS
-from puya.awst_build.eb.base import ExpressionBuilder, IntermediateExpressionBuilder
+from puya.awst_build.eb.base import (
+    ExpressionBuilder,
+    FunctionBuilder,
+    IntermediateExpressionBuilder,
+)
 from puya.awst_build.eb.bytes import BytesExpressionBuilder
 from puya.awst_build.eb.var_factory import builder_for_instance
 from puya.awst_build.intrinsic_models import FunctionOpMapping, PropertyOpMapping
@@ -55,6 +59,11 @@ class IntrinsicEnumClassExpressionBuilder(IntermediateExpressionBuilder):
         self._data = data
 
     @typing.override
+    @property
+    def pytype(self) -> None:  # TODO: ??
+        return None
+
+    @typing.override
     def call(
         self,
         args: Sequence[ExpressionBuilder | Literal],
@@ -85,6 +94,11 @@ class IntrinsicNamespaceClassExpressionBuilder(IntermediateExpressionBuilder):
         self._data = data
 
     @typing.override
+    @property
+    def pytype(self) -> None:  # TODO: ??
+        return None
+
+    @typing.override
     def member_access(self, name: str, location: SourceLocation) -> ExpressionBuilder:
         mapping = self._data.get(name)
         if mapping is None:
@@ -102,7 +116,7 @@ class IntrinsicNamespaceClassExpressionBuilder(IntermediateExpressionBuilder):
             return IntrinsicFunctionExpressionBuilder(fullname, mapping, location)
 
 
-class IntrinsicFunctionExpressionBuilder(IntermediateExpressionBuilder):
+class IntrinsicFunctionExpressionBuilder(FunctionBuilder):
     def __init__(
         self, fullname: str, mappings: Sequence[FunctionOpMapping], location: SourceLocation
     ) -> None:

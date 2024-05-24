@@ -20,7 +20,9 @@ _PYTHON_MEMBER_FIELD_MAP = {
 }
 
 
-class BaseTransactionExpressionBuilder(ValueExpressionBuilder, abc.ABC):
+class BaseTransactionExpressionBuilder(
+    ValueExpressionBuilder[pytypes.TransactionRelatedType], abc.ABC
+):
     @abc.abstractmethod
     def get_field_value(self, field: TxnField, location: SourceLocation) -> Expression: ...
 
