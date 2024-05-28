@@ -93,7 +93,7 @@ PC  Teal                                                                        
 101 retsub                                                                                                                                                      
 24  callsub bytes_unary                                                                                                                                         
 102 proto 0 0                                                                                                                                                   
-105 byte ""                                                                              0x                                                                     
+105 byte 0x                                                                              0x                                                                     
 106 len                                                                                  0                                                                      
 107 !                                                                                    1                                                                      
 108 assert                                                                                                                                                      
